@@ -1,0 +1,20 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Excel files (Optional: keep if source is needed, but large files are usually ignored)
+# *.xlsx
+# *.csv
+
+# Local environment / temporary files
+.vscode/
+.idea/
+.DS_Store
+
+# Hidden / System files
+thumb.db
+desktop.ini
+
+# Deployment artifacts from AI
+.gemini/
+brain/
