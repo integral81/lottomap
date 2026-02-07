@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Version: 4.0.0-Directions-Final -->
 <html>
 
 <head>
@@ -170,15 +171,21 @@
         }
 
         .infowindow {
-            padding: 10px;
-            min-width: 180px;
+            padding: 12px;
+            min-width: 200px;
+            min-height: 120px;
+            box-sizing: border-box;
+            background: #fff;
         }
 
         .iw-title {
             font-weight: 700;
-            font-size: 15px;
-            color: var(--primary);
-            margin-bottom: 3px;
+            font-size: 16px;
+            color: #ff0000;
+            /* Bright Red for Version Check */
+            margin-bottom: 5px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
         }
 
         .iw-addr {
@@ -194,6 +201,62 @@
             background: #eee;
             font-size: 10px;
             margin: 0 2px 2px 0;
+        }
+
+        .iw-actions {
+            display: flex !important;
+            gap: 10px;
+            margin-top: 15px;
+            border-top: 2px solid var(--secondary);
+            /* Thicker line for visibility */
+            padding-top: 12px;
+            visibility: visible !important;
+            min-height: 40px;
+        }
+
+        .btn-iw {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+            border: 1px solid #ddd;
+            background: #fff;
+        }
+
+        .btn-iw:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-navi {
+            background: var(--secondary) !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-navi:hover {
+            background: #1565c0 !important;
+        }
+
+        .iw-addr-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9f9f9;
+            padding: 5px 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .iw-addr-box:hover {
+            background: #f0f0f0;
         }
 
         /* GPS Pulse Animation */
@@ -384,399 +447,438 @@
     </style>
 </head>
 
-<div id="toast-container"></div>
-<div id="app">
-    <div id="sidebar">
-        <h1>🎰 KINOV Lotto Map</h1>
-        <div class="section">
-            <span class="section-title">📅 회차 필터 (Round)</span>
-            <div class="input-row">
-                <input type="number" id="minRound" value="262">
-                <span>~</span>
-                <input type="number" id="maxRound" value="1209">
+<body>
+    <!-- Version Confirmation Bar (Debug) -->
+    <div
+        style="background: #fff3cd; color: #856404; padding: 10px; text-align: center; border-bottom: 1px solid #ffeeba; font-weight: bold; font-size: 14px; position: relative; z-index: 9999;">
+        ✅ 4단계(길찾기) 최신 버전 적용됨 (F5를 눌러 확인)
+    </div>
+    <div id="toast-container"></div>
+    <div id="app">
+        <div id="sidebar">
+            <h1>🎰 KINOV Lotto Map</h1>
+            <div class="section">
+                <span class="section-title">📅 회차 필터 (Round)</span>
+                <div class="input-row">
+                    <input type="number" id="minRound" value="262">
+                    <span>~</span>
+                    <input type="number" id="maxRound" value="1209">
+                </div>
             </div>
-        </div>
-        <div class="section">
-            <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
-            <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" id="freq5" checked> 🌟 5회 이상</label>
-                <label class="checkbox-item"><input type="checkbox" id="freq3" checked> 🔴 3~4회</label>
-                <label class="checkbox-item"><input type="checkbox" id="freq1" checked> 🔵 2회 이하</label>
+            <div class="section">
+                <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="freq5" checked> 🌟 5회 이상</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq3" checked> 🔴 3~4회</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq1" checked> 🔵 2회 이하</label>
+                </div>
             </div>
-        </div>
-        <div class="section">
-            <span class="section-title">🎲 당첨 방식 (Method)</span>
-            <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" id="methodAuto" checked> 자동</label>
-                <label class="checkbox-item"><input type="checkbox" id="methodManual" checked> 수동</label>
-                <label class="checkbox-item"><input type="checkbox" id="methodSemi" checked> 반자동</label>
+            <div class="section">
+                <span class="section-title">🎲 당첨 방식 (Method)</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="methodAuto" checked> 자동</label>
+                    <label class="checkbox-item"><input type="checkbox" id="methodManual" checked> 수동</label>
+                    <label class="checkbox-item"><input type="checkbox" id="methodSemi" checked> 반자동</label>
+                </div>
             </div>
-        </div>
-        <button class="btn-apply" onclick="applyFilters()">적용하기</button>
-        <div class="stats-card">
-            <div class="stat-item"><span>전체 데이터</span> <span id="totalDataCount">0</span></div>
-            <div class="stat-item"><span>필터링 결과</span> <span id="filteredCount" class="stat-value">0</span></div>
+            <button class="btn-apply" onclick="applyFilters()">적용하기</button>
+            <div class="stats-card">
+                <div class="stat-item"><span>전체 데이터</span> <span id="totalDataCount">0</span></div>
+                <div class="stat-item"><span>필터링 결과</span> <span id="filteredCount" class="stat-value">0</span></div>
 
-            <!-- Fallback file loader -->
-            <div id="manualLoader" style="display:none; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
-                <p style="font-size:11px; color:#666; margin-bottom:5px;">⚠️ 자동 로드 실패 시 파일을 직접 선택해 주세요.</p>
-                <input type="file" id="fileInput" accept=".json" style="display:none;"
-                    onchange="handleFileSelect(event)">
-                <button class="btn-apply" style="background:#333; font-size:12px; padding:8px;"
-                    onclick="document.getElementById('fileInput').click()">파일 직접 선택하기 (lotto_data.json)</button>
+                <!-- Fallback file loader -->
+                <div id="manualLoader"
+                    style="display:none; margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;">
+                    <p style="font-size:11px; color:#666; margin-bottom:5px;">⚠️ 자동 로드 실패 시 파일을 직접 선택해 주세요.</p>
+                    <input type="file" id="fileInput" accept=".json" style="display:none;"
+                        onchange="handleFileSelect(event)">
+                    <button class="btn-apply" style="background:#333; font-size:12px; padding:8px;"
+                        onclick="document.getElementById('fileInput').click()">파일 직접 선택하기 (lotto_data.json)</button>
+                </div>
+            </div>
+        </div>
+        <div id="map">
+            <div class="gps-button" onclick="requestMyLocation()" title="내 위치 찾기">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
+                </svg>
             </div>
         </div>
     </div>
-    <div id="map">
-        <div class="gps-button" onclick="requestMyLocation()" title="내 위치 찾기">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
-            </svg>
-        </div>
-    </div>
-</div>
 
-<script>
-    let map, clusterer, allData = [], markers = [];
+    <script>
+        let map, clusterer, allData = [], markers = [];
 
-    function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                processLoadedData(data);
-                document.getElementById('manualLoader').style.display = 'none';
-                alert('데이터를 성공적으로 불러왔습니다! (' + data.length + '건)');
-            } catch (err) {
-                alert('파일 형식이 잘못되었습니다: ' + err.message);
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    processLoadedData(data);
+                    document.getElementById('manualLoader').style.display = 'none';
+                    alert('데이터를 성공적으로 불러왔습니다! (' + data.length + '건)');
+                } catch (err) {
+                    alert('파일 형식이 잘못되었습니다: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processLoadedData(data) {
+            allData = data;
+
+            // Calculate win count per shop (Name + Address)
+            const shopWins = {};
+            data.forEach(item => {
+                const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                shopWins[key] = (shopWins[key] || 0) + 1;
+            });
+            // Attach individual shop win count to each record
+            let highWinCount = 0;
+            data.forEach(item => {
+                const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                item.totalWins = shopWins[key];
+                if (item.totalWins >= 5) highWinCount++;
+            });
+            console.log('Grouped Shops:', Object.keys(shopWins).length);
+            console.log('Records with 5+ wins:', highWinCount);
+
+            document.getElementById('totalDataCount').innerText = data.length.toLocaleString();
+            if (data.length > 0) {
+                const rounds = data.map(d => d.r);
+                const maxR = Math.max(...rounds);
+                const minR = Math.min(...rounds);
+                document.getElementById('maxRound').value = maxR;
+                document.getElementById('minRound').value = minR;
             }
+            applyFilters();
+        }
+
+        window.onload = function () {
+            if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
+                handleScriptError();
+                return;
+            }
+
+            const mapContainer = document.getElementById('map');
+            const mapOption = { center: new kakao.maps.LatLng(36.2683, 127.6358), level: 12 };
+            map = new kakao.maps.Map(mapContainer, mapOption);
+
+            clusterer = new kakao.maps.MarkerClusterer({
+                map: map, averageCenter: true, minLevel: 10,
+                styles: [{
+                    width: '40px', height: '40px', background: 'rgba(211, 47, 47, 0.8)',
+                    color: '#fff', textAlign: 'center', lineHeight: '40px',
+                    borderRadius: '20px', fontWeight: 'bold'
+                }]
+            });
+
+            loadData();
         };
-        reader.readAsText(file);
-    }
 
-    function processLoadedData(data) {
-        allData = data;
-
-        // Calculate win count per shop (Name + Address)
-        const shopWins = {};
-        data.forEach(item => {
-            const key = (item.n || '').trim() + '|' + (item.a || '').trim();
-            shopWins[key] = (shopWins[key] || 0) + 1;
-        });
-        // Attach individual shop win count to each record
-        let highWinCount = 0;
-        data.forEach(item => {
-            const key = (item.n || '').trim() + '|' + (item.a || '').trim();
-            item.totalWins = shopWins[key];
-            if (item.totalWins >= 5) highWinCount++;
-        });
-        console.log('Grouped Shops:', Object.keys(shopWins).length);
-        console.log('Records with 5+ wins:', highWinCount);
-
-        document.getElementById('totalDataCount').innerText = data.length.toLocaleString();
-        if (data.length > 0) {
-            const rounds = data.map(d => d.r);
-            const maxR = Math.max(...rounds);
-            const minR = Math.min(...rounds);
-            document.getElementById('maxRound').value = maxR;
-            document.getElementById('minRound').value = minR;
-        }
-        applyFilters();
-    }
-
-    window.onload = function () {
-        if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
-            handleScriptError();
-            return;
+        function loadData() {
+            const countEl = document.getElementById('totalDataCount');
+            console.log('Loading lotto_data.json...');
+            fetch('lotto_data.json?v=' + Date.now())
+                .then(res => {
+                    if (!res.ok) throw new Error('파일을 찾을 수 없습니다 (Status: ' + res.status + ')');
+                    return res.json();
+                })
+                .then(data => {
+                    processLoadedData(data); // Call the updated processLoadedData
+                })
+                .catch(err => {
+                    console.error('Data load failed:', err);
+                    countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패 (${err.name})</span>`;
+                    document.getElementById('manualLoader').style.display = 'block';
+                    alert('데이터 파일(lotto_data.json) 로드 중에 에러가 발생했습니다.\n\n에러 내용: ' + err.message + '\n\n하단의 [파일 직접 선택하기] 버튼을 통해 파일을 직접 불러와 주세요.');
+                });
         }
 
-        const mapContainer = document.getElementById('map');
-        const mapOption = { center: new kakao.maps.LatLng(36.2683, 127.6358), level: 12 };
-        map = new kakao.maps.Map(mapContainer, mapOption);
+        function applyFilters() {
+            const minR = parseInt(document.getElementById('minRound').value) || 0;
+            const maxR = parseInt(document.getElementById('maxRound').value) || 9999;
+            const auto = document.getElementById('methodAuto').checked;
+            const manual = document.getElementById('methodManual').checked;
+            const semi = document.getElementById('methodSemi').checked;
 
-        clusterer = new kakao.maps.MarkerClusterer({
-            map: map, averageCenter: true, minLevel: 10,
-            styles: [{
-                width: '40px', height: '40px', background: 'rgba(211, 47, 47, 0.8)',
-                color: '#fff', textAlign: 'center', lineHeight: '40px',
-                borderRadius: '20px', fontWeight: 'bold'
-            }]
-        });
+            // Frequency Filters
+            const f5 = document.getElementById('freq5').checked;
+            const f3 = document.getElementById('freq3').checked;
+            const f1 = document.getElementById('freq1').checked;
 
-        loadData();
-    };
+            const filtered = allData.filter(d => {
+                const rMatch = d.r >= minR && d.r <= maxR;
+                let mMatch = false;
+                if (auto && d.m.includes('자동')) mMatch = true;
+                if (manual && d.m.includes('수동')) mMatch = true;
+                if (semi && d.m.includes('반자동')) mMatch = true;
 
-    function loadData() {
-        const countEl = document.getElementById('totalDataCount');
-        console.log('Loading lotto_data.json...');
-        fetch('lotto_data.json?v=' + Date.now())
-            .then(res => {
-                if (!res.ok) throw new Error('파일을 찾을 수 없습니다 (Status: ' + res.status + ')');
-                return res.json();
-            })
-            .then(data => {
-                processLoadedData(data); // Call the updated processLoadedData
-            })
-            .catch(err => {
-                console.error('Data load failed:', err);
-                countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패 (${err.name})</span>`;
-                document.getElementById('manualLoader').style.display = 'block';
-                alert('데이터 파일(lotto_data.json) 로드 중에 에러가 발생했습니다.\n\n에러 내용: ' + err.message + '\n\n하단의 [파일 직접 선택하기] 버튼을 통해 파일을 직접 불러와 주세요.');
-            });
-    }
+                let fMatch = false;
+                if (f5 && d.totalWins >= 5) fMatch = true;
+                if (f3 && d.totalWins >= 3 && d.totalWins <= 4) fMatch = true;
+                if (f1 && d.totalWins <= 2) fMatch = true;
 
-    function applyFilters() {
-        const minR = parseInt(document.getElementById('minRound').value) || 0;
-        const maxR = parseInt(document.getElementById('maxRound').value) || 9999;
-        const auto = document.getElementById('methodAuto').checked;
-        const manual = document.getElementById('methodManual').checked;
-        const semi = document.getElementById('methodSemi').checked;
-
-        // Frequency Filters
-        const f5 = document.getElementById('freq5').checked;
-        const f3 = document.getElementById('freq3').checked;
-        const f1 = document.getElementById('freq1').checked;
-
-        const filtered = allData.filter(d => {
-            const rMatch = d.r >= minR && d.r <= maxR;
-            let mMatch = false;
-            if (auto && d.m.includes('자동')) mMatch = true;
-            if (manual && d.m.includes('수동')) mMatch = true;
-            if (semi && d.m.includes('반자동')) mMatch = true;
-
-            let fMatch = false;
-            if (f5 && d.totalWins >= 5) fMatch = true;
-            if (f3 && d.totalWins >= 3 && d.totalWins <= 4) fMatch = true;
-            if (f1 && d.totalWins <= 2) fMatch = true;
-
-            return rMatch && mMatch && fMatch;
-        });
-
-        document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
-        updateMarkers(filtered);
-    }
-
-    function updateMarkers(data) {
-        clusterer.clear();
-        markers.forEach(m => m.setMap(null));
-        markers = [];
-
-        // To avoid duplicate markers for the same shop at the same location,
-        // we need to group the filtered data by shop (lat, lng, name, address)
-        // and then create a single marker for each unique shop.
-        const uniqueShops = {};
-        data.forEach(d => {
-            const key = `${d.lat}_${d.lng}_${d.n}_${d.a}`;
-            if (!uniqueShops[key]) {
-                uniqueShops[key] = {
-                    n: d.n,
-                    a: d.a,
-                    lat: d.lat,
-                    lng: d.lng,
-                    totalWins: d.totalWins, // This is the total wins for the shop
-                    rounds: [] // To store individual round details for infowindow
-                };
-            }
-            uniqueShops[key].rounds.push({ r: d.r, m: d.m });
-        });
-
-        Object.values(uniqueShops).forEach(shop => {
-            let markerImg = null;
-            // Tiered Styles
-            if (shop.totalWins >= 5) {
-                // Legendary Gold Star
-                markerImg = new kakao.maps.MarkerImage(
-                    'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
-                    new kakao.maps.Size(24, 35)
-                );
-            } else if (shop.totalWins >= 3) {
-                // Professional Red
-                markerImg = new kakao.maps.MarkerImage(
-                    'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png',
-                    new kakao.maps.Size(24, 35),
-                    { offset: new kakao.maps.Point(12, 35) }
-                );
-            }
-
-            const marker = new kakao.maps.Marker({
-                position: new kakao.maps.LatLng(shop.lat, shop.lng),
-                image: markerImg
+                return rMatch && mMatch && fMatch;
             });
 
-            const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
-            const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+            document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
+            updateMarkers(filtered);
+        }
 
-            const content = `
+        function updateMarkers(data) {
+            clusterer.clear();
+            markers.forEach(m => m.setMap(null));
+            markers = [];
+
+            // To avoid duplicate markers for the same shop at the same location,
+            // we need to group the filtered data by shop (lat, lng, name, address)
+            // and then create a single marker for each unique shop.
+            const uniqueShops = {};
+            data.forEach(d => {
+                const key = `${d.lat}_${d.lng}_${d.n}_${d.a}`;
+                if (!uniqueShops[key]) {
+                    uniqueShops[key] = {
+                        n: d.n,
+                        a: d.a,
+                        lat: d.lat,
+                        lng: d.lng,
+                        totalWins: d.totalWins, // This is the total wins for the shop
+                        rounds: [] // To store individual round details for infowindow
+                    };
+                }
+                uniqueShops[key].rounds.push({ r: d.r, m: d.m });
+            });
+
+            Object.values(uniqueShops).forEach(shop => {
+                let markerImg = null;
+                // Tiered Styles
+                if (shop.totalWins >= 5) {
+                    // Legendary Gold Star
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+                        new kakao.maps.Size(24, 35)
+                    );
+                } else if (shop.totalWins >= 3) {
+                    // Professional Red
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png',
+                        new kakao.maps.Size(24, 35),
+                        { offset: new kakao.maps.Point(12, 35) }
+                    );
+                }
+
+                const marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(shop.lat, shop.lng),
+                    image: markerImg
+                });
+
+                const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
+                const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+
+                const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+                const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+
+                const content = `
                     <div class="infowindow">
                         <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
-                        <div class="iw-addr">${shop.a}</div>
+                        <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
+                            <span class="iw-addr">${shop.a}</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
                         <div class="iw-details">${roundTagsHtml}</div>
+                        <div class="iw-actions">
+                            <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
+                                🚗 길찾기
+                            </button>
+                        </div>
                     </div>
                 `;
 
-            const infowindow = new kakao.maps.InfoWindow({
-                content: content,
-                removable: true
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: content,
+                    removable: true
+                });
+
+                kakao.maps.event.addListener(marker, 'click', () => {
+                    infowindow.open(map, marker);
+                });
+
+                markers.push(marker);
             });
-
-            kakao.maps.event.addListener(marker, 'click', () => {
-                infowindow.open(map, marker);
-            });
-
-            markers.push(marker);
-        });
-        clusterer.addMarkers(markers);
-    }
-
-    /**
-     * GPS Location Service Module
-     * Handles user positioning, nearest shop calculation, and UI feedback (Toasts).
-     */
-    let myLocationMarker = null;
-
-    function requestMyLocation() {
-        if (!navigator.onLine) {
-            showToast("🌐 인터넷 연결이 끊겨 있습니다. 네트워크를 확인해 주세요.", "error");
-            return;
+            clusterer.addMarkers(markers);
         }
 
-        if (!navigator.geolocation) {
-            showToast("🚫 이 브라우저에서는 위치 정보를 사용할 수 없습니다.", "error");
-            return;
-        }
+        /**
+         * GPS Location Service Module
+         * Handles user positioning, nearest shop calculation, and UI feedback (Toasts).
+         */
+        let myLocationMarker = null;
 
-        const gpsBtn = document.querySelector('.gps-button');
-        if (gpsBtn) gpsBtn.classList.add('loading');
+        function requestMyLocation() {
+            if (!navigator.onLine) {
+                showToast("🌐 인터넷 연결이 끊겨 있습니다. 네트워크를 확인해 주세요.", "error");
+                return;
+            }
 
-        // GPS Permission & Fetch
-        navigator.geolocation.getCurrentPosition(
-            (pos) => {
-                if (gpsBtn) gpsBtn.classList.remove('loading');
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
-                const center = new kakao.maps.LatLng(lat, lng);
+            if (!navigator.geolocation) {
+                showToast("🚫 이 브라우저에서는 위치 정보를 사용할 수 없습니다.", "error");
+                return;
+            }
 
-                map.setCenter(center);
+            const gpsBtn = document.querySelector('.gps-button');
+            if (gpsBtn) gpsBtn.classList.add('loading');
 
-                // Close all infowindows to clear the view
-                if (typeof clusterer !== 'undefined') {
-                    // There's no direct 'closeAll' on clusterer, but we can just let it be
-                }
+            // GPS Permission & Fetch
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    if (gpsBtn) gpsBtn.classList.remove('loading');
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const center = new kakao.maps.LatLng(lat, lng);
 
-                // Add/Update Blue Dot Marker
-                if (!myLocationMarker) {
-                    myLocationMarker = new kakao.maps.CustomOverlay({
-                        position: center,
-                        content: `
+                    map.setCenter(center);
+
+                    // Close all infowindows to clear the view
+                    if (typeof clusterer !== 'undefined') {
+                        // There's no direct 'closeAll' on clusterer, but we can just let it be
+                    }
+
+                    // Add/Update Blue Dot Marker
+                    if (!myLocationMarker) {
+                        myLocationMarker = new kakao.maps.CustomOverlay({
+                            position: center,
+                            content: `
                                 <div style="position:relative;">
                                     <div class="pulse"></div>
                                     <div style="width:16px; height:16px; background:#1976d2; border:2px solid #fff; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.5); position:relative; z-index:2; transform: translate(-50%, -50%);"></div>
                                 </div>
                             `,
-                        map: map,
-                        zIndex: 1001
-                    });
-                } else {
-                    myLocationMarker.setPosition(center);
-                    myLocationMarker.setMap(map);
-                }
+                            map: map,
+                            zIndex: 1001
+                        });
+                    } else {
+                        myLocationMarker.setPosition(center);
+                        myLocationMarker.setMap(map);
+                    }
 
-                findNearestShop(lat, lng);
-            },
-            (err) => {
-                console.error("GPS Error:", err);
-                if (gpsBtn) gpsBtn.classList.remove('loading');
-                let msg = "위치 정보를 가져오는 데 실패했습니다.";
-                switch (err.code) {
-                    case 1:
-                        msg = "위치 정보 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해 주세요.";
-                        break;
-                    case 2:
-                        msg = "위치 정보를 사용할 수 없습니다. GPS가 켜져 있는지 확인해 주세요.";
-                        break;
-                    case 3:
-                        msg = "위치 정보를 가져오는 데 시간이 초과되었습니다. 다시 시도해 보세요.";
-                        break;
-                }
-                showToast(msg, "error");
-            },
-            { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
-        );
-    }
-
-    function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-    }
-
-    function findNearestShop(lat, lng) {
-        if (typeof allData === 'undefined' || allData.length === 0) return;
-
-        // Sort all shops by distance
-        const sortedShops = allData.map(shop => {
-            return {
-                ...shop,
-                distance: getDistance(lat, lng, shop.lat, shop.lng)
-            };
-        }).sort((a, b) => a.distance - b.distance);
-
-        // Take top 5
-        const top5 = sortedShops.slice(0, 5);
-
-        if (top5.length > 0) {
-            let msg = "📍 주변 1등 배출점 (가까운 순)\n";
-            top5.forEach((shop, index) => {
-                const distStr = shop.distance < 1 ? Math.round(shop.distance * 1000) + "m" : shop.distance.toFixed(1) + "km";
-                msg += `${index + 1}. ${shop.n} (${distStr})\n`;
-            });
-            showToast(msg, "success");
-
-            // Adaptive Zoom: Fit my location and top nearest shops
-            const bounds = new kakao.maps.LatLngBounds();
-            bounds.extend(new kakao.maps.LatLng(lat, lng));
-
-            // Only include shops within 20km for the initial view to avoid extreme zoom out
-            top5.forEach(shop => {
-                if (shop.distance < 20) {
-                    bounds.extend(new kakao.maps.LatLng(shop.lat, shop.lng));
-                }
-            });
-
-            map.setBounds(bounds, 80, 80, 80, 80); // generous padding
+                    findNearestShop(lat, lng);
+                },
+                (err) => {
+                    console.error("GPS Error:", err);
+                    if (gpsBtn) gpsBtn.classList.remove('loading');
+                    let msg = "위치 정보를 가져오는 데 실패했습니다.";
+                    switch (err.code) {
+                        case 1:
+                            msg = "위치 정보 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해 주세요.";
+                            break;
+                        case 2:
+                            msg = "위치 정보를 사용할 수 없습니다. GPS가 켜져 있는지 확인해 주세요.";
+                            break;
+                        case 3:
+                            msg = "위치 정보를 가져오는 데 시간이 초과되었습니다. 다시 시도해 보세요.";
+                            break;
+                    }
+                    showToast(msg, "error");
+                },
+                { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
+            );
         }
-    }
 
-    function showToast(message, type = "info") {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerText = message;
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
 
-        container.appendChild(toast);
+        function findNearestShop(lat, lng) {
+            if (typeof allData === 'undefined' || allData.length === 0) return;
 
-        // Force reflow
-        toast.offsetHeight;
+            // Sort all shops by distance
+            const sortedShops = allData.map(shop => {
+                return {
+                    ...shop,
+                    distance: getDistance(lat, lng, shop.lat, shop.lng)
+                };
+            }).sort((a, b) => a.distance - b.distance);
 
-        toast.classList.add('show');
+            // Take top 5
+            const top5 = sortedShops.slice(0, 5);
 
-        setTimeout(() => {
-            toast.classList.remove('show');
+            if (top5.length > 0) {
+                let msg = "📍 주변 1등 배출점 (가까운 순)\n";
+                top5.forEach((shop, index) => {
+                    const distStr = shop.distance < 1 ? Math.round(shop.distance * 1000) + "m" : shop.distance.toFixed(1) + "km";
+                    msg += `${index + 1}. ${shop.n} (${distStr})\n`;
+                });
+                showToast(msg, "success");
+
+                // Adaptive Zoom: Fit my location and top nearest shops
+                const bounds = new kakao.maps.LatLngBounds();
+                bounds.extend(new kakao.maps.LatLng(lat, lng));
+
+                // Only include shops within 20km for the initial view to avoid extreme zoom out
+                top5.forEach(shop => {
+                    if (shop.distance < 20) {
+                        bounds.extend(new kakao.maps.LatLng(shop.lat, shop.lng));
+                    }
+                });
+
+                map.setBounds(bounds, 80, 80, 80, 80); // generous padding
+            }
+        }
+
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerText = message;
+
+            container.appendChild(toast);
+
+            // Force reflow
+            toast.offsetHeight;
+
+            toast.classList.add('show');
+
             setTimeout(() => {
-                container.removeChild(toast);
-            }, 300);
-        }, 5000);
-    }
-</script>
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode === container) {
+                        container.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("📋 주소가 클립보드에 복사되었습니다.", "success");
+            } catch (err) {
+                showToast("복사 실패", "error");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function openDirections(lat, lng, name) {
+            const url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+            window.open(url, '_blank');
+        }
+    </script>
 </body>
 
 </html>
