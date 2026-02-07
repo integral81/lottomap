@@ -7,11 +7,19 @@ import re
 from pathlib import Path
 import time
 
+
 # --- CONFIGURATION ---
 JSON_FILE = "lotto_data.json"
 EXCEL_FILE = "temp_data.xlsx"
 CACHE_FILE = "geocoded_cache_healthy.xlsx"
+HISTORIC_FILE = "lotto_historic_numbers_1_1209_Final.xlsx"
 KAKAO_API_KEY = os.environ.get("KAKAO_REST_API_KEY") # Set this in GitHub Secrets
+
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Referer': 'https://www.dhlottery.co.kr/',
+}
 
 def normalize_address(addr):
     if not isinstance(addr, str): return addr
@@ -52,7 +60,7 @@ def scrape_round(draw_no):
     print(f"Scraping round {draw_no}...")
     url = f"https://www.dhlottery.co.kr/gameResult.do?method=byWin765&drwNo={draw_no}"
     try:
-        response = requests.get(url, timeout=15)
+        response = requests.get(url, headers=HEADERS, timeout=15)
         soup = BeautifulSoup(response.text, 'html.parser')
         
         # The 1st prize winner table is usually the first table with tbl_data
@@ -81,6 +89,56 @@ def scrape_round(draw_no):
         print(f"Scraping error for round {draw_no}: {e}")
         return []
 
+
+def scrape_winning_numbers(draw_no):
+    print(f"Scraping numbers for round {draw_no}...")
+    url = f"https://www.dhlottery.co.kr/gameResult.do?method=byWin765&drwNo={draw_no}"
+    try:
+        response = requests.get(url, headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        div_win = soup.find('div', class_='win_result')
+        if not div_win: return None
+        
+        # Numbers are in spans inside <div class="num win">
+        num_div = div_win.find('div', class_='num win')
+        if not num_div: return None
+        
+        spans = num_div.find_all('span', class_='ball_645')
+        # Expect 6 numbers
+        nums = [int(s.get_text()) for s in spans][:6]
+        return nums
+    except Exception as e:
+        print(f"Error scraping numbers for {draw_no}: {e}")
+        return None
+
+def update_historic_file(draw_no, numbers):
+    if not Path(HISTORIC_FILE).exists():
+        print(f"{HISTORIC_FILE} not found. Skipping update.")
+        return
+
+    try:
+        df = pd.read_excel(HISTORIC_FILE)
+        # Check if round exists
+        if draw_no in df['회차'].values:
+            print(f"Round {draw_no} already in historic file.")
+            return
+            
+        # Create new row
+        new_row = {'회차': draw_no}
+        for i, n in enumerate(numbers, 1):
+            new_row[f'번호{i}'] = n
+            
+        # Append
+        df = pd.concat([pd.DataFrame([new_row]), df], ignore_index=True)
+        # Sort desc
+        df = df.sort_values(by='회차', ascending=False)
+        
+        df.to_excel(HISTORIC_FILE, index=False)
+        print(f"Updated {HISTORIC_FILE} with round {draw_no} numbers: {numbers}")
+    except Exception as e:
+        print(f"Failed to update historic file: {e}")
+
 def main():
     # 1. Load existing data to find last round
     if not Path(JSON_FILE).exists():
@@ -95,7 +153,7 @@ def main():
     
     # Check current round from Donghaeng Lotto
     try:
-        res = requests.get("https://www.dhlottery.co.kr/common.do?method=main", timeout=10)
+        res = requests.get("https://www.dhlottery.co.kr/common.do?method=main", headers=HEADERS, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
         # Find the latest round number in the main page
         latest_text = soup.find('strong', id='lottoDrwNo')
@@ -116,6 +174,12 @@ def main():
     # 2. Scrape new rounds
     new_records_base = []
     for r in range(last_round + 1, current_round + 1):
+        # Update winning numbers history
+        nums = scrape_winning_numbers(r)
+        if nums:
+             update_historic_file(r, nums)
+
+        # Scrape store locations
         recs = scrape_round(r)
         if recs:
             new_records_base.extend(recs)

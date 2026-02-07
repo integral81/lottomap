@@ -2,8 +2,8 @@ name: Weekly Lotto Data Update
 
 on:
   schedule:
-    # Runs at 12:00 UTC (21:00 KST) every Saturday
-    - cron: '0 12 * * 6'
+    # Runs at 15:00 UTC (00:00 KST Sunday) to avoid traffic peak
+    - cron: '0 15 * * 6'
   workflow_dispatch: # Allows manual trigger
 
 jobs:
