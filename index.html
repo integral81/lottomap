@@ -1169,33 +1169,61 @@
         }
 
         function shareToKakao() {
-            // Initialize Kakao SDK if not already initialized
-            if (!window.Kakao.isInitialized()) {
-                window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d'); // Using the same JavaScript key
-            }
+            try {
+                console.log('[Kakao Share] Function called');
 
-            // Send KakaoTalk share message with k-inov.co.kr link
-            window.Kakao.Share.sendDefault({
-                objectType: 'feed',
-                content: {
-                    title: '🎰 KINOV 로또 명당 지도',
-                    description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.',
-                    imageUrl: 'https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/preview.png',
-                    link: {
-                        mobileWebUrl: 'https://www.k-inov.co.kr',
-                        webUrl: 'https://www.k-inov.co.kr'
-                    }
-                },
-                buttons: [
-                    {
-                        title: 'KINOV 방문하기',
+                // Check if Kakao SDK is loaded
+                if (typeof window.Kakao === 'undefined') {
+                    console.error('[Kakao Share] Kakao SDK not loaded');
+                    alert('카카오 SDK가 로드되지 않았습니다. 페이지를 새로고침해 주세요.');
+                    return;
+                }
+
+                console.log('[Kakao Share] Kakao SDK loaded successfully');
+
+                // Initialize Kakao SDK if not already initialized
+                if (!window.Kakao.isInitialized()) {
+                    console.log('[Kakao Share] Initializing Kakao SDK...');
+                    window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d');
+                    console.log('[Kakao Share] Kakao SDK initialized');
+                } else {
+                    console.log('[Kakao Share] Kakao SDK already initialized');
+                }
+
+                // Prepare share data
+                const shareData = {
+                    objectType: 'feed',
+                    content: {
+                        title: '🎰 KINOV 로또 명당 지도',
+                        description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.',
+                        imageUrl: 'https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/preview.png',
                         link: {
                             mobileWebUrl: 'https://www.k-inov.co.kr',
                             webUrl: 'https://www.k-inov.co.kr'
                         }
-                    }
-                ]
-            });
+                    },
+                    buttons: [
+                        {
+                            title: 'KINOV 방문하기',
+                            link: {
+                                mobileWebUrl: 'https://www.k-inov.co.kr',
+                                webUrl: 'https://www.k-inov.co.kr'
+                            }
+                        }
+                    ]
+                };
+
+                console.log('[Kakao Share] Sending share data:', shareData);
+
+                // Send KakaoTalk share message
+                window.Kakao.Share.sendDefault(shareData);
+
+                console.log('[Kakao Share] Share dialog opened successfully');
+
+            } catch (error) {
+                console.error('[Kakao Share] Error:', error);
+                alert('카카오톡 공유 중 오류가 발생했습니다.\n\n오류: ' + error.message + '\n\n브라우저 콘솔(F12)을 확인해 주세요.');
+            }
         }
     </script>
 </body>
