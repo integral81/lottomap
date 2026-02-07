@@ -139,6 +139,29 @@ def update_historic_file(draw_no, numbers):
     except Exception as e:
         print(f"Failed to update historic file: {e}")
 
+def build_history_json():
+    OUTPUT_JSON = "lotto_history.json"
+    if not Path(HISTORIC_FILE).exists():
+        return
+
+    try:
+        df = pd.read_excel(HISTORIC_FILE)
+        history_map = {}
+        for _, row in df.iterrows():
+            round_num = int(row['회차'])
+            # Assuming columns like 번호1, 번호2... match the file structure
+            numbers = [
+                int(row['번호1']), int(row['번호2']), int(row['번호3']), 
+                int(row['번호4']), int(row['번호5']), int(row['번호6'])
+            ]
+            history_map[str(round_num)] = numbers
+            
+        with open(OUTPUT_JSON, 'w', encoding='utf-8') as f:
+            json.dump(history_map, f, ensure_ascii=False, indent=None)
+        print(f"Rebuilt {OUTPUT_JSON}.")
+    except Exception as e:
+        print(f"Error building JSON: {e}")
+
 def main():
     # 1. Load existing data to find last round
     if not Path(JSON_FILE).exists():
@@ -240,6 +263,9 @@ def main():
     if cache:
         new_cache_df = pd.DataFrame([{'a': k, 'lat': v[0], 'lng': v[1]} for k, v in cache.items()])
         new_cache_df.to_excel(CACHE_FILE, index=False)
+
+    # Rebuild history JSON for frontend
+    build_history_json()
 
     print(f"Successfully added {len(final_new_records)} new records up to round {current_round}.")
 

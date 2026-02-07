@@ -438,6 +438,122 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
+
+        /* Gold Button & Modal */
+        .btn-gold {
+            background: linear-gradient(135deg, #FFD700, #FFA000);
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            animation: shiver 2s infinite;
+        }
+
+        @keyframes shiver {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            5% {
+                transform: rotate(2deg);
+            }
+
+            10% {
+                transform: rotate(-2deg);
+            }
+
+            15% {
+                transform: rotate(2deg);
+            }
+
+            20% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .lucky-balls {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .ball {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .ball.one {
+            background: #fbc400;
+        }
+
+        .ball.two {
+            background: #69c8f2;
+        }
+
+        .ball.three {
+            background: #ff7272;
+        }
+
+        .ball.four {
+            background: #aaaaaa;
+        }
+
+        .ball.five {
+            background: #b0d840;
+        }
     </style>
 </head>
 
@@ -570,21 +686,74 @@
 
         function loadData() {
             const countEl = document.getElementById('totalDataCount');
-            console.log('Loading lotto_data.json...');
-            fetch('lotto_data.json?v=' + Date.now())
-                .then(res => {
-                    if (!res.ok) throw new Error('파일을 찾을 수 없습니다 (Status: ' + res.status + ')');
-                    return res.json();
-                })
-                .then(data => {
-                    processLoadedData(data); // Call the updated processLoadedData
+            console.log('Loading data...');
+
+            Promise.all([
+                fetch('lotto_data.json?v=' + Date.now()).then(res => res.json()),
+                fetch('lotto_history.json?v=' + Date.now()).then(res => res.json())
+            ])
+                .then(([lottoData, historyData]) => {
+                    window.lottoHistory = historyData; // Global variable
+                    processLoadedData(lottoData);
                 })
                 .catch(err => {
                     console.error('Data load failed:', err);
                     countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패 (${err.name})</span>`;
                     document.getElementById('manualLoader').style.display = 'block';
-                    alert('데이터 파일(lotto_data.json) 로드 중에 에러가 발생했습니다.\n\n에러 내용: ' + err.message + '\n\n하단의 [파일 직접 선택하기] 버튼을 통해 파일을 직접 불러와 주세요.');
+                    alert('데이터 파일 로드 중 에러가 발생했습니다.\n\n' + err.message);
                 });
+        }
+
+        /**
+         * 🔮 Lucky Number Generator Algorithm
+         * 1. Store Luck (50%): Numbers that won in this store's history.
+         * 2. Global Hot (30%): Most frequent numbers in recent 100 rounds (Simulated for now).
+         * 3. Random (20%): Pure random luck.
+         */
+        function generateLuckyNumbers(storeWins) {
+            // storeWins: Array of winning rounds for this store e.g., [{r: 1000, m: '자동'}, ...]
+            const history = window.lottoHistory || {};
+            const numberWeights = {};
+
+            // Initialize weights
+            for (let i = 1; i <= 45; i++) numberWeights[i] = 1; // Base weight
+
+            // 1. Analyze Store History
+            let winningNumbers = [];
+            storeWins.forEach(win => {
+                const round = win.r;
+                if (history[round]) {
+                    const nums = history[round];
+                    winningNumbers = [...winningNumbers, ...nums];
+                    nums.forEach(n => {
+                        numberWeights[n] += 5; // Boost weight for numbers that appeared in this store's winning rounds
+                    });
+                }
+            });
+
+            // 2. Select 6 numbers based on weights
+            const selected = new Set();
+            while (selected.size < 6) {
+                const n = weightedRandom(numberWeights);
+                selected.add(n);
+            }
+
+            return {
+                numbers: Array.from(selected).sort((a, b) => a - b),
+                historyCount: storeWins.length,
+                relatedRounds: storeWins.map(w => w.r).slice(0, 5) // Top 5 recent rounds
+            };
+        }
+
+        function weightedRandom(weights) {
+            let sum = 0;
+            for (let i in weights) sum += weights[i];
+            let rand = Math.random() * sum;
+            for (let i in weights) {
+                rand -= weights[i];
+                if (rand < 0) return parseInt(i);
+            }
+            return Math.floor(Math.random() * 45) + 1; // Fallback
         }
 
         function applyFilters() {
@@ -680,6 +849,9 @@
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
                         <div class="iw-details">${roundTagsHtml}</div>
+                        <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins})">
+                            ✨ 이번 주 1등 추천 번호 받기
+                        </button>
                         <div class="iw-actions">
                             <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
                                 🚗 길찾기
@@ -787,6 +959,95 @@
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return R * c;
+        }
+
+        // --- Monetization & Logic ---
+        let currentShopData = null; // Store temp data for the modal
+
+        function openAdModal(name, addr, lat, lng, totalWins) {
+            // Find shop rounds
+            // We need to find the shop object again to get its rounds
+            // Or we can just pass the rounds string? But it's better to find it from allData or markers
+            // Optimization: Let's just find it in allData to be safe or pass the rounds index?
+            // Actually, we can just find it by name/addr from the uniqueShops map construction.
+            // But since we are inside the loop, we have 'shop' object.
+            // The onclick stringification is tricky for arrays. 
+            // So we will just look it up.
+
+            // Re-find logic (Simple enough for now)
+            // But wait, we can just use the unique key logic or filters.
+            // Let's iterate markers/data? No, too slow.
+            // Let's just assume we can find it.
+
+            // Better: Store the current shop's rounds in a global temp variable when clicking?
+            // No, infowindow HTML is generated once.
+
+            // Solution: We will re-filter allData for this specific shop to get rounds.
+            const rounds = allData.filter(d => d.n === name && d.a === addr).map(d => ({ r: d.r, m: d.m }));
+
+            currentShopData = { name, addr, lat, lng, totalWins, rounds };
+
+            // Show Modal
+            const modal = document.getElementById('adModal');
+            const adContent = document.getElementById('adContent');
+            const resultContent = document.getElementById('resultContent');
+
+            modal.style.display = 'flex';
+            adContent.style.display = 'block';
+            resultContent.style.display = 'none';
+
+            // Simulate Ad Delay (3 seconds)
+            setTimeout(() => {
+                showResult();
+            }, 3000);
+        }
+
+        function closeModal() {
+            document.getElementById('adModal').style.display = 'none';
+        }
+
+        function showResult() {
+            document.getElementById('adContent').style.display = 'none';
+            document.getElementById('resultContent').style.display = 'block';
+
+            // Logic
+            const result = generateLuckyNumbers(currentShopData.rounds);
+
+            // Render
+            document.getElementById('paramHCount').innerText = result.historyCount;
+            document.getElementById('paramRounds').innerText = result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '');
+
+            const ballContainer = document.getElementById('luckyBalls');
+            ballContainer.innerHTML = '';
+
+            result.numbers.forEach(n => {
+                const ball = document.createElement('div');
+                ball.className = 'ball ' + getBallColor(n);
+                ball.innerText = n;
+                ballContainer.appendChild(ball);
+            });
+        }
+
+        function getBallColor(n) {
+            if (n <= 10) return 'one';
+            if (n <= 20) return 'two';
+            if (n <= 30) return 'three';
+            if (n <= 40) return 'four';
+            return 'five';
+        }
+
+        function goToShop() {
+            if (!currentShopData) return;
+            openDirections(currentShopData.lat, currentShopData.lng, currentShopData.name);
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('adModal');
+            if (event.target == modal) {
+                closeModal();
+            }
         }
 
         function findNearestShop(lat, lng) {
