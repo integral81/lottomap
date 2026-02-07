@@ -564,6 +564,53 @@
         .ball.five {
             background: #b0d840;
         }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            #app {
+                flex-direction: column !important;
+            }
+
+            #sidebar {
+                width: 100% !important;
+                height: auto !important;
+                max-height: 50vh !important;
+                order: 2 !important;
+                padding: 15px !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            #map {
+                order: 1 !important;
+                height: 50vh !important;
+                min-height: 300px !important;
+            }
+
+            h1 {
+                font-size: 18px !important;
+                margin: 0 0 15px 0 !important;
+            }
+
+            .section {
+                margin-bottom: 15px !important;
+                padding-bottom: 15px !important;
+            }
+
+            .section-title {
+                font-size: 13px !important;
+            }
+
+            .btn-apply {
+                font-size: 14px !important;
+                padding: 12px !important;
+            }
+
+            .stats-card {
+                font-size: 12px !important;
+                padding: 12px !important;
+            }
+        }
     </style>
 </head>
 
