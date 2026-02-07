@@ -499,7 +499,7 @@
             padding: 25px;
             border-radius: 15px;
             width: 90%;
-            max-width: 400px;
+            max-width: 600px;
             text-align: center;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             position: relative;
@@ -613,20 +613,12 @@
         <div id="adModal" class="modal">
             <div class="modal-content">
                 <span class="modal-close" onclick="closeModal()">&times;</span>
-                <div id="adContent">
-                    <h2 style="color:#d32f2f;">✨ 당첨 기운 분석 중... ✨</h2>
-                    <div style="margin:20px 0; font-size:50px;">⏳</div>
-                    <p style="font-size:16px; font-weight:bold; line-height:1.6;">
-                        <a href="#" onclick="shareToKakao()"
-                            style="color:#1976d2; text-decoration:underline;">www.k-inov.com</a> 링크를<br>
-                        카카오친구에게 추천하시면<br>
-                        <span style="color:#d32f2f;">2%의 적립금</span>이 생깁니다.
-                    </p>
-                    <p style="margin-top:10px; font-size:14px; color:#666;">
-                        역대 1위 번호를 바탕으로<br>
-                        1위 확률을 높여드립니다.
-                    </p>
-                    <div style="margin-top:20px; color:#aaa; font-size:12px;">(당첨 기운을 모으는 중입니다...)</div>
+                <div id="adContent" style="width:100%; height:400px; padding:0; overflow:hidden;">
+                    <iframe src="https://www.k-inov.com" style="width:100%; height:100%; border:none;"
+                        title="K-INOV"></iframe>
+                    <div style="text-align:center; padding:5px; font-size:12px; color:#666;">
+                        (당첨 기운을 모으는 중입니다... <span id="timerDisplay">6</span>초)
+                    </div>
                 </div>
                 <div id="resultContent" style="display:none;">
                     <h2 style="color:#1976d2;">🎉 추천 번호 생성 완료! 🎉</h2>
@@ -1022,7 +1014,17 @@
             adContent.style.display = 'block';
             resultContent.style.display = 'none';
 
-            // Simulate Ad Delay (6 seconds)
+            // Simulate Ad Delay (6 seconds) with countdown
+            let timeLeft = 6;
+            const timerEl = document.getElementById('timerDisplay');
+            if (timerEl) timerEl.innerText = timeLeft;
+
+            const interval = setInterval(() => {
+                timeLeft--;
+                if (timerEl) timerEl.innerText = timeLeft;
+                if (timeLeft <= 0) clearInterval(interval);
+            }, 1000);
+
             setTimeout(() => {
                 showResult();
             }, 6000);
@@ -1158,7 +1160,8 @@
         }
 
         function shareToKakao() {
-            alert("카카오톡 공유 기능은 다음 단계에서 구현될 예정입니다! \n(현재는 UI 및 시간 연장 확인 단계입니다)");
+            // Open the actual website as requested
+            window.open("http://www.k-inov.com", "_blank");
         }
     </script>
 </body>
