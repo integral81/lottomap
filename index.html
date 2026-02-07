@@ -290,13 +290,18 @@
             // Calculate win count per shop (Name + Address)
             const shopWins = {};
             data.forEach(item => {
-                const key = item.n + '|' + item.a;
+                const key = (item.n || '').trim() + '|' + (item.a || '').trim();
                 shopWins[key] = (shopWins[key] || 0) + 1;
             });
             // Attach individual shop win count to each record
+            let highWinCount = 0;
             data.forEach(item => {
-                item.totalWins = shopWins[item.n + '|' + item.a];
+                const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                item.totalWins = shopWins[key];
+                if (item.totalWins >= 5) highWinCount++;
             });
+            console.log('Grouped Shops:', Object.keys(shopWins).length);
+            console.log('Records with 5+ wins:', highWinCount);
 
             document.getElementById('totalDataCount').innerText = data.length.toLocaleString();
             if (data.length > 0) {
