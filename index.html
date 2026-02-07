@@ -36,6 +36,10 @@
     <script type="text/javascript"
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=clusterer"
         onerror="handleScriptError()"></script>
+    <!-- Kakao SDK for Sharing -->
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+        integrity="sha384-TiCUE00h+f9AgOsWq5QRFKJdXhSWPqRKN3zzL0VKJb0Xd+Qp7fQbWlYf7yyN1dWD"
+        crossorigin="anonymous"></script>
     <style>
         :root {
             --primary: #d32f2f;
@@ -1165,8 +1169,33 @@
         }
 
         function shareToKakao() {
-            // Open the actual website as requested
-            window.open("http://www.k-inov.co.kr", "_blank");
+            // Initialize Kakao SDK if not already initialized
+            if (!window.Kakao.isInitialized()) {
+                window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d'); // Using the same JavaScript key
+            }
+
+            // Send KakaoTalk share message
+            window.Kakao.Share.sendDefault({
+                objectType: 'feed',
+                content: {
+                    title: '🎰 KINOV 로또 명당 지도',
+                    description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.',
+                    imageUrl: 'https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/preview.png',
+                    link: {
+                        mobileWebUrl: window.location.href,
+                        webUrl: window.location.href
+                    }
+                },
+                buttons: [
+                    {
+                        title: '명당 지도 보기',
+                        link: {
+                            mobileWebUrl: window.location.href,
+                            webUrl: window.location.href
+                        }
+                    }
+                ]
+            });
         }
     </script>
 </body>
