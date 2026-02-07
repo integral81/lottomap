@@ -1174,7 +1174,7 @@
                 window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d'); // Using the same JavaScript key
             }
 
-            // Send KakaoTalk share message
+            // Send KakaoTalk share message with k-inov.co.kr link
             window.Kakao.Share.sendDefault({
                 objectType: 'feed',
                 content: {
@@ -1182,16 +1182,16 @@
                     description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.',
                     imageUrl: 'https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/preview.png',
                     link: {
-                        mobileWebUrl: window.location.href,
-                        webUrl: window.location.href
+                        mobileWebUrl: 'https://www.k-inov.co.kr',
+                        webUrl: 'https://www.k-inov.co.kr'
                     }
                 },
                 buttons: [
                     {
-                        title: '명당 지도 보기',
+                        title: 'KINOV 방문하기',
                         link: {
-                            mobileWebUrl: window.location.href,
-                            webUrl: window.location.href
+                            mobileWebUrl: 'https://www.k-inov.co.kr',
+                            webUrl: 'https://www.k-inov.co.kr'
                         }
                     }
                 ]
