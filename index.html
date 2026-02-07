@@ -230,6 +230,14 @@
                 </div>
             </div>
             <div class="section">
+                <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="freq5" checked> 🌟 5회 이상</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq3" checked> 🔴 3~4회</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq1" checked> 🔵 2회 이하</label>
+                </div>
+            </div>
+            <div class="section">
                 <span class="section-title">🎲 당첨 방식 (Method)</span>
                 <div class="checkbox-group">
                     <label class="checkbox-item"><input type="checkbox" id="methodAuto" checked> 자동</label>
@@ -317,16 +325,7 @@
                     return res.json();
                 })
                 .then(data => {
-                    allData = data;
-                    countEl.innerText = data.length.toLocaleString();
-                    if (data.length > 0) {
-                        const rounds = data.map(d => d.r);
-                        const maxR = Math.max(...rounds);
-                        const minR = Math.min(...rounds);
-                        document.getElementById('maxRound').value = maxR;
-                        document.getElementById('minRound').value = minR;
-                    }
-                    applyFilters();
+                    processLoadedData(data); // Call the updated processLoadedData
                 })
                 .catch(err => {
                     console.error('Data load failed:', err);
@@ -343,46 +342,98 @@
             const manual = document.getElementById('methodManual').checked;
             const semi = document.getElementById('methodSemi').checked;
 
+            // Frequency Filters
+            const f5 = document.getElementById('freq5').checked;
+            const f3 = document.getElementById('freq3').checked;
+            const f1 = document.getElementById('freq1').checked;
+
             const filtered = allData.filter(d => {
-                if (d.r < minR || d.r > maxR) return false;
-                const m = d.m || '';
-                if (m.includes('자동') && !m.includes('반자동') && auto) return true;
-                if (m.includes('수동') && manual) return true;
-                if (m.includes('반자동') && semi) return true;
-                if (m === 'ڵ' && auto) return true;
-                return false;
+                const rMatch = d.r >= minR && d.r <= maxR;
+                let mMatch = false;
+                if (auto && d.m.includes('자동')) mMatch = true;
+                if (manual && d.m.includes('수동')) mMatch = true;
+                if (semi && d.m.includes('반자동')) mMatch = true;
+
+                let fMatch = false;
+                if (f5 && d.totalWins >= 5) fMatch = true;
+                if (f3 && d.totalWins >= 3 && d.totalWins <= 4) fMatch = true;
+                if (f1 && d.totalWins <= 2) fMatch = true;
+
+                return rMatch && mMatch && fMatch;
             });
 
             document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
-            updateMap(filtered);
+            updateMarkers(filtered);
         }
 
-        function updateMap(data) {
+        function updateMarkers(data) {
             clusterer.clear();
             markers.forEach(m => m.setMap(null));
             markers = [];
 
-            const groups = {};
+            // To avoid duplicate markers for the same shop at the same location,
+            // we need to group the filtered data by shop (lat, lng, name, address)
+            // and then create a single marker for each unique shop.
+            const uniqueShops = {};
             data.forEach(d => {
-                const key = `${d.lat}_${d.lng}`;
-                if (!groups[key]) groups[key] = { n: d.n, a: d.a, lat: d.lat, lng: d.lng, rs: [] };
-                groups[key].rs.push({ r: d.r, m: d.m });
+                const key = `${d.lat}_${d.lng}_${d.n}_${d.a}`;
+                if (!uniqueShops[key]) {
+                    uniqueShops[key] = {
+                        n: d.n,
+                        a: d.a,
+                        lat: d.lat,
+                        lng: d.lng,
+                        totalWins: d.totalWins, // This is the total wins for the shop
+                        rounds: [] // To store individual round details for infowindow
+                    };
+                }
+                uniqueShops[key].rounds.push({ r: d.r, m: d.m });
             });
 
-            Object.values(groups).forEach(shop => {
-                const pos = new kakao.maps.LatLng(shop.lat, shop.lng);
-                const marker = new kakao.maps.Marker({ position: pos, title: shop.n });
+            Object.values(uniqueShops).forEach(shop => {
+                let markerImg = null;
+                // Tiered Styles
+                if (shop.totalWins >= 5) {
+                    // Legendary Gold Star
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+                        new kakao.maps.Size(24, 35)
+                    );
+                } else if (shop.totalWins >= 3) {
+                    // Professional Red
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png',
+                        new kakao.maps.Size(24, 35),
+                        { offset: new kakao.maps.Point(12, 35) }
+                    );
+                }
 
-                const rsHtml = shop.rs.sort((a, b) => b.r - a.r).map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+                const marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(shop.lat, shop.lng),
+                    image: markerImg
+                });
+
+                const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
+                const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+
                 const content = `
                     <div class="infowindow">
-                        <div class="iw-title">${shop.n}</div>
+                        <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
                         <div class="iw-addr">${shop.a}</div>
-                        <div class="iw-details"><strong>총 ${shop.rs.length}회 당첨</strong><br>${rsHtml}</div>
-                    </div>`;
+                        <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
+                        <div class="iw-details">${roundTagsHtml}</div>
+                    </div>
+                `;
 
-                const iw = new kakao.maps.InfoWindow({ content: content, removable: true });
-                kakao.maps.event.addListener(marker, 'click', () => iw.open(map, marker));
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: content,
+                    removable: true
+                });
+
+                kakao.maps.event.addListener(marker, 'click', () => {
+                    infowindow.open(map, marker);
+                });
+
                 markers.push(marker);
             });
             clusterer.addMarkers(markers);
