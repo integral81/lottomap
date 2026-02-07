@@ -610,6 +610,31 @@
                 </svg>
             </div>
         </div>
+        <div id="adModal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+                <div id="adContent">
+                    <h2 style="color:#d32f2f;">✨ 당첨 기운 분석 중... ✨</h2>
+                    <div style="margin:20px 0; font-size:50px;">⏳</div>
+                    <p>잠시만 기다려주세요.<br>명당의 데이터를 분석하고 있습니다.</p>
+                    <div style="margin-top:20px; color:#666; font-size:12px;">(당첨 기운을 모으는 중입니다...)</div>
+                </div>
+                <div id="resultContent" style="display:none;">
+                    <h2 style="color:#1976d2;">🎉 추천 번호 생성 완료! 🎉</h2>
+                    <p style="font-size:13px; color:#666; margin-bottom:10px;">
+                        이 명당은 과거 <strong id="paramHCount" style="color:#d32f2f;">0</strong>번의 1등을 배출했습니다.<br>
+                        (<span id="paramRounds"></span> 등)
+                    </p>
+                    <div class="lucky-balls" id="luckyBalls">
+                        <!-- Balls go here -->
+                    </div>
+                    <p style="font-size:12px; color:#888;">* 재미로만 봐주세요. 과도한 구매는 금물!</p>
+                    <button class="btn-apply btn-navi" style="margin-top:10px;" onclick="goToShop()">
+                        🚗 지금 당장 사러 가기 (길찾기)
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -965,24 +990,7 @@
         let currentShopData = null; // Store temp data for the modal
 
         function openAdModal(name, addr, lat, lng, totalWins) {
-            // Find shop rounds
-            // We need to find the shop object again to get its rounds
-            // Or we can just pass the rounds string? But it's better to find it from allData or markers
-            // Optimization: Let's just find it in allData to be safe or pass the rounds index?
-            // Actually, we can just find it by name/addr from the uniqueShops map construction.
-            // But since we are inside the loop, we have 'shop' object.
-            // The onclick stringification is tricky for arrays. 
-            // So we will just look it up.
-
-            // Re-find logic (Simple enough for now)
-            // But wait, we can just use the unique key logic or filters.
-            // Let's iterate markers/data? No, too slow.
-            // Let's just assume we can find it.
-
-            // Better: Store the current shop's rounds in a global temp variable when clicking?
-            // No, infowindow HTML is generated once.
-
-            // Solution: We will re-filter allData for this specific shop to get rounds.
+            // Re-filter allData for this specific shop to get rounds.
             const rounds = allData.filter(d => d.n === name && d.a === addr).map(d => ({ r: d.r, m: d.m }));
 
             currentShopData = { name, addr, lat, lng, totalWins, rounds };
@@ -1049,6 +1057,8 @@
                 closeModal();
             }
         }
+
+
 
         function findNearestShop(lat, lng) {
             if (typeof allData === 'undefined' || allData.length === 0) return;
