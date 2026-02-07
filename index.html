@@ -1207,27 +1207,15 @@
                     console.log('[Kakao Share] Kakao SDK already initialized');
                 }
 
-                // Prepare share data
+                // Prepare share data - using text type to ensure link works
                 const shareData = {
-                    objectType: 'feed',
-                    content: {
-                        title: '🎰 KINOV 로또 명당 지도',
-                        description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.',
-                        imageUrl: 'https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/preview.png',
-                        link: {
-                            mobileWebUrl: 'https://www.k-inov.co.kr',
-                            webUrl: 'https://www.k-inov.co.kr'
-                        }
+                    objectType: 'text',
+                    text: '🎰 KINOV 로또 명당 지도\n\n역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.\n\n지금 바로 KINOV Mall을 방문하세요!',
+                    link: {
+                        mobileWebUrl: 'https://www.k-inov.co.kr',
+                        webUrl: 'https://www.k-inov.co.kr'
                     },
-                    buttons: [
-                        {
-                            title: 'KINOV 방문하기',
-                            link: {
-                                mobileWebUrl: 'https://www.k-inov.co.kr',
-                                webUrl: 'https://www.k-inov.co.kr'
-                            }
-                        }
-                    ]
+                    buttonTitle: 'KINOV Mall 방문하기'
                 };
 
                 console.log('[Kakao Share] Sending share data:', shareData);
