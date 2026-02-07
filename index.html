@@ -1173,7 +1173,6 @@
                 // Check if Kakao SDK is loaded
                 if (typeof window.Kakao === 'undefined') {
                     console.error('[Kakao Share] Kakao SDK not loaded');
-                    alert('카카오 SDK가 로드되지 않았습니다. 페이지를 새로고침해 주세요.');
                     return;
                 }
 
@@ -1220,7 +1219,6 @@
 
             } catch (error) {
                 console.error('[Kakao Share] Error:', error);
-                alert('카카오톡 공유 중 오류가 발생했습니다.\n\n오류: ' + error.message + '\n\n브라우저 콘솔(F12)을 확인해 주세요.');
             }
         }
     </script>
