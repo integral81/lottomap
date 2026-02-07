@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Version: 4.0.0-Directions-Final -->
 <html>
 
 <head>
@@ -180,12 +179,9 @@
 
         .iw-title {
             font-weight: 700;
-            font-size: 16px;
-            color: #ff0000;
-            /* Bright Red for Version Check */
+            font-size: 15px;
+            color: var(--primary);
             margin-bottom: 5px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 5px;
         }
 
         .iw-addr {
@@ -207,11 +203,9 @@
             display: flex !important;
             gap: 10px;
             margin-top: 15px;
-            border-top: 2px solid var(--secondary);
-            /* Thicker line for visibility */
+            border-top: 1px dashed #eee;
             padding-top: 12px;
             visibility: visible !important;
-            min-height: 40px;
         }
 
         .btn-iw {
@@ -448,11 +442,6 @@
 </head>
 
 <body>
-    <!-- Version Confirmation Bar (Debug) -->
-    <div
-        style="background: #fff3cd; color: #856404; padding: 10px; text-align: center; border-bottom: 1px solid #ffeeba; font-weight: bold; font-size: 14px; position: relative; z-index: 9999;">
-        ✅ 4단계(길찾기) 최신 버전 적용됨 (F5를 눌러 확인)
-    </div>
     <div id="toast-container"></div>
     <div id="app">
         <div id="sidebar">
