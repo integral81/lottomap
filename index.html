@@ -639,6 +639,8 @@
 
     <script>
         let map, clusterer, allData = [], markers = [];
+        let currentInfoWindow = null; // Track the currently open InfoWindow
+
 
         function handleFileSelect(event) {
             const file = event.target.files[0];
@@ -891,7 +893,13 @@
                 });
 
                 kakao.maps.event.addListener(marker, 'click', () => {
+                    // Close previous InfoWindow if exists
+                    if (currentInfoWindow) {
+                        currentInfoWindow.close();
+                    }
+
                     infowindow.open(map, marker);
+                    currentInfoWindow = infowindow; // Update current
                 });
 
                 markers.push(marker);
