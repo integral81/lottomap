@@ -1117,7 +1117,7 @@
             <div id="resultContent"
                 style="display:none; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; min-height:420px;">
                 <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.2);">🎉 추천 번호 생성 완료! 🎉</h2>
-                <p style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px;">
+                <p id="resultInfoText" style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px;">
                     이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
                     (<span id="paramRounds"></span> 등)
                 </p>
@@ -1586,7 +1586,13 @@
             adContent.style.display = 'flex'; // Changed to flex for centering
             resultContent.style.display = 'none';
 
-            // Reset UI State
+            // Reset UI State (CRITICAL: Reset result text structure)
+            const resultInfo = document.getElementById('resultInfoText');
+            if (resultInfo) {
+                resultInfo.innerHTML = `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
+                    (<span id="paramRounds"></span> 등)`;
+            }
+
             modeSelection.style.display = 'block';
             if (analysisLoading) analysisLoading.style.display = 'none';
             if (modeDreamInput) modeDreamInput.style.display = 'none';
@@ -1812,26 +1818,37 @@
             if (customResult) {
                 result = customResult;
                 // Update text based on result type
-                const container = document.getElementById('paramHCount').parentElement;
+                // Update text based on result type
+                // const container... removed, using ID inside blocks
 
                 if (result.type === 'dream') {
-                    container.innerHTML =
-                        `꿈 키워드 <strong style="color:#fae100;">'${result.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
+                    // Use safer selector
+                    const container = document.getElementById('resultInfoText');
+                    if (container) {
+                        container.innerHTML =
+                            `꿈 키워드 <strong style="color:#fae100;">'${result.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
+                    }
                 } else if (result.type === 'horoscope') {
-                    container.innerHTML =
-                        `<div class="horoscope-text-box">
-                            <div style="font-size:24px; margin-bottom:5px;">${result.icon}</div>
-                            <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${result.zodiac}띠 오늘의 운세</div>
-                            ${result.text}
-                        </div>
-                        <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
+                    const container = document.getElementById('resultInfoText');
+                    if (container) {
+                        container.innerHTML =
+                            `<div class="horoscope-text-box">
+                                <div style="font-size:24px; margin-bottom:5px;">${result.icon}</div>
+                                <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${result.zodiac}띠 오늘의 운세</div>
+                                ${result.text}
+                            </div>
+                            <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
+                    }
                 }
             } else {
                 result = generateLuckyNumbers(currentShopData.rounds);
-                // Restore default text
-                document.getElementById('paramHCount').parentElement.innerHTML =
-                    `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${result.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
-                    `(<span id="paramRounds">${result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '')}</span> 등)`;
+                // Restore default text (Safely using ID)
+                const container = document.getElementById('resultInfoText');
+                if (container) {
+                    container.innerHTML =
+                        `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${result.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
+                        `(<span id="paramRounds">${result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '')}</span> 등)`;
+                }
             }
 
             // Legal Disclaimer
