@@ -1,0 +1,95 @@
+Starting Smart Scraper...
+[16:34:23] Initializing Chrome Options...
+[16:34:23] Starting ChromeDriver...
+[16:34:26] ChromeDriver started successfully.
+[16:34:26] Visiting main page...
+[16:34:26] Initializing Chrome Options...
+[16:34:26] Starting ChromeDriver...
+[16:34:29] Error fetching round 10: Message: 
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff78caaf3d5
+	0x7ff78c
+[16:34:29] Saved debug_error.html
+[16:34:30] ChromeDriver started successfully.
+[16:34:31] Main page session established.
+[16:34:32] Retry 2 for round 1: Message: 
+Stacktrace:
+Symbols not available. Dumpi
+[16:34:41] Initializing Chrome Options...
+[16:34:41] Starting ChromeDriver...
+[16:34:42] Error fetching round 14: Message: 
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff78caaf3d5
+	0x7ff78caaf430
+	0x7ff78c8510bd
+	0x7ff78c8ac2fe
+	0x7ff78c8ac60c
+	0x7ff78c8fd187
+	0x7ff78c8f9d08
+	0x7ff78c89cb0c
+	0x7ff78c89da53
+	0x7ff78cd8b470
+	0x7ff78cd8586d
+	0x7ff78cda621a
+	0x7ff78cacb235
+	0x7ff78cad3a5c
+	0x7ff78cab8844
+	0x7ff78cab89f6
+	0x7ff78ca9eb87
+	0x7fff7dfae8d7
+	0x7fff7f24c53c
+
+[16:34:43] ChromeDriver started successfully.
+[16:34:55] Error fetching round 11: Message: 
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff78caaf3d5
+	0x7ff78c
+[16:34:55] Saved debug_error.html
+[16:34:55] Initializing Chrome Options...
+[16:34:55] Starting ChromeDriver...
+[16:34:57] ChromeDriver started successfully.
+[16:34:59] Initializing Chrome Options...
+[16:34:59] Starting ChromeDriver...
+[16:35:02] Retry 1 for round 1: Message: 
+Stacktrace:
+Symbols not available. Dumpi
+[16:35:03] ChromeDriver started successfully.
+[16:35:05] Retry 3 for round 1: Message: 
+Stacktrace:
+Symbols not available. Dumpi
+[16:35:07] Failed round 1 after retries.
+[16:35:08] Error fetching round 15: Message: 
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff78caaf3d5
+	0x7ff78caaf430
+	0x7ff78c8510bd
+	0x7ff78c8ac2fe
+	0x7ff78c8ac60c
+	0x7ff78c8fd187
+	0x7ff78c8f9d08
+	0x7ff78c89cb0c
+	0x7ff78c89da53
+	0x7ff78cd8b470
+	0x7ff78cd8586d
+	0x7ff78cda621a
+	0x7ff78cacb235
+	0x7ff78cad3a5c
+	0x7ff78cab8844
+	0x7ff78cab89f6
+	0x7ff78ca9eb87
+	0x7fff7dfae8d7
+	0x7fff7f24c53c
+
+[16:35:12] Initializing Chrome Options...
+[16:35:12] Starting ChromeDriver...
+[16:35:15] ChromeDriver started successfully.
+[16:35:16] Error fetching round 12: Message: 
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff78caaf3d5
+	0x7ff78c
+[16:35:16] Saved debug_error.html

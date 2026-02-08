@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lotto QR Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #qrcode {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .desc {
+            margin-top: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Lotto QR Scanner Test</h1>
+    <p>아래 QR 코드를 'QR 당첨확인' 기능으로 스캔해보세요.</p>
+
+    <div id="qrcode"></div>
+
+    <div class="desc">
+        <strong>제 1210회차 테스트 데이터</strong><br>
+        A: 1등 (1, 7, 9, 17, 27, 38)<br>
+        B: 2등 (1, 7, 9, 17, 27, 31[보너스])<br>
+        C: 3등 (1, 7, 9, 17, 27, 45)<br>
+        D: 낙첨 (2, 3, 4, 5, 6, 8)
+    </div>
+
+    <script>
+        // Round 1210 Winning: 1, 7, 9, 17, 27, 38 + Bonus 31
+        // URL Format: http://m.dhlottery.co.kr/?v=1210m{GameA}{GameB}{GameC}{GameD}
+        // Each game is 12 digits.
+
+        const round = 1210;
+        const gameA = "010709172738"; // 1st
+        const gameB = "010709172731"; // 2nd
+        const gameC = "010709172745"; // 3rd
+        const gameD = "020304050608"; // Fail
+
+        const url = `http://m.dhlottery.co.kr/?v=${round}m${gameA}${gameB}${gameC}${gameD}`;
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: url,
+            width: 250,
+            height: 250
+        });
+
+        console.log("Generated QR for:", url);
+    </script>
+</body>
+
+</html>

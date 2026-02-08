@@ -1595,26 +1595,26 @@
                 style="margin-top:10px; background:#fae100; color:#3c1e1e; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
                 onclick="goToShop()">
                 🚗 지금 당장 사러 가기 (길찾기)
+            </button>
         </div> <!-- end info-modal -->
     </div> <!-- end ad-content -->
-
     <!-- Frequency Statistics Modal -->
     <div id="statModal" class="modal">
         <div class="freq-modal-content">
             <div class="freq-header">
                 <div class="back-btn" onclick="closeStatModal()">
-                    <span>❮</span> Menu
+                    <span>❮</span> 닫기
                 </div>
                 <div>번호별 출현횟수 <span style="font-size: 10px; opacity: 0.8; vertical-align: middle;">(보너스 제외)</span></div>
-                <div style="width: 45px;"></div> <!-- Spacer -->
+                <div style="width: 45px;"></div>
             </div>
+
             <div class="freq-body">
                 <div class="freq-controls">
                     <div class="freq-filter-row">
-                        <span class="freq-filter-item" onclick="setFreqPeriod(3)">3주</span>
-                        <span class="freq-filter-item" onclick="setFreqPeriod(5)">5주</span>
-                        <span class="freq-filter-item" onclick="setFreqPeriod(10)">10주</span>
                         <span class="freq-filter-item active" onclick="setFreqPeriod(0)">전체</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(10)">최근 10주</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(5)">최근 5주</span>
                     </div>
                     <div class="freq-range-display" id="freqRangeText">
                         데이터 로딩 중...
@@ -1622,7 +1622,12 @@
                 </div>
                 <div id="freqListContainer">
                     <!-- Data will be injected here -->
-                    <div style="text-align:center; padding:20px; color:#666;">데이터 분석 중...</div>
+                    <div style="padding: 10px; text-align: center; font-size: 12px; color: #666; background: #fffde7;">
+                        복권의 QR 코드를 화면에 비춰주세요.
+                    </div>
+                </div>
+                <div class="freq-disclaimer">
+                    * 보너스 번호는 통계에서 제외됩니다.
                 </div>
             </div>
         </div>
@@ -1631,19 +1636,21 @@
     <!-- QR Code Scanner Modal -->
     <div id="qrModal" class="modal">
         <div class="qr-modal-content">
-            <div class="freq-header" style="background: #1976d2;">
-                <div class="back-btn" onclick="closeQRScanner()">
-                    <span>❮</span> Menu
+            <span class="modal-close" style="color:#333; z-index:100; padding:10px; right:10px; top:5px;"
+                onclick="closeQRScanner()">&times;</span>
+
+            <div id="qr-reader" style="width:100%;"></div>
+
+            <div id="qrResult" class="qr-result-container" style="display:none;">
+                <h3 style="margin:0 0 10px 0; color:#333; text-align:center;">
+                    제 <span id="qrRound" style="color:#d32f2f;">0</span>회 당첨 결과
+                </h3>
+                <div id="qrGameList">
+                    <!-- Javascript will populate this -->
                 </div>
-                <div>QR코드 당첨확인</div>
-                <div style="width: 45px;"></div>
-            </div>
-            <div style="padding: 10px; text-align: center; font-size: 12px; color: #666; background: #fffde7;">
-                복권의 QR 코드를 화면에 비춰주세요. (보너스 번호 제외)
-            </div>
-            <div id="qr-reader"></div>
-            <div id="qrResult" class="qr-result-container" style="display: none;">
-                <!-- Results will be injected here -->
+                <div style="text-align:center; margin-top:15px;">
+                    <button class="btn-sm" onclick="restartQRScanner()">다시 스캔하기</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2555,7 +2562,7 @@
             container.innerHTML = html;
         }
 
-        let html5QrcodeScanner = null;
+        let html5QrCode = null;
 
         function showQRScanner() {
             closeNav();
@@ -2564,70 +2571,107 @@
 
             // Reset Result
             document.getElementById('qrResult').style.display = 'none';
+            document.getElementById('qr-reader').style.display = 'block';
 
-            if (!html5QrcodeScanner) {
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "qr-reader",
-                    {
-                        fps: 10,
-                        qrbox: { width: 250, height: 250 },
-                        rememberLastUsedCamera: true,
-                        // Fix for mobile devices to use back camera by default
-                        aspectRatio: 1.0
-                    },
-                    /* verbose= */ false
-                );
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
             }
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+            // Start Camera (Prefer Environment)
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .catch(err => {
+                    console.error("Error starting QR scanner", err);
+                    // Fallback to user facing camera if environment fails? or just alert
+                    alert("후면 카메라를 실행할 수 없습니다. 권한을 확인해주세요.");
+                });
+        }
+
+        function closeQRScanner() {
+            const modal = document.getElementById('qrModal');
+            modal.style.display = 'none';
+
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => console.log("Failed to stop qr code scanner", err));
+            }
+        }
+
+        function restartQRScanner() {
+            document.getElementById('qrResult').style.display = 'none';
+            document.getElementById('qr-reader').style.display = 'block';
+
+            // If stopped, start again
+            // html5QrCode object exists but might be stopped
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                .catch(err => console.error(err));
         }
 
         function onScanSuccess(decodedText, decodedResult) {
             console.log(`Scan result: ${decodedText}`);
-            // Sample: http://m.dhlottery.co.kr/?v=0800m010203040506...
             if (decodedText.includes('dhlottery.co.kr') && decodedText.includes('v=')) {
-                // Pause scanning to show result
-                html5QrcodeScanner.pause(true);
-                processQRData(decodedText);
+                // Stop scanning
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    document.getElementById('qr-reader').style.display = 'none';
+                    verifyLotteryQR(decodedText);
+                }).catch(err => console.error(err));
             } else {
-                showToast("⚠️ 올바른 로또 QR 코드가 아닙니다.", "info");
+                // Continuous scanning until valid code, or maybe show toast?
+                // showToast("로또 QR 코드가 아닙니다.", "info");
             }
         }
 
-        function onScanFailure(error) {
-            // Usually we just ignore failures as it scans continuously
-        }
-
-        function closeQRScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().catch(err => console.error("Failed to clear scanner", err));
-            }
-            document.getElementById('qrModal').style.display = 'none';
-        }
-
-        function processQRData(url) {
+        function verifyLotteryQR(url) {
             try {
                 const urlObj = new URL(url);
                 const v = urlObj.searchParams.get('v');
-                if (!v) throw new Error("Missing v parameter");
+                if (!v) throw new Error("QR 데이터 파싱 실패 (v param missing)");
 
+                // Format: ROUND + 'm' + NUMBERS...
                 const parts = v.split('m');
-                const round = parts[0];
+                const round = parseInt(parts[0]);
                 const rawNumbers = parts[1];
 
-                // winning Numbers (Bonus excluded)
+                document.getElementById('qrRound').innerText = round;
+
+                // Get winning numbers
                 const winNums = window.lottoHistory ? window.lottoHistory[String(round)] : null;
+                const resultArea = document.getElementById('qrResult');
+                resultArea.style.display = 'block';
+
+                const listContainer = document.getElementById('qrGameList');
+                listContainer.innerHTML = '';
 
                 if (!winNums) {
-                    showToast(`${round}회차 당첨 정보가 데이터에 없습니다.`, "info");
-                    html5QrcodeScanner.resume();
+                    listContainer.innerHTML = `<div style="padding:20px; text-align:center;">
+                        ${round}회차 추첨 결과가 아직 없습니다.<br>
+                        (토요일 오후 8시 35분 이후 확인 가능)
+                    </div>`;
                     return;
                 }
 
-                // Parse games (6 numbers = 12 chars each)
+                // winNums: [n1, n2, n3, n4, n5, n6, bonus]
+                const mainNums = winNums.slice(0, 6);
+                const bonusNum = winNums[6];
+
+                // Parse games
                 const games = [];
-                for (let i = 0; i < rawNumbers.length; i += 12) {
-                    const gameStr = rawNumbers.substring(i, i + 12);
+                // rawNumbers string contains concatenated games.
+                // It 'usually' splits by 'n' or other delimiters in older formats?
+                // But the snippet saw `v.split('m')` logic.
+                // Let's rely on fixed width 12 chars per game logic if possible, 
+                // but safeguard against delimiters.
+                // Removing non-digit characters is safer.
+                const cleanNums = rawNumbers.replace(/[^0-9]/g, '');
+
+                for (let i = 0; i < cleanNums.length; i += 12) {
+                    const gameStr = cleanNums.substring(i, i + 12);
                     if (gameStr.length < 12) break;
+
                     const nums = [];
                     for (let j = 0; j < 12; j += 2) {
                         nums.push(parseInt(gameStr.substring(j, j + 2)));
@@ -2635,48 +2679,59 @@
                     games.push(nums);
                 }
 
-                displayQRResults(round, winNums, games);
-            } catch (err) {
-                console.error("QR Parse Error:", err);
-                showToast("QR 코드 해석 실패", "error");
-                html5QrcodeScanner.resume();
-            }
-        }
+                const gameLabels = ['A', 'B', 'C', 'D', 'E'];
 
-        function displayQRResults(round, winNums, games) {
-            const resultArea = document.getElementById('qrResult');
-            resultArea.style.display = 'block';
+                games.forEach((myNums, idx) => {
+                    let matchCount = 0;
+                    let bonusMatch = false;
 
-            let html = `<div style="margin-bottom:15px; text-align:center;">
-                <div style="font-weight:bold; font-size:16px;">${round}회차 당첨 확인</div>
-                <div style="font-size:12px; color:#666;">당첨번호: ${winNums.join(', ')}</div>
-            </div>`;
+                    myNums.forEach(n => {
+                        if (mainNums.includes(n)) matchCount++;
+                        if (n === bonusNum) bonusMatch = true;
+                    });
 
-            games.forEach((myNums, idx) => {
-                const matches = myNums.filter(n => winNums.includes(n));
-                const matchCount = matches.length;
-                let prize = "낙첨";
-                let prizeClass = "prize-none";
+                    let rank = "낙첨";
+                    let rankClass = "prize-none";
 
-                if (matchCount === 6) { prize = "1등 🎉"; prizeClass = "prize-win"; }
-                else if (matchCount === 5) { prize = "3등 🥉"; prizeClass = "prize-win"; } // Bonus excluded rule
-                else if (matchCount === 4) { prize = "4등 💵"; prizeClass = "prize-win"; }
-                else if (matchCount === 3) { prize = "5등 💰"; prizeClass = "prize-win"; }
+                    if (matchCount === 6) { rank = "1등 🥇"; rankClass = "prize-win"; }
+                    else if (matchCount === 5 && bonusMatch) { rank = "2등 🥈"; rankClass = "prize-win"; }
+                    else if (matchCount === 5) { rank = "3등 🥉"; rankClass = "prize-win"; }
+                    else if (matchCount === 4) { rank = "4등 💵"; rankClass = "prize-win"; }
+                    else if (matchCount === 3) { rank = "5등 💰"; rankClass = "prize-win"; }
 
-                html += `
-                    <div class="qr-game-row">
-                        <div style="font-weight:bold; color:#1976d2;">GAME ${String.fromCharCode(65 + idx)}</div>
-                        <div style="display:flex; gap:4px;">
-                            ${myNums.map(n => `<span style="font-size:12px; color:${winNums.includes(n) ? 'red' : '#333'}; font-weight:${winNums.includes(n) ? 'bold' : 'normal'}">${n}</span>`).join(' ')}
+                    // Render
+                    const row = document.createElement('div');
+                    row.className = 'qr-game-row';
+
+                    const ballsHtml = myNums.map(n => {
+                        let style = "display:inline-block; width:20px; text-align:center;";
+                        let color = "#333";
+                        let weight = "normal";
+
+                        if (mainNums.includes(n)) {
+                            color = "#d32f2f"; weight = "bold";
+                        } else if (n === bonusNum && matchCount === 5) {
+                            color = "#1976d2"; weight = "bold"; // Bonus highlight
+                        }
+
+                        return `<span style="${style} color:${color}; font-weight:${weight};">${n}</span>`;
+                    }).join('');
+
+                    row.innerHTML = `
+                        <div style="font-weight:bold; color:#666; width:20px;">${gameLabels[idx] || '?'}</div>
+                        <div style="flex:1; display:flex; justify-content:center; gap:2px; font-size:13px;">
+                            ${ballsHtml}
                         </div>
-                        <div class="qr-prize-badge ${prizeClass}">${prize}</div>
-                    </div>
-                `;
-            });
+                        <div class="qr-prize-badge ${rankClass}">${rank}</div>
+                    `;
+                    listContainer.appendChild(row);
+                });
 
-            html += `<button class="btn-apply" style="margin-top:15px; background:#1976d2;" onclick="html5QrcodeScanner.resume(); document.getElementById('qrResult').style.display='none';">다시 스캔하기</button>`;
-
-            resultArea.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+                alert("QR 코드를 분석할 수 없습니다. " + e.message);
+                restartQRScanner();
+            }
         }
 
         // Close modal when clicking outside

@@ -107,6 +107,14 @@ def scrape_winning_numbers(draw_no):
         spans = num_div.find_all('span', class_='ball_645')
         # Expect 6 numbers
         nums = [int(s.get_text()) for s in spans][:6]
+        
+        # Bonus Number
+        bonus_div = div_win.find('div', class_='num bonus')
+        if bonus_div:
+            bonus_span = bonus_div.find('span', class_='ball_645')
+            if bonus_span:
+                nums.append(int(bonus_span.get_text()))
+                
         return nums
     except Exception as e:
         print(f"Error scraping numbers for {draw_no}: {e}")
@@ -127,7 +135,10 @@ def update_historic_file(draw_no, numbers):
         # Create new row
         new_row = {'회차': draw_no}
         for i, n in enumerate(numbers, 1):
-            new_row[f'번호{i}'] = n
+            if i == 7:
+                new_row['보너스'] = n
+            else:
+                new_row[f'번호{i}'] = n
             
         # Append
         df = pd.concat([pd.DataFrame([new_row]), df], ignore_index=True)
@@ -154,6 +165,20 @@ def build_history_json():
                 int(row['번호1']), int(row['번호2']), int(row['번호3']), 
                 int(row['번호4']), int(row['번호5']), int(row['번호6'])
             ]
+            
+            # Helper to safely get bonus
+            bonus = 0
+            if '보너스' in row and pd.notna(row['보너스']):
+                 bonus = int(row['보너스'])
+            elif '번호7' in row and pd.notna(row['번호7']):
+                 bonus = int(row['번호7'])
+            
+            # If we found a bonus (non-zero), append it. 
+            # Note: Older rounds might not have bonus recorded in Excel if it was old format?
+            # But the user wants consistency.
+            if bonus > 0:
+                numbers.append(bonus)
+                
             history_map[str(round_num)] = numbers
             
         with open(OUTPUT_JSON, 'w', encoding='utf-8') as f:
