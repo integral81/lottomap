@@ -1871,6 +1871,21 @@
 
 
 
+        function focusShop(lat, lng) {
+            // Find maker by coordinates (approximate match to handle float precision)
+            const target = markers.find(m => {
+                const p = m.getPosition();
+                return Math.abs(p.getLat() - lat) < 0.000001 && Math.abs(p.getLng() - lng) < 0.000001;
+            });
+
+            if (target) {
+                const mapCenter = new kakao.maps.LatLng(lat, lng);
+                map.panTo(mapCenter);
+                // Trigger click to open InfoWindow
+                kakao.maps.event.trigger(target, 'click');
+            }
+        }
+
         function findNearestShop(lat, lng) {
             if (typeof allData === 'undefined' || allData.length === 0) return;
 
@@ -1883,13 +1898,14 @@
             }).sort((a, b) => a.distance - b.distance);
 
             // Take top 3
-            const top5 = sortedShops.slice(0, 3);
+            const top3 = sortedShops.slice(0, 3);
 
-            if (top5.length > 0) {
-                let msg = "📍 주변 1등 배출점 (가까운 순)\n";
-                top5.forEach((shop, index) => {
+            if (top3.length > 0) {
+                let msg = "📍 <strong>주변 1등 배출점 (가까운 순)</strong><br>";
+                top3.forEach((shop, index) => {
                     const distStr = shop.distance < 1 ? Math.round(shop.distance * 1000) + "m" : shop.distance.toFixed(1) + "km";
-                    msg += `${index + 1}. ${shop.n} (${distStr})\n`;
+                    // Add clickable span
+                    msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
                 });
                 showToast(msg, "success");
 
@@ -1897,14 +1913,14 @@
                 const bounds = new kakao.maps.LatLngBounds();
                 bounds.extend(new kakao.maps.LatLng(lat, lng));
 
-                // Only include shops within 20km for the initial view to avoid extreme zoom out
-                top5.forEach(shop => {
+                // Only include shops within 20km for the initial view
+                top3.forEach(shop => {
                     if (shop.distance < 20) {
                         bounds.extend(new kakao.maps.LatLng(shop.lat, shop.lng));
                     }
                 });
 
-                map.setBounds(bounds, 80, 80, 80, 80); // generous padding
+                map.setBounds(bounds, 80, 80, 80, 80);
             }
         }
 
@@ -1912,7 +1928,8 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.innerText = message;
+            // Use innerHTML to support links/clicks
+            toast.innerHTML = message;
 
             container.appendChild(toast);
 
