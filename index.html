@@ -868,24 +868,60 @@
             <div class="modal-content">
                 <span class="modal-close" onclick="closeModal()">&times;</span>
                 <div id="adContent"
-                    style="width:100%; height:420px; padding:20px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <div style="background:#fae100; color:#3c1e1e; padding:12px 20px; text-align:center; font-weight:bold; cursor:pointer; font-size:16px; border-radius:8px; margin-bottom:20px; box-shadow:0 4px 6px rgba(0,0,0,0.1);"
-                        onclick="shareToKakao()">
-                        📢 카카오톡 공유하기를 하시면 1등번호 확률이 높아집니다 (클릭)
-                    </div>
-                    <div style="text-align:center; color:white; font-size:18px; line-height:1.8;">
-                        <h2 style="margin:0 0 20px 0; font-size:28px;">🎰 당첨의 기운을 모으는 중...</h2>
-                        <p style="margin:10px 0;">이 판매점의 역대 당첨 데이터를 분석하고 있습니다</p>
-                        <p style="margin:10px 0 20px 0; font-size:24px; font-weight:bold;">⏱️ <span
-                                id="timerDisplay">6</span>초
-                        </p>
-                        <!-- KINOV Mall Promotional Section -->
-                        <div style="background:transparent; border-radius:12px; padding:10px; margin-top:20px; cursor:pointer;"
-                            onclick="window.open('https://www.k-inov.co.kr', '_blank')">
-                            <img src="kinovhead.jpg" alt="KINOV Mall"
-                                style="width:100%; max-width:450px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+                    style="width:100%; height:450px; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+
+                    <!-- Mode Selection Menu -->
+                    <div id="modeSelection" style="width:100%; max-width:400px;">
+                        <div style="background:#fae100; color:#3c1e1e; padding:8px 15px; text-align:center; font-weight:bold; cursor:pointer; font-size:14px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1);"
+                            onclick="shareToKakao()">
+                            📢 카톡 공유하고 당첨 확률 높이기 (클릭)
+                        </div>
+
+                        <h2
+                            style="color:white; text-align:center; margin-bottom:15px; font-size:20px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                            🔮 번호 생성 방식을 선택하세요
+                        </h2>
+
+                        <div class="selection-menu">
+                            <!-- 1. Data Analysis -->
+                            <div class="selection-card" onclick="selectAnalysisMode()">
+                                <div class="selection-icon">📊</div>
+                                <div class="selection-info">
+                                    <span class="selection-title">데이터 정밀 분석</span>
+                                    <span class="selection-desc">명당의 과거 당첨 패턴을 정밀 분석</span>
+                                </div>
+                            </div>
+
+                            <!-- 2. Dream -->
+                            <div class="selection-card" onclick="selectDreamMode()">
+                                <div class="selection-icon">🌙</div>
+                                <div class="selection-info">
+                                    <span class="selection-title">꿈 해몽 번호 (준비중)</span>
+                                    <span class="selection-desc">어젯밤 꿈 내용을 입력해보세요</span>
+                                </div>
+                            </div>
+
+                            <!-- 3. Horoscope -->
+                            <div class="selection-card" onclick="selectHoroscopeMode()">
+                                <div class="selection-icon">🐅</div>
+                                <div class="selection-info">
+                                    <span class="selection-title">오늘의 띠별 운세 (준비중)</span>
+                                    <span class="selection-desc">나의 띠에 맞는 행운의 숫자</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Loading Animation (Initially Hidden) -->
+                    <div id="analysisLoading" class="loader-container">
+                        <div class="spinner"></div>
+                        <h3 style="margin:10px 0; font-size:22px;">데이터 분석 중...</h3>
+                        <p style="font-size:14px; opacity:0.9;">명당의 기운을 모으고 있습니다</p>
+                    </div>
+
+                    <!-- Placeholders for Step 2 & 3 -->
+                    <div id="modeDreamInput" class="input-container"></div>
+                    <div id="modeHoroscopeSelect" class="input-container"></div>
                 </div>
             </div>
             <div id="resultContent"
