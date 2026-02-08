@@ -913,17 +913,23 @@
             <div class="section">
                 <span class="section-title">📅 회차 필터 (Round)</span>
                 <div class="input-row">
-                    <input type="number" id="minRound" value="262">
+                    <input type="number" id="minRound" value="1">
                     <span>~</span>
                     <input type="number" id="maxRound" value="1210">
                     <button class="btn-sm" onclick="refreshRecentRounds()">조회</button>
                 </div>
+                <!-- Data Availability Notice -->
+                <div
+                    style="font-size:11px; color:#666; margin-top:8px; line-height:1.4; background:rgba(0,0,0,0.03); padding:6px; border-radius:4px;">
+                    1. 1등 당첨번호는 1회차부터 제공<br>
+                    2. 1등 판매점현황은 262회차부터 제공
+                </div>
             </div>
 
-            <!-- Recent 5 Rounds Display -->
+            <!-- Recent 3 Rounds Display -->
             <div class="section" id="recentRoundsContainer"
                 style="background:#f0f4f8; padding:10px; border-radius:8px; margin-bottom:20px;">
-                <span class="section-title" style="margin-bottom:8px;">📊 최근 5회차 당첨번호 (기준: <span id="recentRefRound"
+                <span class="section-title" style="margin-bottom:8px;">📊 최근 3회차 당첨번호 (기준: <span id="recentRefRound"
                         style="color:#d32f2f;">1210</span>회)</span>
                 <div id="recentRoundsList" style="display:flex; flex-direction:column; gap:6px;">
                     <!-- Javascript will populate this -->
@@ -1316,8 +1322,8 @@
                 return;
             }
 
-            // Loop 5 rounds: maxRound, maxRound-1, ..., maxRound-4
-            for (let i = 0; i < 5; i++) {
+            // Loop 3 rounds: maxRound, maxRound-1, maxRound-2 (Reduced to save space)
+            for (let i = 0; i < 3; i++) {
                 const targetRound = maxRound - i;
                 if (targetRound < 1) continue; // No rounds below 1
 
