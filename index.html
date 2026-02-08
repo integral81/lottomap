@@ -1127,6 +1127,34 @@
             display: flex;
             flex-direction: column;
             max-height: 85vh;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 640px) {
+            .freq-modal-content {
+                width: 95%;
+                max-height: 90vh;
+                border-radius: 15px;
+            }
+
+            .freq-body {
+                padding: 15px 10px;
+            }
+
+            .freq-row {
+                gap: 8px;
+            }
+
+            .freq-ball {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+
+            .freq-bar-container {
+                height: 10px;
+            }
         }
 
         .freq-header {
@@ -1186,9 +1214,16 @@
 
         .freq-bar-fill {
             height: 100%;
-            background: #444;
+            background: linear-gradient(90deg, #444, #777);
             border-radius: 6px;
-            transition: width 0.5s ease-out;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .freq-disclaimer {
+            font-size: 11px;
+            color: #ff5252;
+            margin-top: 5px;
+            font-weight: 500;
         }
 
         .freq-count {
@@ -1503,7 +1538,7 @@
                 <div class="back-btn" onclick="closeStatModal()">
                     <span>❮</span> Menu
                 </div>
-                <div>번호별 출현횟수</div>
+                <div>번호별 출현횟수 <span style="font-size: 10px; opacity: 0.8; vertical-align: middle;">(보너스 제외)</span></div>
                 <div style="width: 45px;"></div> <!-- Spacer -->
             </div>
             <div class="freq-body">
