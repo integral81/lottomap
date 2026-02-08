@@ -1789,14 +1789,24 @@
             let result;
             if (customResult) {
                 result = customResult;
-                // Update text for Dream Mode
+                // Update text based on result type
+                const container = document.getElementById('paramHCount').parentElement;
+
                 if (result.type === 'dream') {
-                    document.getElementById('paramHCount').parentElement.innerHTML =
+                    container.innerHTML =
                         `꿈 키워드 <strong style="color:#fae100;">'${result.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
+                } else if (result.type === 'horoscope') {
+                    container.innerHTML =
+                        `<div class="horoscope-text-box">
+                            <div style="font-size:24px; margin-bottom:5px;">${result.icon}</div>
+                            <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${result.zodiac}띠 오늘의 운세</div>
+                            ${result.text}
+                        </div>
+                        <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
                 }
             } else {
                 result = generateLuckyNumbers(currentShopData.rounds);
-                // Restore default text if needed (or ensure HTML structure supports both)
+                // Restore default text
                 document.getElementById('paramHCount').parentElement.innerHTML =
                     `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${result.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
                     `(<span id="paramRounds">${result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '')}</span> 등)`;
