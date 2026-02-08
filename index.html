@@ -296,15 +296,12 @@
             pointer-events: none;
         }
 
-        /* GPS Button Style */
-        .gps-button {
+        /* Floating Button Common */
+        .floating-btn {
             position: absolute;
-            bottom: 30px;
-            right: 30px;
             width: 50px;
             height: 50px;
             background: #fff;
-            border: 2px solid var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -312,25 +309,178 @@
             cursor: pointer;
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .gps-button:hover {
+        .floating-btn:hover {
             transform: scale(1.1);
             background: #f0f0f0;
         }
 
-        .gps-button svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--primary);
-            transition: transform 0.2s;
-            -webkit-transition: transform 0.2s;
+        /* GPS Button Position */
+        .gps-button {
+            bottom: 30px;
+            right: 30px;
+            border: 2px solid var(--primary);
         }
 
-        .gps-button.loading svg {
-            animation: rotate 1s linear infinite;
-            -webkit-animation: rotate 1s linear infinite;
+        /* Menu Button Style */
+        .menu-btn {
+            top: 20px;
+            right: 20px;
+            border: 2px solid var(--secondary);
+        }
+
+        .hamburger-icon {
+            width: 20px;
+            height: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .hamburger-icon span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: var(--secondary);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .menu-btn.active .hamburger-icon span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .menu-btn.active .hamburger-icon span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-btn.active .hamburger-icon span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        /* Side Nav Drawer */
+        .side-nav {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: white;
+            z-index: 9000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .side-nav.open {
+            transform: translateX(0);
+        }
+
+        .side-nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 8999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .side-nav-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .side-nav-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, var(--secondary), #1565c0);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .side-nav-header .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .close-nav {
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .close-nav:hover {
+            opacity: 1;
+        }
+
+        .side-nav-body {
+            padding: 20px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .menu-category {
+            padding: 10px 20px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: #f8f9fa;
+            border-left-color: var(--secondary);
+        }
+
+        .menu-item .m-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item .m-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .side-nav-footer {
+            padding: 20px;
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        /* Mobile specific adjustments */
+        @media (max-width: 640px) {
+            .side-nav {
+                width: 80%;
+            }
         }
 
         @keyframes rotate {
@@ -985,153 +1135,192 @@
                 </div>
             </div>
         </div>
-        <div id="map">
-            <div class="gps-button" onclick="requestMyLocation()" title="내 위치 찾기">
-                <svg viewBox="0 0 24 24">
-                    <path
-                        d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
-                </svg>
+    </div>
+
+    <!-- Hamburger Menu Button -->
+    <div id="menuBtn" class="floating-btn menu-btn" onclick="toggleNav()" title="메뉴 열기">
+        <div class="hamburger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Side Navigation Drawer -->
+    <div id="sideNavOverlay" class="side-nav-overlay" onclick="closeNav()"></div>
+    <div id="sideNav" class="side-nav">
+        <div class="side-nav-header">
+            <div class="logo">🎰 KINOV</div>
+            <span class="close-nav" onclick="closeNav()">&times;</span>
+        </div>
+
+        <div class="side-nav-body">
+            <div class="menu-category">당첨 정보</div>
+            <div class="menu-item" onclick="showStats()">
+                <span class="m-icon">📊</span>
+                <span class="m-text">번호별 출현횟수 (준비중)</span>
+            </div>
+            <!-- Nationwide Rankings placeholder if needed later -->
+
+            <div class="menu-category">편의 기능</div>
+            <div class="menu-item" onclick="showQRScanner()">
+                <span class="m-icon">📷</span>
+                <span class="m-text">QR코드 당첨확인 (준비중)</span>
+            </div>
+            <div class="menu-item" onclick="requestMyLocation(); closeNav();">
+                <span class="m-icon">📍</span>
+                <span class="m-text">내 주변 명당 찾기</span>
+            </div>
+
+            <div class="menu-category">기타</div>
+            <div class="menu-item" onclick="shareToKakao()">
+                <span class="m-icon">📢</span>
+                <span class="m-text">친구에게 공유하기</span>
             </div>
         </div>
-        <div id="adModal" class="modal">
-            <div class="modal-content">
-                <span class="modal-close" onclick="closeModal()">&times;</span>
-                <div id="adContent"
-                    style="width:100%; height:450px; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
 
-                    <!-- Mode Selection Menu -->
-                    <div id="modeSelection" style="width:100%; max-width:400px;">
-                        <div style="background:#fae100; color:#3c1e1e; padding:8px 15px; text-align:center; font-weight:bold; cursor:pointer; font-size:14px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1);"
-                            onclick="shareToKakao()">
-                            📢 카톡 공유하고 당첨 확률 높이기 (클릭)
-                        </div>
+        <div class="side-nav-footer">
+            &copy; 2026 KINOV. All rights reserved.
+        </div>
+    </div>
 
-                        <h2
-                            style="color:white; text-align:center; margin-bottom:15px; font-size:20px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
-                            🔮 번호 생성 방식을 선택하세요
-                        </h2>
+    <div id="adModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="adContent"
+                style="width:100%; height:450px; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
 
-                        <div class="selection-menu">
-                            <!-- 1. Data Analysis -->
-                            <div class="selection-card" onclick="selectAnalysisMode()">
-                                <div class="selection-icon">📊</div>
-                                <div class="selection-info">
-                                    <span class="selection-title">데이터 정밀 분석</span>
-                                    <span class="selection-desc">명당의 과거 당첨 패턴을 정밀 분석</span>
-                                </div>
-                            </div>
-
-                            <!-- 2. Dream -->
-                            <div class="selection-card" onclick="selectDreamMode()">
-                                <div class="selection-icon">🌙</div>
-                                <div class="selection-info">
-                                    <span class="selection-title">꿈 해몽 번호</span>
-                                    <span class="selection-desc">어젯밤 꿈 내용을 입력해보세요</span>
-                                </div>
-                            </div>
-
-                            <!-- 3. Horoscope -->
-                            <div class="selection-card" onclick="selectHoroscopeMode()">
-                                <div class="selection-icon">🐅</div>
-                                <div class="selection-info">
-                                    <span class="selection-title">오늘의 띠별 운세</span>
-                                    <span class="selection-desc">나의 띠에 맞는 행운의 숫자</span>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Mode Selection Menu -->
+                <div id="modeSelection" style="width:100%; max-width:400px;">
+                    <div style="background:#fae100; color:#3c1e1e; padding:8px 15px; text-align:center; font-weight:bold; cursor:pointer; font-size:14px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1);"
+                        onclick="shareToKakao()">
+                        📢 카톡 공유하고 당첨 확률 높이기 (클릭)
                     </div>
 
-                    <!-- Loading Animation (Initially Hidden) -->
-                    <div id="analysisLoading" class="loader-container">
-                        <div class="spinner"></div>
-                        <h3 style="margin:10px 0; font-size:22px;">데이터 분석 중...</h3>
-                        <p style="font-size:14px; opacity:0.9;">명당의 기운을 모으고 있습니다</p>
-                    </div>
+                    <h2
+                        style="color:white; text-align:center; margin-bottom:15px; font-size:20px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                        🔮 번호 생성 방식을 선택하세요
+                    </h2>
 
-                    <!-- Placeholders for Step 2 & 3 -->
-                    <div id="modeDreamInput" class="input-container">
-                        <h2
-                            style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
-                            🌙 어젯밤 무슨 꿈을 꾸셨나요?
-                        </h2>
-
-                        <div class="dream-tags">
-                            <button class="dream-tag" onclick="handleDreamTag('돼지')">🐷 돼지</button>
-                            <button class="dream-tag" onclick="handleDreamTag('똥')">💩 똥</button>
-                            <button class="dream-tag" onclick="handleDreamTag('조상')">👴 조상</button>
-                            <button class="dream-tag" onclick="handleDreamTag('불')">🔥 불</button>
-                            <button class="dream-tag" onclick="handleDreamTag('물')">💧 물</button>
-                            <button class="dream-tag" onclick="handleDreamTag('뱀')">🐍 뱀</button>
+                    <div class="selection-menu">
+                        <!-- 1. Data Analysis -->
+                        <div class="selection-card" onclick="selectAnalysisMode()">
+                            <div class="selection-icon">📊</div>
+                            <div class="selection-info">
+                                <span class="selection-title">데이터 정밀 분석</span>
+                                <span class="selection-desc">명당의 과거 당첨 패턴을 정밀 분석</span>
+                            </div>
                         </div>
 
-                        <div class="dream-input-box">
-                            <input type="text" id="dreamInput" class="dream-input" placeholder="기타 꿈 입력 (10자 이내)"
-                                maxlength="10">
-                            <button class="btn-dream-submit" onclick="handleDreamSubmit()">결과보기</button>
+                        <!-- 2. Dream -->
+                        <div class="selection-card" onclick="selectDreamMode()">
+                            <div class="selection-icon">🌙</div>
+                            <div class="selection-info">
+                                <span class="selection-title">꿈 해몽 번호</span>
+                                <span class="selection-desc">어젯밤 꿈 내용을 입력해보세요</span>
+                            </div>
                         </div>
 
-                        <div style="margin-top:20px;">
-                            <button class="btn-sm" style="background:rgba(0,0,0,0.3);"
-                                onclick="resetToModeSelection()">🔙 뒤로가기</button>
-                        </div>
-                    </div>
-                    <div id="modeHoroscopeSelect" class="input-container">
-                        <h2
-                            style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
-                            🐅 당신의 띠를 선택하세요
-                        </h2>
-                        <div class="zodiac-grid">
-                            <div class="zodiac-item" onclick="handleZodiacClick('쥐', '🐹')"><span
-                                    class="zodiac-icon">🐹</span><span class="zodiac-name">쥐띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('소', '🐮')"><span
-                                    class="zodiac-icon">🐮</span><span class="zodiac-name">소띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('호랑이', '🐯')"><span
-                                    class="zodiac-icon">🐯</span><span class="zodiac-name">범띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('토끼', '🐰')"><span
-                                    class="zodiac-icon">🐰</span><span class="zodiac-name">토끼띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('용', '🐲')"><span
-                                    class="zodiac-icon">🐲</span><span class="zodiac-name">용띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('뱀', '🐍')"><span
-                                    class="zodiac-icon">🐍</span><span class="zodiac-name">뱀띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('말', '🐴')"><span
-                                    class="zodiac-icon">🐴</span><span class="zodiac-name">말띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('양', '🐑')"><span
-                                    class="zodiac-icon">🐑</span><span class="zodiac-name">양띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('원숭이', '🐵')"><span
-                                    class="zodiac-icon">🐵</span><span class="zodiac-name">원숭이띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('닭', '🐔')"><span
-                                    class="zodiac-icon">🐔</span><span class="zodiac-name">닭띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('개', '🐶')"><span
-                                    class="zodiac-icon">🐶</span><span class="zodiac-name">개띠</span></div>
-                            <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
-                                    class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
-                        </div>
-
-                        <div style="margin-top:20px;">
-                            <button class="btn-sm" style="background:rgba(0,0,0,0.3);"
-                                onclick="resetToModeSelection()">🔙 뒤로가기</button>
+                        <!-- 3. Horoscope -->
+                        <div class="selection-card" onclick="selectHoroscopeMode()">
+                            <div class="selection-icon">🐅</div>
+                            <div class="selection-info">
+                                <span class="selection-title">오늘의 띠별 운세</span>
+                                <span class="selection-desc">나의 띠에 맞는 행운의 숫자</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div id="resultContent"
-                style="display:none; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; min-height:420px;">
-                <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.2);">🎉 추천 번호 생성 완료! 🎉</h2>
-                <p id="resultInfoText" style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px;">
-                    이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
-                    (<span id="paramRounds"></span> 등)
-                </p>
-                <div class="lucky-balls" id="luckyBalls">
-                    <!-- Balls go here -->
+
+                <!-- Loading Animation (Initially Hidden) -->
+                <div id="analysisLoading" class="loader-container">
+                    <div class="spinner"></div>
+                    <h3 style="margin:10px 0; font-size:22px;">데이터 분석 중...</h3>
+                    <p style="font-size:14px; opacity:0.9;">명당의 기운을 모으고 있습니다</p>
                 </div>
-                <p style="font-size:12px; color:rgba(255,255,255,0.8);">* 재미로만 봐주세요. 과도한 구매는 금물!</p>
-                <button class="btn-apply btn-navi"
-                    style="margin-top:10px; background:#fae100; color:#3c1e1e; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
-                    onclick="goToShop()">
-                    🚗 지금 당장 사러 가기 (길찾기)
-                </button>
+
+                <!-- Placeholders for Step 2 & 3 -->
+                <div id="modeDreamInput" class="input-container">
+                    <h2 style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                        🌙 어젯밤 무슨 꿈을 꾸셨나요?
+                    </h2>
+
+                    <div class="dream-tags">
+                        <button class="dream-tag" onclick="handleDreamTag('돼지')">🐷 돼지</button>
+                        <button class="dream-tag" onclick="handleDreamTag('똥')">💩 똥</button>
+                        <button class="dream-tag" onclick="handleDreamTag('조상')">👴 조상</button>
+                        <button class="dream-tag" onclick="handleDreamTag('불')">🔥 불</button>
+                        <button class="dream-tag" onclick="handleDreamTag('물')">💧 물</button>
+                        <button class="dream-tag" onclick="handleDreamTag('뱀')">🐍 뱀</button>
+                    </div>
+
+                    <div class="dream-input-box">
+                        <input type="text" id="dreamInput" class="dream-input" placeholder="기타 꿈 입력 (10자 이내)"
+                            maxlength="10">
+                        <button class="btn-dream-submit" onclick="handleDreamSubmit()">결과보기</button>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <button class="btn-sm" style="background:rgba(0,0,0,0.3);" onclick="resetToModeSelection()">🔙
+                            뒤로가기</button>
+                    </div>
+                </div>
+                <div id="modeHoroscopeSelect" class="input-container">
+                    <h2 style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                        🐅 당신의 띠를 선택하세요
+                    </h2>
+                    <div class="zodiac-grid">
+                        <div class="zodiac-item" onclick="handleZodiacClick('쥐', '🐹')"><span
+                                class="zodiac-icon">🐹</span><span class="zodiac-name">쥐띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('소', '🐮')"><span
+                                class="zodiac-icon">🐮</span><span class="zodiac-name">소띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('호랑이', '🐯')"><span
+                                class="zodiac-icon">🐯</span><span class="zodiac-name">범띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('토끼', '🐰')"><span
+                                class="zodiac-icon">🐰</span><span class="zodiac-name">토끼띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('용', '🐲')"><span
+                                class="zodiac-icon">🐲</span><span class="zodiac-name">용띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('뱀', '🐍')"><span
+                                class="zodiac-icon">🐍</span><span class="zodiac-name">뱀띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('말', '🐴')"><span
+                                class="zodiac-icon">🐴</span><span class="zodiac-name">말띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('양', '🐑')"><span
+                                class="zodiac-icon">🐑</span><span class="zodiac-name">양띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('원숭이', '🐵')"><span
+                                class="zodiac-icon">🐵</span><span class="zodiac-name">원숭이띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('닭', '🐔')"><span
+                                class="zodiac-icon">🐔</span><span class="zodiac-name">닭띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('개', '🐶')"><span
+                                class="zodiac-icon">🐶</span><span class="zodiac-name">개띠</span></div>
+                        <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
+                                class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
+                    </div>
+
+                    <div style="margin-top:20px;">
+                        <button class="btn-sm" style="background:rgba(0,0,0,0.3);" onclick="resetToModeSelection()">🔙
+                            뒤로가기</button>
+                    </div>
+                </div>
             </div>
         </div>
+        <div id="resultContent"
+            style="display:none; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; min-height:420px;">
+            <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.2);">🎉 추천 번호 생성 완료! 🎉</h2>
+            <p id="resultInfoText" style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px;">
+                이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
+                (<span id="paramRounds"></span> 등)
+            </p>
+            <div class="lucky-balls" id="luckyBalls">
+                <!-- Balls go here -->
+            </div>
+            <p style="font-size:12px; color:rgba(255,255,255,0.8);">* 재미로만 봐주세요. 과도한 구매는 금물!</p>
+            <button class="btn-apply btn-navi"
+                style="margin-top:10px; background:#fae100; color:#3c1e1e; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
+                onclick="goToShop()">
+                🚗 지금 당장 사러 가기 (길찾기)
+            </button>
+        </div>
+    </div>
     </div>
     </div>
 
@@ -1911,11 +2100,49 @@
         function goToShop() {
             if (!currentShopData) return;
             openDirections(currentShopData.lat, currentShopData.lng, currentShopData.name);
-            // closeModal(); // Do not close automatically or it might conflict with navigation? 
-            // Actually, usually you want to close modal if leaving. 
-            // But if opening _blank, modal stays. Let's force close logic.
-            // Calling closeModal() triggers history.back(), cleaning up state.
             closeModal();
+        }
+
+        // --- Side Nav Controls ---
+        function toggleNav() {
+            const nav = document.getElementById('sideNav');
+            const overlay = document.getElementById('sideNavOverlay');
+            const btn = document.getElementById('menuBtn');
+            const isOpen = nav.classList.contains('open');
+
+            if (isOpen) {
+                closeNav();
+            } else {
+                nav.classList.add('open');
+                overlay.style.display = 'block';
+                setTimeout(() => overlay.classList.add('show'), 10);
+                btn.classList.add('active');
+            }
+        }
+
+        function closeNav() {
+            const nav = document.getElementById('sideNav');
+            const overlay = document.getElementById('sideNavOverlay');
+            const btn = document.getElementById('menuBtn');
+
+            nav.classList.remove('open');
+            overlay.classList.remove('show');
+            setTimeout(() => {
+                if (!nav.classList.contains('open')) {
+                    overlay.style.display = 'none';
+                }
+            }, 300);
+            btn.classList.remove('active');
+        }
+
+        function showStats() {
+            showToast("📊 번호별 출현횟수 기능 개발 중입니다!", "info");
+            closeNav();
+        }
+
+        function showQRScanner() {
+            showToast("📷 QR코드 당첨확인 기능 개발 중입니다!", "info");
+            closeNav();
         }
 
         // Close modal when clicking outside - Direct listener for better mobile support
