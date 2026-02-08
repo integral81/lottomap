@@ -40,16 +40,25 @@ def verify_and_correct():
     updates_count = 0
     consecutive_errors = 0
     
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+    }
+
     for r in range(start_round, end_round + 1):
         round_str = str(r)
         url = f'https://www.dhlottery.co.kr/common.do?method=getLottoNumber&drwNo={r}'
         
         try:
             # print(f"Checking Round {r}...", end='\r')
-            resp = requests.get(url, timeout=10)
+            resp = requests.get(url, headers=headers, timeout=10)
             
             if resp.status_code == 200:
-                result = resp.json()
+                try:
+                    result = resp.json()
+                except ValueError:
+                    print(f"\n[Error] Round {r}: Response is not JSON. (Content: {resp.text[:50]}...)")
+                    consecutive_errors += 1
+                    continue
                 consecutive_errors = 0 # Reset error count
                 
                 if result.get('returnValue') == 'success':
