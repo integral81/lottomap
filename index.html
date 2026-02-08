@@ -1162,18 +1162,40 @@
             transition: width 0.5s ease;
         }
 
-        .freq-count {
-            width: 35px;
-            text-align: right;
-            font-size: 14px;
-            color: #666;
-            font-weight: 500;
+        #mapProcessing {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .processing-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid white;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: rotate 1s linear infinite;
         }
     </style>
 </head>
 
 <body>
     <div id="toast-container"></div>
+    <div id="mapProcessing">
+        <div class="processing-spinner"></div>
+        <span>지도 데이터 처리 중...</span>
+    </div>
     <div id="app">
         <div id="sidebar">
             <h1>🎰 KINOV Lotto Map</h1>
@@ -1493,9 +1515,9 @@
             if (data.length > 0) {
                 const rounds = data.map(d => d.r);
                 const maxR = Math.max(...rounds);
-                const minR = Math.min(...rounds);
+                const minR = Math.max(1, maxR - 20); // Mobile Performance: Show last 20 rounds by default
                 document.getElementById('maxRound').value = maxR;
-                document.getElementById('minRound').value = 1; // Force start from 1 as request
+                document.getElementById('minRound').value = minR;
             }
 
             applyFilters();
@@ -1703,98 +1725,109 @@
             }
         }
 
+        let markerCreationTimer = null;
+
         function updateMarkers(data) {
+            // Cancel any ongoing marker creation
+            if (markerCreationTimer) {
+                clearTimeout(markerCreationTimer);
+                markerCreationTimer = null;
+            }
+
             clusterer.clear();
             markers.forEach(m => m.setMap(null));
             markers = [];
 
-            // To avoid duplicate markers for the same shop at the same location,
-            // we need to group the filtered data by shop (lat, lng, name, address)
-            // and then create a single marker for each unique shop.
+            const indicator = document.getElementById('mapProcessing');
+            if (indicator) indicator.style.display = 'flex';
+
+            // Group data by unique shop location/name (Optimization: pre-group for fewer markers)
             const uniqueShops = {};
             data.forEach(d => {
                 const key = `${d.lat}_${d.lng}_${d.n}_${d.a}`;
                 if (!uniqueShops[key]) {
                     uniqueShops[key] = {
-                        n: d.n,
-                        a: d.a,
-                        lat: d.lat,
-                        lng: d.lng,
-                        totalWins: d.totalWins, // This is the total wins for the shop
-                        rounds: [] // To store individual round details for infowindow
+                        n: d.n, a: d.a, lat: d.lat, lng: d.lng,
+                        totalWins: d.totalWins || 0,
+                        rounds: []
                     };
                 }
                 uniqueShops[key].rounds.push({ r: d.r, m: d.m });
             });
 
-            Object.values(uniqueShops).forEach(shop => {
-                let markerImg = null;
-                // Tiered Styles
-                if (shop.totalWins >= 5) {
-                    // Legendary Gold Star
-                    markerImg = new kakao.maps.MarkerImage(
-                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
-                        new kakao.maps.Size(24, 35)
-                    );
-                } else if (shop.totalWins >= 3) {
-                    // Professional Red
-                    markerImg = new kakao.maps.MarkerImage(
-                        'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png',
-                        new kakao.maps.Size(24, 35),
-                        { offset: new kakao.maps.Point(12, 35) }
-                    );
-                }
+            const shops = Object.values(uniqueShops);
+            const totalShops = shops.length;
+            let currentIndex = 0;
+            const batchSize = 150; // Optimized batch for mobile performance
 
-                const marker = new kakao.maps.Marker({
-                    position: new kakao.maps.LatLng(shop.lat, shop.lng),
-                    image: markerImg
-                });
+            function processBatch() {
+                const endIndex = Math.min(currentIndex + batchSize, totalShops);
+                const batchMarkers = [];
 
-                const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
-                const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
-
-                const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
-                const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
-
-                const content = `
-                    <div class="infowindow">
-                        <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
-                        <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
-                            <span class="iw-addr">${shop.a}</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                        </div>
-                        <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
-                        <div class="iw-details">${roundTagsHtml}</div>
-                        <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins})">
-                            ✨ 이번 주 1등 추천 번호 받기
-                        </button>
-                        <div class="iw-actions">
-                            <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
-                                🚗 길찾기
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: content,
-                    removable: true,
-                    zIndex: 1500 // Ensure popup is on top of markers
-                });
-
-                kakao.maps.event.addListener(marker, 'click', () => {
-                    // Close previous InfoWindow if exists
-                    if (currentInfoWindow) {
-                        currentInfoWindow.close();
+                for (let i = currentIndex; i < endIndex; i++) {
+                    const shop = shops[i];
+                    let markerImg = null;
+                    if (shop.totalWins >= 5) {
+                        markerImg = new kakao.maps.MarkerImage('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', new kakao.maps.Size(24, 35));
+                    } else if (shop.totalWins >= 3) {
+                        markerImg = new kakao.maps.MarkerImage('https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png', new kakao.maps.Size(24, 35), { offset: new kakao.maps.Point(12, 35) });
                     }
 
-                    infowindow.open(map, marker);
-                    currentInfoWindow = infowindow; // Update current
-                });
+                    const marker = new kakao.maps.Marker({
+                        position: new kakao.maps.LatLng(shop.lat, shop.lng),
+                        image: markerImg
+                    });
 
-                markers.push(marker);
-            });
-            clusterer.addMarkers(markers);
+                    // Lazy InfoWindow: Only create on click
+                    kakao.maps.event.addListener(marker, 'click', () => {
+                        if (currentInfoWindow) currentInfoWindow.close();
+
+                        const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
+                        const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+                        const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+                        const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+
+                        const content = `
+                            <div class="infowindow">
+                                <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
+                                <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
+                                    <span class="iw-addr">${shop.a}</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                                </div>
+                                <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
+                                <div class="iw-details">${roundTagsHtml}</div>
+                                <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins})">
+                                    ✨ 이번 주 1등 추천 번호 받기
+                                </button>
+                                <div class="iw-actions">
+                                    <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
+                                        🚗 길찾기
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        currentInfoWindow = new kakao.maps.InfoWindow({ content: content, removable: true, zIndex: 1500 });
+                        currentInfoWindow.open(map, marker);
+                    });
+
+                    batchMarkers.push(marker);
+                    markers.push(marker);
+                }
+
+                clusterer.addMarkers(batchMarkers);
+                currentIndex = endIndex;
+
+                if (currentIndex < totalShops) {
+                    markerCreationTimer = setTimeout(processBatch, 10); // Relinquish UI thread for 10ms
+                } else {
+                    if (indicator) indicator.style.display = 'none';
+                    markerCreationTimer = null;
+                    console.log('All markers added:', totalShops);
+                }
+            }
+
+            processBatch();
         }
 
         /**
