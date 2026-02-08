@@ -1882,7 +1882,7 @@
                 const nums = window.lottoHistory[String(targetRound)];
 
                 if (nums && nums.length > 0) {
-                    nums.sort((a, b) => a - b).forEach(n => {
+                    [...nums].sort((a, b) => a - b).forEach(n => {
                         const ball = document.createElement('span');
                         ball.className = 'mini-ball ' + getBallColor(n);
                         ball.innerText = n;
