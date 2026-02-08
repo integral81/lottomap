@@ -1532,8 +1532,8 @@
             console.log('Loading data...');
 
             Promise.all([
-                fetch('lotto_data.json?v=' + Date.now()).then(res => res.json()),
-                fetch('lotto_history.json?v=' + Date.now()).then(res => res.json())
+                fetch('lotto_data.json').then(res => res.json()),
+                fetch('lotto_history.json').then(res => res.json())
             ])
                 .then(([lottoData, historyData]) => {
                     window.lottoHistory = historyData; // Global variable
@@ -2310,19 +2310,20 @@
             const oldest = targetRounds[targetRounds.length - 1];
             document.getElementById('statsRangeText').innerText = `${oldest}회 ~ ${latest}회`;
 
+            let listHtml = '';
             sorted.forEach(item => {
                 const perc = (item.count / maxCount) * 100;
-                const row = document.createElement('div');
-                row.className = 'freq-row';
-                row.innerHTML = `
-                    <div class="freq-num">${item.num < 10 ? '0' + item.num : item.num}</div>
-                    <div class="freq-bar-container">
-                        <div class="freq-bar-fill" style="width: ${perc}%"></div>
+                listHtml += `
+                    <div class="freq-row">
+                        <div class="freq-num">${item.num < 10 ? '0' + item.num : item.num}</div>
+                        <div class="freq-bar-container">
+                            <div class="freq-bar-fill" style="width: ${perc}%"></div>
+                        </div>
+                        <div class="freq-count">${item.count}</div>
                     </div>
-                    <div class="freq-count">${item.count}</div>
                 `;
-                body.appendChild(row);
             });
+            body.innerHTML = listHtml;
         }
 
         function showQRScanner() {
