@@ -1080,6 +1080,88 @@
             line-height: 1.5;
             border-left: 4px solid #fae100;
         }
+
+        /* Frequency Dashboard Styles */
+        .freq-modal-content {
+            background: #fff;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+        }
+
+        .freq-header {
+            background: #80cbc4;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .freq-header .back-btn {
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .freq-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .freq-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+        }
+
+        .freq-ball {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .freq-bar-container {
+            flex: 1;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .freq-bar-fill {
+            height: 100%;
+            background: #444;
+            border-radius: 6px;
+            transition: width 0.5s ease-out;
+        }
+
+        .freq-count {
+            width: 35px;
+            text-align: right;
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -1180,7 +1262,7 @@
             <div class="menu-category">당첨 정보</div>
             <div class="menu-item" onclick="showStats()">
                 <span class="m-icon">📊</span>
-                <span class="m-text">번호별 출현횟수 (준비중)</span>
+                <span class="m-text">번호별 출현횟수</span>
             </div>
             <!-- Nationwide Rankings placeholder if needed later -->
 
@@ -1342,6 +1424,23 @@
                 🚗 지금 당장 사러 가기 (길찾기)
         </div> <!-- end info-modal -->
     </div> <!-- end ad-content -->
+
+    <!-- Frequency Statistics Modal -->
+    <div id="statModal" class="modal">
+        <div class="freq-modal-content">
+            <div class="freq-header">
+                <div class="back-btn" onclick="closeStatModal()">
+                    <span>❮</span> Menu
+                </div>
+                <div>번호별 출현횟수</div>
+                <div style="width: 45px;"></div> <!-- Spacer -->
+            </div>
+            <div class="freq-body" id="freqBody">
+                <!-- Data will be injected here -->
+                <div style="text-align:center; padding:20px; color:#666;">데이터 분석 중...</div>
+            </div>
+        </div>
+    </div>
 
     <script>
         let map, clusterer, allData = [], markers = [];
@@ -2155,8 +2254,60 @@
         }
 
         function showStats() {
-            showToast("📊 번호별 출현횟수 기능 개발 중입니다!", "info");
             closeNav();
+            const modal = document.getElementById('statModal');
+            modal.style.display = 'flex';
+            renderFrequencyStats();
+        }
+
+        function closeStatModal() {
+            document.getElementById('statModal').style.display = 'none';
+        }
+
+        function renderFrequencyStats() {
+            const container = document.getElementById('freqBody');
+            if (!window.lottoHistory) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:red;">데이터를 불러올 수 없습니다.</div>';
+                return;
+            }
+
+            // 1. Calculate frequencies for all numbers (1-45)
+            const counts = {};
+            for (let i = 1; i <= 45; i++) counts[i] = 0;
+
+            const rounds = Object.keys(window.lottoHistory);
+            rounds.forEach(r => {
+                const nums = window.lottoHistory[r];
+                nums.forEach(n => {
+                    if (counts[n] !== undefined) counts[n]++;
+                });
+            });
+
+            // 2. Convert to array and sort by frequency (descending)
+            const sorted = Object.keys(counts).map(num => ({
+                num: parseInt(num),
+                count: counts[num]
+            })).sort((a, b) => b.count - a.count || a.num - b.num);
+
+            const maxCount = sorted[0].count;
+
+            // 3. Render
+            let html = '';
+            sorted.forEach((item, index) => {
+                const percentage = (item.count / maxCount) * 100;
+                const paddedNum = item.num < 10 ? '0' + item.num : item.num;
+                html += `
+                    <div class="freq-row">
+                        <div class="freq-ball">${paddedNum}</div>
+                        <div class="freq-bar-container">
+                            <div class="freq-bar-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="freq-count">${item.count}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
         }
 
         function showQRScanner() {
@@ -2164,15 +2315,17 @@
             closeNav();
         }
 
-        // Close modal when clicking outside - Direct listener for better mobile support
-        const modalEl = document.getElementById('adModal');
-        if (modalEl) {
-            modalEl.addEventListener('click', function (event) {
-                if (event.target === modalEl) {
-                    closeModal();
-                }
-            });
-        }
+        // Close modal when clicking outside
+        window.addEventListener('click', function (event) {
+            const adModal = document.getElementById('adModal');
+            const statModal = document.getElementById('statModal');
+            if (event.target === adModal) {
+                closeModal();
+            }
+            if (event.target === statModal) {
+                closeStatModal();
+            }
+        });
 
         // Handle Back Button
         window.addEventListener('popstate', function (event) {
