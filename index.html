@@ -3,8 +3,23 @@
 
 <head>
     <meta charset="utf-8">
-    <title>KINOV Lotto Map</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KINOV Lotto Map - 전국 로또 명당 지도</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="전국 로또 1등 당첨 판매점을 지도에서 한눈에 확인하세요. 내 주변 명당 찾기, 로또 번호 무료 추천 서비스 제공.">
+    <meta name="keywords" content="로또, 로또명당, 로또지도, 로또1등, 로또당첨번호, 로또판매점, KINOV">
+    <meta name="author" content="KINOV">
+
+    <!-- Open Graph (KakaoTalk, Facebook, etc.) -->
+    <meta property="og:title" content="🎰 KINOV 로또 명당 지도">
+    <meta property="og:description" content="역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.">
+    <meta property="og:image" content="https://www.k-inov.co.kr/assets/img/lotto_share_thumb.png">
+    <!-- Update with actual image URL if available, or use a placeholder -->
+    <meta property="og:url" content="https://integral81.github.io/lotto_kakaomap/">
+    <meta property="og:type" content="website">
+
+    <!-- Favicon (Using Emoji for now if no file exists) -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
     <script>
         // SDK Error Handler (Defined first)
         function handleScriptError() {
@@ -1817,6 +1832,16 @@
                 document.getElementById('paramHCount').parentElement.innerHTML =
                     `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${result.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
                     `(<span id="paramRounds">${result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '')}</span> 등)`;
+            }
+
+            // Legal Disclaimer
+            const legalDiv = document.getElementById('legalDisclaimer');
+            if (!legalDiv) {
+                const legal = document.createElement('div');
+                legal.id = 'legalDisclaimer';
+                legal.style.cssText = "font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 15px; text-align: center; line-height: 1.4;";
+                legal.innerHTML = "※ 본 서비스는 동행복권의 당첨 데이터를 기반으로 통계적/임의적 분석을 제공하며, 당첨을 보장하지 않습니다.<br>과도한 복권 구매는 도박 중독을 유발할 수 있습니다.";
+                document.getElementById('resultContent').appendChild(legal);
             }
 
             // Render
