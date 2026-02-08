@@ -1198,7 +1198,7 @@
     </div>
     <div id="app">
         <div id="sidebar">
-            <h1>🎰 KINOV Lotto Map</h1>
+            <h1>🎰 KINOV Lotto Map <span style="font-size:10px; color:#999; font-weight:normal;">v1.0.4</span></h1>
             <div class="section">
                 <span class="section-title">📅 회차 필터 (Round)</span>
                 <div class="input-row">
@@ -1542,9 +1542,13 @@
             const countEl = document.getElementById('totalDataCount');
             console.log('Loading data...');
 
-            // 1. Load History Data (Small, for statistics and widgets)
-            fetch('lotto_history.json')
-                .then(res => res.json())
+            const ts = new Date().getTime();
+            // 1. Load History Data (Small)
+            fetch(`lotto_history.json?v=${ts}`)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then(historyData => {
                     window.lottoHistory = historyData;
                     console.log('History data loaded');
@@ -1564,9 +1568,12 @@
                 })
                 .catch(err => console.error('History load failed:', err));
 
-            // 2. Load Map Data (Large, for markers)
-            fetch('lotto_data.json')
-                .then(res => res.json())
+            // 2. Load Map Data (Large)
+            fetch(`lotto_data.json?v=${ts}`)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then(lottoData => {
                     processLoadedData(lottoData);
                 })
