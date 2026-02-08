@@ -565,6 +565,38 @@
             background: #b0d840;
         }
 
+        /* Mini Ball for Recent Rounds */
+        .mini-ball {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+            margin-right: 2px;
+        }
+
+        .recent-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .recent-round-num {
+            font-size: 11px;
+            font-weight: bold;
+            color: #555;
+            width: 45px;
+        }
+
         /* Mobile Responsive Design */
         @media (max-width: 768px) {
             #app {
@@ -627,6 +659,18 @@
                     <input type="number" id="maxRound" value="1210">
                 </div>
             </div>
+
+            <!-- Recent 5 Rounds Display -->
+            <div class="section" id="recentRoundsContainer"
+                style="background:#f0f4f8; padding:10px; border-radius:8px; margin-bottom:20px;">
+                <span class="section-title" style="margin-bottom:8px;">📊 최근 5회차 당첨번호 (기준: <span id="recentRefRound"
+                        style="color:#d32f2f;">1210</span>회)</span>
+                <div id="recentRoundsList" style="display:flex; flex-direction:column; gap:6px;">
+                    <!-- Javascript will populate this -->
+                    <div style="font-size:12px; color:#666; text-align:center;">데이터 로딩 중...</div>
+                </div>
+            </div>
+
             <div class="section">
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group">
@@ -887,6 +931,67 @@
 
             document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
             updateMarkers(filtered);
+            document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
+            updateMarkers(filtered);
+            updateRecentRounds(maxR);
+        }
+
+        function updateRecentRounds(maxRound) {
+            const container = document.getElementById('recentRoundsList');
+            const refSpan = document.getElementById('recentRefRound');
+            if (refSpan) refSpan.innerText = maxRound;
+
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Check if history data is loaded
+            if (!window.lottoHistory) {
+                container.innerHTML = '<div style="font-size:12px; color:#666; text-align:center;">데이터 로딩 중...</div>';
+                return;
+            }
+
+            // Loop 5 rounds: maxRound, maxRound-1, ..., maxRound-4
+            for (let i = 0; i < 5; i++) {
+                const targetRound = maxRound - i;
+                if (targetRound < 1) continue; // No rounds below 1
+
+                const row = document.createElement('div');
+                row.className = 'recent-row';
+
+                // Round Number
+                const roundNum = document.createElement('span');
+                roundNum.className = 'recent-round-num';
+                roundNum.innerText = targetRound + '회';
+                row.appendChild(roundNum);
+
+                // Balls Container
+                const ballsDiv = document.createElement('div');
+                ballsDiv.style.display = 'flex';
+                ballsDiv.style.gap = '2px';
+
+                // Get Winning Numbers
+                // lottoHistory key is string "1210"
+                const nums = window.lottoHistory[String(targetRound)];
+
+                if (nums && nums.length > 0) {
+                    nums.sort((a, b) => a - b).forEach(n => {
+                        const ball = document.createElement('span');
+                        ball.className = 'mini-ball ' + getBallColor(n);
+                        ball.innerText = n;
+                        ballsDiv.appendChild(ball);
+                    });
+                } else {
+                    const noData = document.createElement('span');
+                    noData.style.fontSize = '11px';
+                    noData.style.color = '#999';
+                    noData.innerText = '데이터 없음';
+                    ballsDiv.appendChild(noData);
+                }
+
+                row.appendChild(ballsDiv);
+                container.appendChild(row);
+            }
         }
 
         function updateMarkers(data) {
