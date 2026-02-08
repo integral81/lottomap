@@ -30,11 +30,14 @@ def verify_and_correct():
     if not data:
         return
 
-    start_round = 1
-    end_round = 1000 # Correcting 1~1000 as requested
+    start_round = 485 # Resume from 485
+    end_round = 1000 
+    
+    print(f"[*] Waiting 5 minutes (300s) cooldown before resuming...")
+    time.sleep(300)
     
     print(f"[*] Starting verification for rounds {start_round} to {end_round}...")
-    print(f"[*] Delay: 1.0 second per request to verify safely.")
+    print(f"[*] Delay: 2.0 seconds per request.")
     print(f"[*] You can continue other work while this runs.")
     
     updates_count = 0
@@ -100,7 +103,7 @@ def verify_and_correct():
             print(f"\n[Stop] Too many consecutive errors. Stopping verification.")
             break
             
-        time.sleep(1.0) # 1 second sleep
+        time.sleep(2.0) # 2 seconds sleep
         
     print(f"\n\n[*] Verification complete. Total updates: {updates_count}")
 
