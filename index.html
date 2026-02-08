@@ -1134,8 +1134,9 @@
                         onclick="document.getElementById('fileInput').click()">파일 직접 선택하기 (lotto_data.json)</button>
                 </div>
             </div>
-        </div>
-    </div>
+        </div> <!-- end #sidebar -->
+        <div id="map"></div>
+    </div> <!-- end #app -->
 
     <!-- Hamburger Menu Button -->
     <div id="menuBtn" class="floating-btn menu-btn" onclick="toggleNav()" title="메뉴 열기">
@@ -1327,9 +1328,7 @@
     <script>
         let map, clusterer, allData = [], markers = [];
         let currentInfoWindow = null; // Track the currently open InfoWindow
-
-
-        function handleFileSelect(event) {
+nction handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -1450,15 +1449,13 @@
                 }
             });
 
-            // 2. Select 6 numbers based on weights
-            const selected = new Set();
-            while (selected.size < 6) {
-                const n = weightedRandom(numberWeights);
+            // 2. Select 6 num        ed o        s
+            const selected = new Set                while (selected.size < 6) {
+                const n = wei        dom(numberWeights);
                 selected.add(n);
             }
 
-            return {
-                numbers: Array.from(selected).sort((a, b) => a - b),
+            return                   numbers: Array.from(selecte        (a, b) => a - b),
                 historyCount: storeWins.length,
                 relatedRounds: storeWins.map(w => w.r).slice(0, 5) // Top 5 recent rounds
             };
@@ -1701,8 +1698,7 @@
 
                     // Add/Update Blue Dot Marker
                     if (!myLocationMarker) {
-                        myLocationMarker = new kakao.maps.CustomOverlay({
-                            position: center,
+                        myLo        rker = new kakao.maps.CustomOv                                    position: center,
                             content: `
                                 <div style="position:relative;">
                                     <div class="pulse"></div>
