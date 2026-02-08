@@ -1758,28 +1758,55 @@
             };
             let seed = Math.abs(hash);
 
-            // 1. Horoscope Text Generation
-            const fortunes = [
-                "금전운이 매우 좋은 날입니다. 작은 투자도 큰 결실을 맺을 수 있습니다.",
-                "뜻밖의 행운이 찾아올 수 있습니다. 주변을 잘 살펴보세요.",
-                "오늘은 직감이 매우 뛰어난 날입니다. 당신의 느낌을 믿어보세요.",
-                "귀인의 도움을 받아 어려움이 해결될 것입니다. 긍정적인 마음을 가지세요.",
-                "재물운이 상승하는 시기입니다. 로또 구매하기 딱 좋은 날!",
-                "작은 노력으로 큰 기쁨을 얻을 수 있는 날입니다.",
-                "행운의 여신이 당신을 보고 미소 짓고 있습니다.",
-                "오랫동안 기다려온 소식이 들려올 수 있습니다.",
+            // 1. Horoscope Text Pools
+            const genFortunes = [
+                "금기(金氣)의 영향으로 신중함이 요구되는 하루입니다.",
                 "오늘은 당신의 날입니다. 무엇을 해도 술술 풀릴 것입니다.",
-                "주변 사람들과의 관계에서 행운이 비롯될 것입니다."
+                "직감이 매우 뛰어난 날입니다. 당신의 느낌을 믿어보세요.",
+                "귀인의 도움을 받아 어려움이 해결될 것입니다. 긍정적인 마음을 가지세요.",
+                "행운의 여신이 당신을 보고 미소 짓고 있습니다.",
+                "뜻밖의 행운이 찾아올 수 있습니다. 주변을 잘 살펴보세요.",
+                "차분하게 내실을 다지면 더 큰 기회가 찾아올 것입니다.",
+                "새로운 변화를 시도하기에 아주 적절한 시기입니다."
             ];
 
-            const luckyColors = ["빨강", "파랑", "노랑", "초록", "보라", "금색", "은색", "흰색"];
-            const directions = ["동", "서", "남", "북", "동남", "동북", "서남", "서북"];
+            const loveFortunes = [
+                "말의 표현을 조절하세요. 배려가 필요한 시기입니다.",
+                "소중한 사람과 즐거운 시간을 보내기에 좋은 날입니다.",
+                "솔직한 감정 표현이 상대방의 마음을 움직일 것입니다.",
+                "작은 오해가 생길 수 있으니 충분한 대화를 나누세요.",
+                "새로운 인연이 나타날 수 있는 기운이 강합니다.",
+                "서로에 대한 신뢰가 깊어지는 따뜻한 하루가 될 것입니다.",
+                "당신의 매력이 돋보이는 날입니다. 자신감을 가지세요.",
+                "가까운 사람과의 갈등은 먼저 손을 내미는 것이 좋습니다."
+            ];
 
-            const fortuneIndex = Math.floor(seededRandom(seed) * fortunes.length);
-            const colorIndex = Math.floor(seededRandom(seed + 1) * luckyColors.length);
-            const dirIndex = Math.floor(seededRandom(seed + 2) * directions.length);
+            const moneyFortunes = [
+                "예상치 못한 지출에 대비하세요. 신중한 소비가 필요합니다.",
+                "금전운이 매우 좋습니다. 작은 투자도 결실을 맺을 수 있습니다.",
+                "재물운이 상승하는 시기입니다. 로또 구매하기 딱 좋은 날!",
+                "지갑 관리에 신경 써야 하는 하루입니다. 충동구매를 주의하세요.",
+                "생각지 못한 곳에서 작은 수익이 발생할 수 있습니다.",
+                "계획적인 소비가 당신에게 더 큰 행운을 불러올 것입니다.",
+                "금전적인 이득보다는 인맥을 쌓는 것이 장기적으로 유리합니다.",
+                "뿌린 대로 거두는 날입니다. 성실함이 보상으로 돌아옵니다."
+            ];
 
-            const text = `${fortunes[fortuneIndex]}<br>행운의 색: <b>${luckyColors[colorIndex]}</b>, 방향: <b>${directions[dirIndex]}쪽</b>`;
+            const luckyColors = ["빨강", "파랑", "노랑", "초록", "보라", "금색", "은색", "흰색", "검정", "주황"];
+
+            const genIdx = Math.floor(seededRandom(seed) * genFortunes.length);
+            const loveIdx = Math.floor(seededRandom(seed + 1) * loveFortunes.length);
+            const moneyIdx = Math.floor(seededRandom(seed + 2) * moneyFortunes.length);
+            const colorIdx = Math.floor(seededRandom(seed + 3) * luckyColors.length);
+
+            const text = `
+                <div style="text-align:left; margin: 0 auto; max-width:280px; line-height:1.8; font-size:14px;">
+                    • <b>종합운</b> : ${genFortunes[genIdx]}<br>
+                    • <b>애정운</b> : ${loveFortunes[loveIdx]}<br>
+                    • <b>금전운</b> : ${moneyFortunes[moneyIdx]}<br>
+                    • <b>행운의 색상</b> : ${luckyColors[colorIdx]}
+                </div>
+            `;
 
             // 2. Number Generation
             const selected = new Set();
