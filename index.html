@@ -1166,7 +1166,7 @@
                 const maxR = Math.max(...rounds);
                 const minR = Math.min(...rounds);
                 document.getElementById('maxRound').value = maxR;
-                document.getElementById('minRound').value = minR;
+                document.getElementById('minRound').value = 1; // Force start from 1 as request
             }
 
             applyFilters();
