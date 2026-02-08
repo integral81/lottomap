@@ -773,6 +773,60 @@
             }
         }
 
+        /* Dream Mode Styles */
+        .dream-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .dream-tag {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .dream-tag:hover {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .dream-input-box {
+            display: flex;
+            gap: 5px;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .dream-input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+        }
+
+        .btn-dream-submit {
+            background: #fae100;
+            color: #333;
+            border: none;
+            padding: 0 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
         /* Input Container for Dream/Zodiac */
         .input-container {
             display: none;
@@ -920,7 +974,32 @@
                     </div>
 
                     <!-- Placeholders for Step 2 & 3 -->
-                    <div id="modeDreamInput" class="input-container"></div>
+                    <div id="modeDreamInput" class="input-container">
+                        <h2
+                            style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                            🌙 어젯밤 무슨 꿈을 꾸셨나요?
+                        </h2>
+
+                        <div class="dream-tags">
+                            <button class="dream-tag" onclick="handleDreamTag('돼지')">🐷 돼지</button>
+                            <button class="dream-tag" onclick="handleDreamTag('똥')">💩 똥</button>
+                            <button class="dream-tag" onclick="handleDreamTag('조상')">👴 조상</button>
+                            <button class="dream-tag" onclick="handleDreamTag('불')">🔥 불</button>
+                            <button class="dream-tag" onclick="handleDreamTag('물')">💧 물</button>
+                            <button class="dream-tag" onclick="handleDreamTag('뱀')">🐍 뱀</button>
+                        </div>
+
+                        <div class="dream-input-box">
+                            <input type="text" id="dreamInput" class="dream-input" placeholder="기타 꿈 입력 (10자 이내)"
+                                maxlength="10">
+                            <button class="btn-dream-submit" onclick="handleDreamSubmit()">결과보기</button>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <button class="btn-sm" style="background:rgba(0,0,0,0.3);"
+                                onclick="resetToModeSelection()">🔙 뒤로가기</button>
+                        </div>
+                    </div>
                     <div id="modeHoroscopeSelect" class="input-container"></div>
                 </div>
             </div>
@@ -1426,7 +1505,96 @@
         }
 
         function selectDreamMode() {
-            alert('🌙 꿈 해몽 기능은 [2단계]에서 구현될 예정입니다!\n조금만 기다려주세요.');
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('modeDreamInput').style.display = 'block';
+        }
+
+        function resetToModeSelection() {
+            document.getElementById('modeDreamInput').style.display = 'none';
+            document.getElementById('modeHoroscopeSelect').style.display = 'none';
+            document.getElementById('modeSelection').style.display = 'block';
+        }
+
+        function handleDreamTag(keyword) {
+            document.getElementById('dreamInput').value = keyword;
+            handleDreamSubmit();
+        }
+
+        function handleDreamSubmit() {
+            const input = document.getElementById('dreamInput');
+            const keyword = input.value.trim();
+
+            if (!keyword) {
+                alert('꿈 내용을 입력해주세요!');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('modeDreamInput').style.display = 'none';
+            const loader = document.getElementById('analysisLoading');
+            if (loader) {
+                loader.style.display = 'flex';
+                loader.querySelector('h3').innerText = '꿈 해몽 중...';
+                loader.querySelector('p').innerText = '꿈 속에 숨겨진 행운을 찾고 있습니다';
+            }
+
+            setTimeout(() => {
+                const luckyNumbers = generateDreamNumbers(keyword);
+                showResult(luckyNumbers);
+            }, 2000);
+        }
+
+        function generateDreamNumbers(keyword) {
+            // 1. Traditional Dream Mappings (Simple Version)
+            const dreamMap = {
+                '돼지': [8, 12, 23, 33, 38, 41],
+                '똥': [6, 17, 24, 35, 36, 42],
+                '조상': [1, 3, 15, 27, 39, 41],
+                '불': [2, 11, 22, 33, 40, 44],
+                '물': [4, 9, 21, 26, 31, 37],
+                '뱀': [5, 10, 16, 28, 34, 45],
+                '용': [7, 18, 20, 30, 42, 45]
+            };
+
+            // If keyword exists in map, return it (with small variation if needed, but fixed for now)
+            if (dreamMap[keyword]) {
+                return {
+                    numbers: dreamMap[keyword],
+                    historyCount: 0, // Not based on history
+                    type: 'dream',
+                    keyword: keyword
+                };
+            }
+
+            // 2. Hash-based Generation for unknown keywords
+            // This ensures the same keyword always yields the same numbers
+            let hash = 0;
+            for (let i = 0; i < keyword.length; i++) {
+                hash = ((hash << 5) - hash) + keyword.charCodeAt(i);
+                hash |= 0; // Convert to 32bit integer
+            }
+
+            // Seeding logic using text hash
+            const seededRandom = (seed) => {
+                var x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            };
+
+            const selected = new Set();
+            let seed = Math.abs(hash);
+
+            while (selected.size < 6) {
+                const n = Math.floor(seededRandom(seed) * 45) + 1;
+                selected.add(n);
+                seed++;
+            }
+
+            return {
+                numbers: Array.from(selected).sort((a, b) => a - b),
+                historyCount: 0,
+                type: 'dream',
+                keyword: keyword
+            };
         }
 
         function selectHoroscopeMode() {
@@ -1445,17 +1613,28 @@
             document.getElementById('adModal').style.display = 'none';
         }
 
-        function showResult() {
+        function showResult(customResult = null) {
             document.getElementById('adContent').style.display = 'none';
             document.getElementById('resultContent').style.display = 'block';
 
             // Logic
-            const result = generateLuckyNumbers(currentShopData.rounds);
+            let result;
+            if (customResult) {
+                result = customResult;
+                // Update text for Dream Mode
+                if (result.type === 'dream') {
+                    document.getElementById('paramHCount').parentElement.innerHTML =
+                        `꿈 키워드 <strong style="color:#fae100;">'${result.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
+                }
+            } else {
+                result = generateLuckyNumbers(currentShopData.rounds);
+                // Restore default text if needed (or ensure HTML structure supports both)
+                document.getElementById('paramHCount').parentElement.innerHTML =
+                    `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${result.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
+                    `(<span id="paramRounds">${result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '')}</span> 등)`;
+            }
 
             // Render
-            document.getElementById('paramHCount').innerText = result.historyCount;
-            document.getElementById('paramRounds').innerText = result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '');
-
             const ballContainer = document.getElementById('luckyBalls');
             ballContainer.innerHTML = '';
 
