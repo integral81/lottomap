@@ -1531,19 +1531,28 @@
             const countEl = document.getElementById('totalDataCount');
             console.log('Loading data...');
 
-            Promise.all([
-                fetch('lotto_data.json').then(res => res.json()),
-                fetch('lotto_history.json').then(res => res.json())
-            ])
-                .then(([lottoData, historyData]) => {
-                    window.lottoHistory = historyData; // Global variable
+            // 1. Load History Data (Small, for statistics and widgets)
+            fetch('lotto_history.json')
+                .then(res => res.json())
+                .then(historyData => {
+                    window.lottoHistory = historyData;
+                    console.log('History data loaded');
+                    // Update widgets immediately if we have a default/initial max round
+                    const initialMax = parseInt(document.getElementById('maxRound').value) || 1210;
+                    updateRecentRounds(initialMax);
+                })
+                .catch(err => console.error('History load failed:', err));
+
+            // 2. Load Map Data (Large, for markers)
+            fetch('lotto_data.json')
+                .then(res => res.json())
+                .then(lottoData => {
                     processLoadedData(lottoData);
                 })
                 .catch(err => {
-                    console.error('Data load failed:', err);
-                    countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패 (${err.name})</span>`;
+                    console.error('Map data load failed:', err);
+                    countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패</span>`;
                     document.getElementById('manualLoader').style.display = 'block';
-                    alert('데이터 파일 로드 중 에러가 발생했습니다.\n\n' + err.message);
                 });
         }
 
