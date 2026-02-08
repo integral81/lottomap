@@ -1067,138 +1067,14 @@
             line-height: 1.5;
             border-left: 4px solid #fae100;
         }
-
-        /* Frequency Stats Modal Styles */
-        #statsModal {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #fff;
-            flex-direction: column;
-        }
-
-        .stats-header {
-            padding: 15px 20px;
-            background: #4bab9a;
-            /* Color from user screenshot */
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-weight: bold;
-        }
-
-        .stats-header h2 {
-            margin: 0;
-            font-size: 18px;
-            flex: 1;
-            text-align: center;
-        }
-
-        .stats-tabs {
-            display: flex;
-            gap: 15px;
-            padding: 10px 20px;
-            background: #fff;
-            border-bottom: 1px solid #eee;
-        }
-
-        .stats-tab {
-            font-size: 14px;
-            color: var(--secondary);
-            cursor: pointer;
-            padding: 5px 0;
-        }
-
-        .stats-tab.active {
-            font-weight: bold;
-            border-bottom: 2px solid var(--secondary);
-        }
-
-        .stats-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px 20px;
-        }
-
-        .freq-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .freq-num {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 1px solid #ffaa00;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-            flex-shrink: 0;
-        }
-
-        .freq-bar-container {
-            flex: 1;
-            height: 8px;
-            background: #eee;
-            border-radius: 4px;
-            position: relative;
-        }
-
-        .freq-bar-fill {
-            height: 100%;
-            background: #555;
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        #mapProcessing {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            pointer-events: none;
-        }
-
-        .processing-spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid white;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: rotate 1s linear infinite;
-        }
     </style>
 </head>
 
 <body>
     <div id="toast-container"></div>
-    <div id="mapProcessing">
-        <div class="processing-spinner"></div>
-        <span>지도 데이터 처리 중...</span>
-    </div>
     <div id="app">
         <div id="sidebar">
-            <h1>🎰 KINOV Lotto Map <span style="font-size:10px; color:#999; font-weight:normal;">v1.0.4</span></h1>
+            <h1>🎰 KINOV Lotto Map</h1>
             <div class="section">
                 <span class="section-title">📅 회차 필터 (Round)</span>
                 <div class="input-row">
@@ -1444,28 +1320,6 @@
                 🚗 지금 당장 사러 가기 (길찾기)
             </button>
         </div>
-
-        <!-- Frequency Statistics Modal -->
-        <div id="statsModal">
-            <div class="stats-header">
-                <span style="cursor:pointer; font-size: 20px;" onclick="closeStats()">&lt; Menu</span>
-                <h2>번호별 출현횟수</h2>
-                <div style="width: 60px;"></div>
-            </div>
-            <div class="stats-tabs">
-                <span class="stats-tab" id="tab-3" onclick="updateStatsPeriod(3)">3주</span>
-                <span class="stats-tab" id="tab-5" onclick="updateStatsPeriod(5)">5주</span>
-                <span class="stats-tab" id="tab-10" onclick="updateStatsPeriod(10)">10주</span>
-                <span class="stats-tab active" id="tab-all" onclick="updateStatsPeriod('all')">전체</span>
-            </div>
-            <div style="padding: 10px 20px; font-size: 13px; color: var(--secondary); background: #f9f9f9;">
-                <span id="statsRangeText">1회 ~ 1210회</span>
-                <span style="float:right;">출현횟수순</span>
-            </div>
-            <div class="stats-body" id="statsBody">
-                <!-- Frequency rows injected here -->
-            </div>
-        </div>
     </div>
     </div>
     </div>
@@ -1512,8 +1366,19 @@
             console.log('Records with 5+ wins:', highWinCount);
 
             document.getElementById('totalDataCount').innerText = data.length.toLocaleString();
+            if (data.length > 0) {
+                const rounds = data.map(d => d.r);
+                const maxR = Math.max(...rounds);
+                const minR = Math.min(...rounds);
+                document.getElementById('maxRound').value = maxR;
+                document.getElementById('minRound').value = 1; // Force start from 1 as request
+            }
 
             applyFilters();
+
+            // Initial load of recent rounds
+            const initialMax = parseInt(document.getElementById('maxRound').value) || 1210;
+            updateRecentRounds(initialMax);
         }
 
         window.onload = function () {
@@ -1542,45 +1407,19 @@
             const countEl = document.getElementById('totalDataCount');
             console.log('Loading data...');
 
-            const ts = new Date().getTime();
-            // 1. Load History Data (Small)
-            fetch(`lotto_history.json?v=${ts}`)
-                .then(res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.json();
-                })
-                .then(historyData => {
-                    window.lottoHistory = historyData;
-                    console.log('History data loaded');
-
-                    // Fast UI Init: Get max round from history
-                    const rounds = Object.keys(historyData).map(Number).sort((a, b) => b - a);
-                    if (rounds.length > 0) {
-                        const maxR = rounds[0];
-                        const minR = Math.max(1, maxR - 9); // Default to last 10 rounds for speed
-
-                        document.getElementById('maxRound').value = maxR;
-                        document.getElementById('minRound').value = minR;
-
-                        // Update widgets immediately
-                        updateRecentRounds(maxR);
-                    }
-                })
-                .catch(err => console.error('History load failed:', err));
-
-            // 2. Load Map Data (Large)
-            fetch(`lotto_data.json?v=${ts}`)
-                .then(res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.json();
-                })
-                .then(lottoData => {
+            Promise.all([
+                fetch('lotto_data.json?v=' + Date.now()).then(res => res.json()),
+                fetch('lotto_history.json?v=' + Date.now()).then(res => res.json())
+            ])
+                .then(([lottoData, historyData]) => {
+                    window.lottoHistory = historyData; // Global variable
                     processLoadedData(lottoData);
                 })
                 .catch(err => {
-                    console.error('Map data load failed:', err);
-                    countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패</span>`;
+                    console.error('Data load failed:', err);
+                    countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패 (${err.name})</span>`;
                     document.getElementById('manualLoader').style.display = 'block';
+                    alert('데이터 파일 로드 중 에러가 발생했습니다.\n\n' + err.message);
                 });
         }
 
@@ -1731,109 +1570,98 @@
             }
         }
 
-        let markerCreationTimer = null;
-
         function updateMarkers(data) {
-            // Cancel any ongoing marker creation
-            if (markerCreationTimer) {
-                clearTimeout(markerCreationTimer);
-                markerCreationTimer = null;
-            }
-
             clusterer.clear();
             markers.forEach(m => m.setMap(null));
             markers = [];
 
-            const indicator = document.getElementById('mapProcessing');
-            if (indicator) indicator.style.display = 'flex';
-
-            // Group data by unique shop location/name (Optimization: pre-group for fewer markers)
+            // To avoid duplicate markers for the same shop at the same location,
+            // we need to group the filtered data by shop (lat, lng, name, address)
+            // and then create a single marker for each unique shop.
             const uniqueShops = {};
             data.forEach(d => {
                 const key = `${d.lat}_${d.lng}_${d.n}_${d.a}`;
                 if (!uniqueShops[key]) {
                     uniqueShops[key] = {
-                        n: d.n, a: d.a, lat: d.lat, lng: d.lng,
-                        totalWins: d.totalWins || 0,
-                        rounds: []
+                        n: d.n,
+                        a: d.a,
+                        lat: d.lat,
+                        lng: d.lng,
+                        totalWins: d.totalWins, // This is the total wins for the shop
+                        rounds: [] // To store individual round details for infowindow
                     };
                 }
                 uniqueShops[key].rounds.push({ r: d.r, m: d.m });
             });
 
-            const shops = Object.values(uniqueShops);
-            const totalShops = shops.length;
-            let currentIndex = 0;
-            const batchSize = 150; // Optimized batch for mobile performance
+            Object.values(uniqueShops).forEach(shop => {
+                let markerImg = null;
+                // Tiered Styles
+                if (shop.totalWins >= 5) {
+                    // Legendary Gold Star
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+                        new kakao.maps.Size(24, 35)
+                    );
+                } else if (shop.totalWins >= 3) {
+                    // Professional Red
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png',
+                        new kakao.maps.Size(24, 35),
+                        { offset: new kakao.maps.Point(12, 35) }
+                    );
+                }
 
-            function processBatch() {
-                const endIndex = Math.min(currentIndex + batchSize, totalShops);
-                const batchMarkers = [];
+                const marker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(shop.lat, shop.lng),
+                    image: markerImg
+                });
 
-                for (let i = currentIndex; i < endIndex; i++) {
-                    const shop = shops[i];
-                    let markerImg = null;
-                    if (shop.totalWins >= 5) {
-                        markerImg = new kakao.maps.MarkerImage('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', new kakao.maps.Size(24, 35));
-                    } else if (shop.totalWins >= 3) {
-                        markerImg = new kakao.maps.MarkerImage('https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png', new kakao.maps.Size(24, 35), { offset: new kakao.maps.Point(12, 35) });
+                const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
+                const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+
+                const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+                const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+
+                const content = `
+                    <div class="infowindow">
+                        <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
+                        <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
+                            <span class="iw-addr">${shop.a}</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                        </div>
+                        <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
+                        <div class="iw-details">${roundTagsHtml}</div>
+                        <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins})">
+                            ✨ 이번 주 1등 추천 번호 받기
+                        </button>
+                        <div class="iw-actions">
+                            <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
+                                🚗 길찾기
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: content,
+                    removable: true,
+                    zIndex: 1500 // Ensure popup is on top of markers
+                });
+
+                kakao.maps.event.addListener(marker, 'click', () => {
+                    // Close previous InfoWindow if exists
+                    if (currentInfoWindow) {
+                        currentInfoWindow.close();
                     }
 
-                    const marker = new kakao.maps.Marker({
-                        position: new kakao.maps.LatLng(shop.lat, shop.lng),
-                        image: markerImg
-                    });
+                    infowindow.open(map, marker);
+                    currentInfoWindow = infowindow; // Update current
+                });
 
-                    // Lazy InfoWindow: Only create on click
-                    kakao.maps.event.addListener(marker, 'click', () => {
-                        if (currentInfoWindow) currentInfoWindow.close();
-
-                        const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
-                        const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
-                        const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
-                        const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
-
-                        const content = `
-                            <div class="infowindow">
-                                <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
-                                <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
-                                    <span class="iw-addr">${shop.a}</span>
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                                </div>
-                                <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
-                                <div class="iw-details">${roundTagsHtml}</div>
-                                <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins})">
-                                    ✨ 이번 주 1등 추천 번호 받기
-                                </button>
-                                <div class="iw-actions">
-                                    <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
-                                        🚗 길찾기
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-
-                        currentInfoWindow = new kakao.maps.InfoWindow({ content: content, removable: true, zIndex: 1500 });
-                        currentInfoWindow.open(map, marker);
-                    });
-
-                    batchMarkers.push(marker);
-                    markers.push(marker);
-                }
-
-                clusterer.addMarkers(batchMarkers);
-                currentIndex = endIndex;
-
-                if (currentIndex < totalShops) {
-                    markerCreationTimer = setTimeout(processBatch, 10); // Relinquish UI thread for 10ms
-                } else {
-                    if (indicator) indicator.style.display = 'none';
-                    markerCreationTimer = null;
-                    console.log('All markers added:', totalShops);
-                }
-            }
-
-            processBatch();
+                markers.push(marker);
+            });
+            clusterer.addMarkers(markers);
         }
 
         /**
@@ -2308,70 +2136,8 @@
         }
 
         function showStats() {
+            showToast("📊 번호별 출현횟수 기능 개발 중입니다!", "info");
             closeNav();
-            const modal = document.getElementById('statsModal');
-            modal.style.display = 'flex';
-            updateStatsPeriod('all');
-        }
-
-        function closeStats() {
-            document.getElementById('statsModal').style.display = 'none';
-        }
-
-        function updateStatsPeriod(period) {
-            // UI Tab active state
-            document.querySelectorAll('.stats-tab').forEach(t => t.classList.remove('active'));
-            const activeTab = document.getElementById(period === 'all' ? 'tab-all' : `tab-${period}`);
-            if (activeTab) activeTab.classList.add('active');
-
-            renderFrequencyStats(period);
-        }
-
-        function renderFrequencyStats(period) {
-            const history = window.lottoHistory || {};
-            const rounds = Object.keys(history).map(Number).sort((a, b) => b - a); // Descending rounds
-            if (rounds.length === 0) return;
-
-            const targetRounds = period === 'all' ? rounds : rounds.slice(0, period);
-            const counts = {};
-            for (let i = 1; i <= 45; i++) counts[i] = 0;
-
-            targetRounds.forEach(r => {
-                const nums = history[r] || [];
-                nums.forEach(n => {
-                    if (counts[n] !== undefined) counts[n]++;
-                });
-            });
-
-            // Convert to array and sort DESC by frequency
-            const sorted = Object.entries(counts).map(([num, count]) => ({
-                num: parseInt(num),
-                count: count
-            })).sort((a, b) => b.count - a.count);
-
-            const maxCount = Math.max(...sorted.map(s => s.count)) || 1;
-            const body = document.getElementById('statsBody');
-            body.innerHTML = '';
-
-            // Update range text
-            const latest = rounds[0];
-            const oldest = targetRounds[targetRounds.length - 1];
-            document.getElementById('statsRangeText').innerText = `${oldest}회 ~ ${latest}회`;
-
-            let listHtml = '';
-            sorted.forEach(item => {
-                const perc = (item.count / maxCount) * 100;
-                listHtml += `
-                    <div class="freq-row">
-                        <div class="freq-num">${item.num < 10 ? '0' + item.num : item.num}</div>
-                        <div class="freq-bar-container">
-                            <div class="freq-bar-fill" style="width: ${perc}%"></div>
-                        </div>
-                        <div class="freq-count">${item.count}</div>
-                    </div>
-                `;
-            });
-            body.innerHTML = listHtml;
         }
 
         function showQRScanner() {
