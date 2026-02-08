@@ -1799,6 +1799,7 @@
                     position: new kakao.maps.LatLng(shop.lat, shop.lng),
                     image: markerImg
                 });
+                marker.shopData = shop; // Store shop data for retrieval
 
                 const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
                 const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
@@ -2443,38 +2444,55 @@
 
 
         function focusShop(lat, lng) {
-            // Find maker by coordinates (approximate match to handle float precision)
+            console.log('Focusing shop:', lat, lng);
+            // Find marker by coordinates (approximate match to handle float precision)
             const target = markers.find(m => {
                 const p = m.getPosition();
-                return Math.abs(p.getLat() - lat) < 0.000001 && Math.abs(p.getLng() - lng) < 0.000001;
+                return Math.abs(p.getLat() - lat) < 0.0001 && Math.abs(p.getLng() - lng) < 0.0001;
             });
 
             if (target) {
+                // Zoom in to resolve clusters and ensure marker is visible
+                if (map.getLevel() > 5) {
+                    map.setLevel(3);
+                }
                 const mapCenter = new kakao.maps.LatLng(lat, lng);
                 map.panTo(mapCenter);
-                // Trigger click to open InfoWindow
-                kakao.maps.event.trigger(target, 'click');
+
+                // Trigger click to open InfoWindow (Wait a bit for pan to finish for better UI)
+                setTimeout(() => {
+                    kakao.maps.event.trigger(target, 'click');
+                }, 300);
+            } else {
+                console.warn('Marker not found for:', lat, lng);
+                showToast("현재 조건(회차 필터 등)에 맞는 판매점 마커를 찾을 수 없습니다.", "info");
             }
         }
 
         function findNearestShop(lat, lng) {
-            if (typeof allData === 'undefined' || allData.length === 0) return;
+            // Find nearest among ACTIVE markers (filtered ones on the map)
+            if (!markers || markers.length === 0) {
+                showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
+                return;
+            }
 
-            // Sort all shops by distance
-            const sortedShops = allData.map(shop => {
+            // Sort all markers by distance
+            const sortedByDist = markers.map(m => {
+                const p = m.getPosition();
                 return {
-                    ...shop,
-                    distance: getDistance(lat, lng, shop.lat, shop.lng)
+                    marker: m,
+                    distance: getDistance(lat, lng, p.getLat(), p.getLng())
                 };
             }).sort((a, b) => a.distance - b.distance);
 
             // Take top 3
-            const top3 = sortedShops.slice(0, 3);
+            const top3 = sortedByDist.slice(0, 3);
 
             if (top3.length > 0) {
                 let msg = "📍 <strong>주변 1등 배출점 (가까운 순)</strong><br>";
-                top3.forEach((shop, index) => {
-                    const distStr = shop.distance < 1 ? Math.round(shop.distance * 1000) + "m" : shop.distance.toFixed(1) + "km";
+                top3.forEach((item, index) => {
+                    const shop = item.marker.shopData;
+                    const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
                     // Add clickable span
                     msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
                 });
@@ -2484,10 +2502,9 @@
                 const bounds = new kakao.maps.LatLngBounds();
                 bounds.extend(new kakao.maps.LatLng(lat, lng));
 
-                // Only include shops within 20km for the initial view
-                top3.forEach(shop => {
-                    if (shop.distance < 20) {
-                        bounds.extend(new kakao.maps.LatLng(shop.lat, shop.lng));
+                top3.forEach(item => {
+                    if (item.distance < 10) { // Only include within 10km for bounds
+                        bounds.extend(item.marker.getPosition());
                     }
                 });
 
