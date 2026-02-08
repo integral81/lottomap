@@ -540,6 +540,23 @@
                 flex: none;
                 order: 1;
                 /* Mobile: Map Top */
+                position: relative;
+                /* Anchor for absolute buttons */
+            }
+
+            /* Move floating buttons to bottom-right of map area on mobile */
+            .gps-button {
+                position: absolute !important;
+                bottom: 20px !important;
+                right: 20px !important;
+                z-index: 1001;
+            }
+
+            .menu-btn {
+                position: absolute !important;
+                top: 20px !important;
+                right: 20px !important;
+                z-index: 1001;
             }
         }
 
@@ -1265,25 +1282,25 @@
                 </div>
             </div>
         </div> <!-- end #sidebar -->
-        <div id="map"></div>
-    </div> <!-- end #app -->
+        <div id="map">
+            <!-- Hamburger Menu Button (Moved inside #map for mobile anchoring) -->
+            <div id="menuBtn" class="floating-btn menu-btn" onclick="toggleNav()" title="메뉴 열기">
+                <div class="hamburger-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
 
-    <!-- Hamburger Menu Button -->
-    <div id="menuBtn" class="floating-btn menu-btn" onclick="toggleNav()" title="메뉴 열기">
-        <div class="hamburger-icon">
-            <span></span>
-            <span></span>
-            <span></span>
+            <!-- GPS Button (Moved inside #map for mobile anchoring) -->
+            <div class="floating-btn gps-button" onclick="requestMyLocation()" title="내 위치 찾기">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
+                </svg>
+            </div>
         </div>
-    </div>
-
-    <!-- GPS Button -->
-    <div class="floating-btn gps-button" onclick="requestMyLocation()" title="내 위치 찾기">
-        <svg viewBox="0 0 24 24">
-            <path
-                d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z" />
-        </svg>
-    </div>
+    </div> <!-- end #app -->
 
     <!-- Side Navigation Drawer -->
     <div id="sideNavOverlay" class="side-nav-overlay" onclick="closeNav()"></div>
