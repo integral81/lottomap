@@ -1162,6 +1162,41 @@
             color: #333;
             font-weight: 500;
         }
+
+        .freq-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .freq-filter-row {
+            display: flex;
+            gap: 15px;
+            font-size: 0.95rem;
+            color: #1976d2;
+            font-weight: 500;
+        }
+
+        .freq-filter-item {
+            cursor: pointer;
+            padding: 2px 5px;
+            transition: all 0.2s;
+        }
+
+        .freq-filter-item.active {
+            font-weight: 800;
+            border-bottom: 2px solid #1976d2;
+        }
+
+        .freq-range-display {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #1976d2;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
@@ -1435,9 +1470,22 @@
                 <div>번호별 출현횟수</div>
                 <div style="width: 45px;"></div> <!-- Spacer -->
             </div>
-            <div class="freq-body" id="freqBody">
-                <!-- Data will be injected here -->
-                <div style="text-align:center; padding:20px; color:#666;">데이터 분석 중...</div>
+            <div class="freq-body">
+                <div class="freq-controls">
+                    <div class="freq-filter-row">
+                        <span class="freq-filter-item" onclick="setFreqPeriod(3)">3주</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(5)">5주</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(10)">10주</span>
+                        <span class="freq-filter-item active" onclick="setFreqPeriod(0)">전체</span>
+                    </div>
+                    <div class="freq-range-display" id="freqRangeText">
+                        데이터 로딩 중...
+                    </div>
+                </div>
+                <div id="freqListContainer">
+                    <!-- Data will be injected here -->
+                    <div style="text-align:center; padding:20px; color:#666;">데이터 분석 중...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -2253,10 +2301,14 @@
             btn.classList.remove('active');
         }
 
+        let currentFreqPeriod = 0; // 0 for All, N for last N weeks
+
         function showStats() {
             closeNav();
             const modal = document.getElementById('statModal');
             modal.style.display = 'flex';
+            currentFreqPeriod = 0; // Reset to All
+            updateFreqFilterUI();
             renderFrequencyStats();
         }
 
@@ -2264,20 +2316,54 @@
             document.getElementById('statModal').style.display = 'none';
         }
 
+        function setFreqPeriod(period) {
+            currentFreqPeriod = period;
+            updateFreqFilterUI();
+            renderFrequencyStats();
+        }
+
+        function updateFreqFilterUI() {
+            const items = document.querySelectorAll('.freq-filter-item');
+            items.forEach(item => {
+                const onclickStr = item.getAttribute('onclick');
+                const p = parseInt(onclickStr.match(/\d+/)[0]);
+                if (p === currentFreqPeriod) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
         function renderFrequencyStats() {
-            const container = document.getElementById('freqBody');
+            const container = document.getElementById('freqListContainer');
+            const rangeText = document.getElementById('freqRangeText');
             if (!window.lottoHistory) {
                 container.innerHTML = '<div style="text-align:center; padding:20px; color:red;">데이터를 불러올 수 없습니다.</div>';
                 return;
             }
 
-            // 1. Calculate frequencies for all numbers (1-45)
+            // Get sorted rounds
+            const rounds = Object.keys(window.lottoHistory).map(Number).sort((a, b) => b - a);
+            const totalRoundsAvailable = rounds.length;
+            const maxR = rounds[0];
+
+            let targetRounds = rounds;
+            let minR = rounds[rounds.length - 1];
+
+            if (currentFreqPeriod > 0) {
+                targetRounds = rounds.slice(0, currentFreqPeriod);
+                minR = targetRounds[targetRounds.length - 1];
+            }
+
+            rangeText.innerText = `${minR}회 ~ ${maxR}회`;
+
+            // 1. Calculate frequencies for the selected range (1-45)
             const counts = {};
             for (let i = 1; i <= 45; i++) counts[i] = 0;
 
-            const rounds = Object.keys(window.lottoHistory);
-            rounds.forEach(r => {
-                const nums = window.lottoHistory[r];
+            targetRounds.forEach(r => {
+                const nums = window.lottoHistory[r.toString()];
                 nums.forEach(n => {
                     if (counts[n] !== undefined) counts[n]++;
                 });
@@ -2289,12 +2375,12 @@
                 count: counts[num]
             })).sort((a, b) => b.count - a.count || a.num - b.num);
 
-            const maxCount = sorted[0].count;
+            const maxCount = sorted.length > 0 ? sorted[0].count : 0;
 
             // 3. Render
             let html = '';
             sorted.forEach((item, index) => {
-                const percentage = (item.count / maxCount) * 100;
+                const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
                 const paddedNum = item.num < 10 ? '0' + item.num : item.num;
                 html += `
                     <div class="freq-row">
