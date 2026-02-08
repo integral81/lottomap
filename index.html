@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 
 <head>
@@ -1319,16 +1319,15 @@
                 style="margin-top:10px; background:#fae100; color:#3c1e1e; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
                 onclick="goToShop()">
                 🚗 지금 당장 사러 가기 (길찾기)
-            </button>
-        </div>
-    </div>
-    </div>
-    </div>
+        </div> <!-- end info-modal -->
+    </div> <!-- end ad-content -->
 
     <script>
         let map, clusterer, allData = [], markers = [];
         let currentInfoWindow = null; // Track the currently open InfoWindow
-nction handleFileSelect(event) {
+
+
+        function handleFileSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -1449,13 +1448,15 @@ nction handleFileSelect(event) {
                 }
             });
 
-            // 2. Select 6 num        ed o        s
-            const selected = new Set                while (selected.size < 6) {
-                const n = wei        dom(numberWeights);
+            // 2. Select 6 numbers based on weights
+            const selected = new Set();
+            while (selected.size < 6) {
+                const n = weightedRandom(numberWeights);
                 selected.add(n);
             }
 
-            return                   numbers: Array.from(selecte        (a, b) => a - b),
+            return {
+                numbers: Array.from(selected).sort((a, b) => a - b),
                 historyCount: storeWins.length,
                 relatedRounds: storeWins.map(w => w.r).slice(0, 5) // Top 5 recent rounds
             };
@@ -1698,7 +1699,8 @@ nction handleFileSelect(event) {
 
                     // Add/Update Blue Dot Marker
                     if (!myLocationMarker) {
-                        myLo        rker = new kakao.maps.CustomOv                                    position: center,
+                        myLocationMarker = new kakao.maps.CustomOverlay({
+                            position: center,
                             content: `
                                 <div style="position:relative;">
                                     <div class="pulse"></div>
