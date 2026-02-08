@@ -1091,7 +1091,7 @@
             <div class="section">
                 <span class="section-title">📅 회차 필터 (Round)</span>
                 <div class="input-row">
-                    <input type="number" id="minRound" value="1">
+                    <input type="number" id="minRound" value="1201">
                     <span>~</span>
                     <input type="number" id="maxRound" value="1210" max="1210"
                         oninput="if(parseInt(this.value) > 1210) this.value = 1210;">
@@ -1390,7 +1390,7 @@
                 const maxR = Math.max(...rounds);
                 const minR = Math.min(...rounds);
                 document.getElementById('maxRound').value = maxR;
-                document.getElementById('minRound').value = 1; // Force start from 1 as request
+                document.getElementById('minRound').value = Math.max(1, maxR - 9);
             }
 
             applyFilters();
