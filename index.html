@@ -1386,27 +1386,51 @@
             const adContent = document.getElementById('adContent');
             const resultContent = document.getElementById('resultContent');
 
+            // Mode Containers
+            const modeSelection = document.getElementById('modeSelection');
+            const analysisLoading = document.getElementById('analysisLoading');
+            const modeDreamInput = document.getElementById('modeDreamInput');
+            const modeHoroscopeSelect = document.getElementById('modeHoroscopeSelect');
+
             modal.style.display = 'flex';
-            adContent.style.display = 'block';
+            adContent.style.display = 'flex'; // Changed to flex for centering
             resultContent.style.display = 'none';
+
+            // Reset UI State
+            modeSelection.style.display = 'block';
+            if (analysisLoading) analysisLoading.style.display = 'none';
+            if (modeDreamInput) modeDreamInput.style.display = 'none';
+            if (modeHoroscopeSelect) modeHoroscopeSelect.style.display = 'none';
 
             // Push history state to support Back Button closing
             history.pushState({ modalOpen: true }, null, "");
+        }
 
-            // Simulate Ad Delay (6 seconds) with countdown
-            let timeLeft = 6;
-            const timerEl = document.getElementById('timerDisplay');
-            if (timerEl) timerEl.innerText = timeLeft;
+        // --- Phase 10: Selection Handlers ---
 
-            const interval = setInterval(() => {
-                timeLeft--;
-                if (timerEl) timerEl.innerText = timeLeft;
-                if (timeLeft <= 0) clearInterval(interval);
-            }, 1000);
+        function selectAnalysisMode() {
+            // Hide selection, show loading
+            document.getElementById('modeSelection').style.display = 'none';
+            const loader = document.getElementById('analysisLoading');
+            if (loader) {
+                loader.style.display = 'flex';
+                // Reset text if needed
+                loader.querySelector('h3').innerText = '데이터 분석 중...';
+                loader.querySelector('p').innerText = '명당의 기운을 모으고 있습니다';
+            }
 
+            // Simulate Analysis Delay (3 seconds)
             setTimeout(() => {
                 showResult();
-            }, 6000);
+            }, 3000);
+        }
+
+        function selectDreamMode() {
+            alert('🌙 꿈 해몽 기능은 [2단계]에서 구현될 예정입니다!\n조금만 기다려주세요.');
+        }
+
+        function selectHoroscopeMode() {
+            alert('🐅 띠별 운세 기능은 [3단계]에서 구현될 예정입니다!\n조금만 기다려주세요.');
         }
 
         function closeModal() {
