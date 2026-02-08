@@ -665,6 +665,22 @@
                 padding: 12px !important;
             }
         }
+
+        .btn-sm {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-sm:hover {
+            background-color: #333;
+        }
     </style>
 </head>
 
@@ -679,6 +695,7 @@
                     <input type="number" id="minRound" value="262">
                     <span>~</span>
                     <input type="number" id="maxRound" value="1210">
+                    <button class="btn-sm" onclick="refreshRecentRounds()">조회</button>
                 </div>
             </div>
 
@@ -827,7 +844,13 @@
                 document.getElementById('maxRound').value = maxR;
                 document.getElementById('minRound').value = minR;
             }
-            applyFilters();
+            document.getElementById('minRound').value = minR;
+        }
+        applyFilters();
+
+        // Initial load of recent rounds
+        const initialMax = parseInt(document.getElementById('maxRound').value) || 1210;
+        updateRecentRounds(initialMax);
         }
 
         window.onload = function () {
@@ -953,6 +976,11 @@
 
             document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
             updateMarkers(filtered);
+            // updateRecentRounds(maxR); // Removed as per user request
+        }
+
+        function refreshRecentRounds() {
+            const maxR = parseInt(document.getElementById('maxRound').value) || 9999;
             updateRecentRounds(maxR);
         }
 
