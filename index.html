@@ -494,6 +494,8 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            cursor: pointer;
+            /* Critical for iOS to recognize clicks on transparent/overlay elements */
         }
 
         .modal-content {
@@ -506,6 +508,8 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
+            cursor: default;
+            /* Reset cursor for content area */
         }
 
         .modal-close {
@@ -1240,6 +1244,9 @@
             adContent.style.display = 'block';
             resultContent.style.display = 'none';
 
+            // Push history state to support Back Button closing
+            history.pushState({ modalOpen: true }, null, "");
+
             // Simulate Ad Delay (6 seconds) with countdown
             let timeLeft = 6;
             const timerEl = document.getElementById('timerDisplay');
@@ -1257,6 +1264,14 @@
         }
 
         function closeModal() {
+            // If the modal is open, going back will trigger popstate which closes it effectively
+            // But we need to check if we are actually in the modal state
+            if (document.getElementById('adModal').style.display === 'flex') {
+                history.back();
+            }
+        }
+
+        function _internalCloseModal() {
             document.getElementById('adModal').style.display = 'none';
         }
 
@@ -1293,6 +1308,10 @@
         function goToShop() {
             if (!currentShopData) return;
             openDirections(currentShopData.lat, currentShopData.lng, currentShopData.name);
+            // closeModal(); // Do not close automatically or it might conflict with navigation? 
+            // Actually, usually you want to close modal if leaving. 
+            // But if opening _blank, modal stays. Let's force close logic.
+            // Calling closeModal() triggers history.back(), cleaning up state.
             closeModal();
         }
 
@@ -1303,6 +1322,16 @@
                 closeModal();
             }
         }
+
+        // Handle Back Button
+        window.addEventListener('popstate', function (event) {
+            // When history changes (Back pressed), we close the modal UI
+            // Check if modal is currently visible
+            const modal = document.getElementById('adModal');
+            if (modal && modal.style.display === 'flex') {
+                _internalCloseModal();
+            }
+        });
 
 
 
