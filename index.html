@@ -849,6 +849,59 @@
         .btn-sm:hover {
             background-color: #333;
         }
+
+        /* Zodiac Mode Styles */
+        .zodiac-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+
+        .zodiac-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            aspect-ratio: 1;
+            /* Square shape */
+        }
+
+        .zodiac-item:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .zodiac-icon {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .zodiac-name {
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .horoscope-text-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            line-height: 1.5;
+            border-left: 4px solid #fae100;
+        }
     </style>
 </head>
 
@@ -1000,7 +1053,43 @@
                                 onclick="resetToModeSelection()">🔙 뒤로가기</button>
                         </div>
                     </div>
-                    <div id="modeHoroscopeSelect" class="input-container"></div>
+                    <div id="modeHoroscopeSelect" class="input-container">
+                        <h2
+                            style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                            🐅 당신의 띠를 선택하세요
+                        </h2>
+                        <div class="zodiac-grid">
+                            <div class="zodiac-item" onclick="handleZodiacClick('쥐', '🐹')"><span
+                                    class="zodiac-icon">🐹</span><span class="zodiac-name">쥐띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('소', '🐮')"><span
+                                    class="zodiac-icon">🐮</span><span class="zodiac-name">소띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('호랑이', '🐯')"><span
+                                    class="zodiac-icon">🐯</span><span class="zodiac-name">범띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('토끼', '🐰')"><span
+                                    class="zodiac-icon">🐰</span><span class="zodiac-name">토끼띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('용', '🐲')"><span
+                                    class="zodiac-icon">🐲</span><span class="zodiac-name">용띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('뱀', '🐍')"><span
+                                    class="zodiac-icon">🐍</span><span class="zodiac-name">뱀띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('말', '🐴')"><span
+                                    class="zodiac-icon">🐴</span><span class="zodiac-name">말띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('양', '🐑')"><span
+                                    class="zodiac-icon">🐑</span><span class="zodiac-name">양띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('원숭이', '🐵')"><span
+                                    class="zodiac-icon">🐵</span><span class="zodiac-name">원숭이띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('닭', '🐔')"><span
+                                    class="zodiac-icon">🐔</span><span class="zodiac-name">닭띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('개', '🐶')"><span
+                                    class="zodiac-icon">🐶</span><span class="zodiac-name">개띠</span></div>
+                            <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
+                                    class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <button class="btn-sm" style="background:rgba(0,0,0,0.3);"
+                                onclick="resetToModeSelection()">🔙 뒤로가기</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="resultContent"
@@ -1598,7 +1687,86 @@
         }
 
         function selectHoroscopeMode() {
-            alert('🐅 띠별 운세 기능은 [3단계]에서 구현될 예정입니다!\n조금만 기다려주세요.');
+            document.getElementById('modeSelection').style.display = 'none';
+            document.getElementById('modeHoroscopeSelect').style.display = 'block';
+        }
+
+        function handleZodiacClick(zodiacName, icon) {
+            // Show loading
+            document.getElementById('modeHoroscopeSelect').style.display = 'none';
+            const loader = document.getElementById('analysisLoading');
+            if (loader) {
+                loader.style.display = 'flex';
+                loader.querySelector('h3').innerText = '오늘의 운세 분석 중...';
+                loader.querySelector('p').innerText = '별들의 기운을 읽고 있습니다';
+            }
+
+            // Simulate and Generate
+            setTimeout(() => {
+                const horoscopeData = generateHoroscope(zodiacName);
+                showResult({
+                    type: 'horoscope',
+                    zodiac: zodiacName,
+                    icon: icon,
+                    ...horoscopeData
+                });
+            }, 2000);
+        }
+
+        function generateHoroscope(zodiacName) {
+            // Get today's date string YYYY-MM-DD
+            const today = new Date().toISOString().split('T')[0];
+            const key = today + zodiacName;
+
+            // Generate seeded random based on date + zodiac
+            let hash = 0;
+            for (let i = 0; i < key.length; i++) {
+                hash = ((hash << 5) - hash) + key.charCodeAt(i);
+                hash |= 0;
+            }
+            const seededRandom = (seed) => {
+                var x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            };
+            let seed = Math.abs(hash);
+
+            // 1. Horoscope Text Generation
+            const fortunes = [
+                "금전운이 매우 좋은 날입니다. 작은 투자도 큰 결실을 맺을 수 있습니다.",
+                "뜻밖의 행운이 찾아올 수 있습니다. 주변을 잘 살펴보세요.",
+                "오늘은 직감이 매우 뛰어난 날입니다. 당신의 느낌을 믿어보세요.",
+                "귀인의 도움을 받아 어려움이 해결될 것입니다. 긍정적인 마음을 가지세요.",
+                "재물운이 상승하는 시기입니다. 로또 구매하기 딱 좋은 날!",
+                "작은 노력으로 큰 기쁨을 얻을 수 있는 날입니다.",
+                "행운의 여신이 당신을 보고 미소 짓고 있습니다.",
+                "오랫동안 기다려온 소식이 들려올 수 있습니다.",
+                "오늘은 당신의 날입니다. 무엇을 해도 술술 풀릴 것입니다.",
+                "주변 사람들과의 관계에서 행운이 비롯될 것입니다."
+            ];
+
+            const luckyColors = ["빨강", "파랑", "노랑", "초록", "보라", "금색", "은색", "흰색"];
+            const directions = ["동", "서", "남", "북", "동남", "동북", "서남", "서북"];
+
+            const fortuneIndex = Math.floor(seededRandom(seed) * fortunes.length);
+            const colorIndex = Math.floor(seededRandom(seed + 1) * luckyColors.length);
+            const dirIndex = Math.floor(seededRandom(seed + 2) * directions.length);
+
+            const text = `${fortunes[fortuneIndex]}<br>행운의 색: <b>${luckyColors[colorIndex]}</b>, 방향: <b>${directions[dirIndex]}쪽</b>`;
+
+            // 2. Number Generation
+            const selected = new Set();
+            let numSeed = seed + 100;
+            while (selected.size < 6) {
+                const n = Math.floor(seededRandom(numSeed) * 45) + 1;
+                selected.add(n);
+                numSeed++;
+            }
+
+            return {
+                text: text,
+                numbers: Array.from(selected).sort((a, b) => a - b),
+                historyCount: 0
+            };
         }
 
         function closeModal() {
