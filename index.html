@@ -591,6 +591,25 @@
             max-width: 90vw;
             border: 1px solid rgba(255, 255, 255, 0.3);
             font-weight: 500;
+            position: relative;
+            padding-right: 45px;
+            /* Space for close button */
+        }
+
+        .toast-close {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+            color: #999;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .toast-close:hover {
+            color: #333;
         }
 
         .toast.show {
@@ -2496,7 +2515,7 @@
                     // Add clickable span
                     msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
                 });
-                showToast(msg, "success");
+                showToast(msg, "success", true); // Pass true to make it persistent
 
                 // Adaptive Zoom: Fit my location and top nearest shops
                 const bounds = new kakao.maps.LatLngBounds();
@@ -2512,12 +2531,27 @@
             }
         }
 
-        function showToast(message, type = "info") {
+        function showToast(message, type = "info", persistent = false) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            // Use innerHTML to support links/clicks
-            toast.innerHTML = message;
+
+            // Contents
+            const content = document.createElement('div');
+            content.innerHTML = message;
+            toast.appendChild(content);
+
+            // Close Button
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'toast-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.onclick = () => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode === container) container.removeChild(toast);
+                }, 300);
+            };
+            toast.appendChild(closeBtn);
 
             container.appendChild(toast);
 
@@ -2526,14 +2560,17 @@
 
             toast.classList.add('show');
 
-            setTimeout(() => {
-                toast.classList.remove('show');
+            // Auto-hide only if NOT persistent
+            if (!persistent) {
                 setTimeout(() => {
-                    if (toast.parentNode === container) {
-                        container.removeChild(toast);
+                    if (toast.classList.contains('show')) {
+                        toast.classList.remove('show');
+                        setTimeout(() => {
+                            if (toast.parentNode === container) container.removeChild(toast);
+                        }, 300);
                     }
-                }, 300);
-            }, 5000);
+                }, 5000);
+            }
         }
 
         function copyToClipboard(text) {
