@@ -1515,7 +1515,7 @@
             if (data.length > 0) {
                 const rounds = data.map(d => d.r);
                 const maxR = Math.max(...rounds);
-                const minR = Math.max(1, maxR - 20); // Mobile Performance: Show last 20 rounds by default
+                const minR = Math.max(1, maxR - 9); // Mobile Performance: Show last 10 rounds by default
                 document.getElementById('maxRound').value = maxR;
                 document.getElementById('minRound').value = minR;
             }
