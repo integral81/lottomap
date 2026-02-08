@@ -915,7 +915,8 @@
                 <div class="input-row">
                     <input type="number" id="minRound" value="1">
                     <span>~</span>
-                    <input type="number" id="maxRound" value="1210">
+                    <input type="number" id="maxRound" value="1210" max="1210"
+                        oninput="if(parseInt(this.value) > 1210) this.value = 1210;">
                     <button class="btn-sm" onclick="refreshRecentRounds()">조회</button>
                 </div>
                 <!-- Data Availability Notice -->
