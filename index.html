@@ -635,6 +635,11 @@
             border-top: 1px solid #eee;
         }
 
+        /* Hide mobile line breaks on desktop */
+        .mobile-br {
+            display: none;
+        }
+
         /* Mobile specific adjustments */
         @media (max-width: 640px) {
             .side-nav {
@@ -644,11 +649,6 @@
             .mobile-br {
                 display: inline;
             }
-        }
-
-        /* Hide mobile line breaks on desktop */
-        .mobile-br {
-            display: none;
         }
 
         @keyframes rotate {
