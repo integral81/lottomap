@@ -1196,9 +1196,10 @@
             padding: 10px;
             border-radius: 8px;
             border: none;
-            font-size: 14px;
             text-align: center;
             outline: none;
+            min-width: 0;
+            /* Allow input to shrink if needed */
         }
 
         .btn-dream-submit {
@@ -1209,6 +1210,10 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            white-space: nowrap;
+            /* Prevent text wrapping */
+            flex-shrink: 0;
+            /* Don't let the button shrink below its text content */
         }
 
         /* Input Container for Dream/Zodiac */
