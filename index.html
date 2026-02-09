@@ -1131,6 +1131,50 @@
             margin-top: 10px;
         }
 
+        /* AI System Card Style */
+        .ai-system-card {
+            background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: left;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .ai-system-card .ai-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .ai-system-card .ai-desc {
+            font-size: 13px;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            word-break: keep-all;
+        }
+
+        .ai-system-card .ai-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ai-system-card .ai-tag {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
         .selection-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 12px;
@@ -1727,6 +1771,19 @@
                     <div style="background:#fae100; color:#3c1e1e; padding:8px 15px; text-align:center; font-weight:bold; cursor:pointer; font-size:14px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1);"
                         onclick="shareToKakao()">
                         📢 카톡 공유하고 당첨 확률 높이기 (클릭)
+                    </div>
+
+                    <!-- AI Analysis System Card -->
+                    <div class="ai-system-card">
+                        <div class="ai-title">✨ AI 로또 분석 시스템</div>
+                        <div class="ai-desc">
+                            1,200회차 이상의 역대 당첨 데이터를 AI가 심층 분석하여 통계 기반 인사이트를 제공합니다.
+                        </div>
+                        <div class="ai-tags">
+                            <div class="ai-tag">📈 실시간 분석</div>
+                            <div class="ai-tag">🪄 AI 예측</div>
+                            <div class="ai-tag">📊 27개 분석도구</div>
+                        </div>
                     </div>
 
                     <h2
