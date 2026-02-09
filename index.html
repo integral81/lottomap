@@ -2864,7 +2864,7 @@
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
-                            <button class="btn-iw btn-navi" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}')">
+                            <button class="btn-iw btn-navi" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}')">
                                 🚗 길찾기
                             </button>
                         </div>
@@ -4143,7 +4143,7 @@
 
         // ============ Roadview Functions ============
 
-        function openRoadview(lat, lng, shopName, actionType, actionData) {
+        function openRoadview(lat, lng, shopName, address, actionType, actionData) {
             const modal = document.getElementById('roadviewModal');
             const roadviewContainer = document.getElementById('roadview');
             const shopNameEl = document.getElementById('roadviewShopName');
@@ -4196,7 +4196,7 @@
                 // Setup KakaoMap button
                 const kakaoMapBtn = document.getElementById('roadviewKakaoMapBtn');
                 kakaoMapBtn.onclick = function () {
-                    openKakaoMap(lat, lng, shopName);
+                    openKakaoMap(lat, lng, shopName, address);
                 };
             });
         }
@@ -4211,18 +4211,19 @@
         }
 
         function openRoadviewWithCopy(lat, lng, shopName, address) {
-            openRoadview(lat, lng, shopName, 'copy', address);
+            openRoadview(lat, lng, shopName, address, 'copy', address);
         }
 
-        function openRoadviewWithNavi(lat, lng, shopName) {
-            openRoadview(lat, lng, shopName, 'navi', { lat: lat, lng: lng, name: shopName });
+        function openRoadviewWithNavi(lat, lng, shopName, address) {
+            openRoadview(lat, lng, shopName, address, 'navi', { lat: lat, lng: lng, name: shopName });
         }
 
-        function openKakaoMap(lat, lng, shopName) {
-            // Open Kakao Map with coordinates
-            // Mobile: Try to open Kakao Map app, fallback to web
-            // PC: Open Kakao Map web
-            const url = `https://map.kakao.com/link/map/${encodeURIComponent(shopName)},${lat},${lng}`;
+        function openKakaoMap(lat, lng, shopName, address) {
+            // Open Kakao Map with address search + "복권" keyword
+            // This helps users find the exact lottery shop location more easily
+            // Using search instead of coordinates shows nearby lottery shops
+            const searchQuery = `${address} 복권`;
+            const url = `https://map.kakao.com/link/search/${encodeURIComponent(searchQuery)}`;
             window.open(url, '_blank');
         }
 
