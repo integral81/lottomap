@@ -776,6 +776,20 @@
             }
         }
 
+        @keyframes pulse-alert {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+            }
+        }
+
         .modal {
             display: none;
             position: fixed;
