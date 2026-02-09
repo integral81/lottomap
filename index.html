@@ -3464,7 +3464,7 @@
                     // Add clickable span
                     msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
                 });
-                showToast(msg, "success", true); // Pass true to make it persistent
+                // REMOVED old showToast call from here to put it after setBounds for better sync
 
                 // Adaptive Zoom: Fit my location and top nearest shops
                 const bounds = new kakao.maps.LatLngBounds();
@@ -3478,16 +3478,33 @@
 
                 const bottomPad = isMobile ? 180 : 40;
                 map.setBounds(bounds, 40, 40, bottomPad, 40);
+
+                showToast(msg, "success", true, 'nearby-shops-toast'); // Use ID to prevent duplicates
             }
         }
 
-        function showToast(message, type = "info", persistent = false) {
+        function showToast(message, type = "info", persistent = false, id = null) {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
+
+            // Check for existing toast with same ID
+            let toast = id ? document.getElementById(id) : null;
+
+            if (toast && toast.parentNode === container) {
+                // Update existing toast content
+                const content = toast.querySelector('.toast-content');
+                if (content) content.innerHTML = message;
+                toast.className = `toast toast-${type} show`; // Ensure it's visible and has correct type
+                return;
+            }
+
+            // Create new toast if not found
+            toast = document.createElement('div');
+            if (id) toast.id = id;
             toast.className = `toast toast-${type}`;
 
             // Contents
             const content = document.createElement('div');
+            content.className = 'toast-content'; // Add class for update logic
             content.innerHTML = message;
             toast.appendChild(content);
 
