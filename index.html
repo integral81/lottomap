@@ -2459,18 +2459,24 @@
 
                 // Helper to create a unified row component
                 const createRow = (label, numbers, isManual = false) => {
-                    const wrapper = document.createElement('div');
-                    wrapper.style.display = 'flex';
-                    wrapper.style.flexDirection = 'column';
-                    wrapper.style.alignItems = 'center';
-                    wrapper.style.gap = '5px';
-                    wrapper.style.width = '100%';
+                    // Main Container (Vertical stack for Row + Optional Link)
+                    const mainContainer = document.createElement('div');
+                    mainContainer.style.display = 'flex';
+                    mainContainer.style.flexDirection = 'column';
+                    mainContainer.style.alignItems = 'center';
+                    mainContainer.style.width = '100%';
+
+                    // Row (Label + Balls)
+                    const rowWrapper = document.createElement('div');
+                    rowWrapper.style.display = 'flex';
+                    rowWrapper.style.alignItems = 'center';
+                    rowWrapper.style.justifyContent = 'center';
+                    rowWrapper.style.gap = '10px';
 
                     // Label
                     const labelDiv = document.createElement('div');
-                    labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold;">[${label}]</span>`;
-                    labelDiv.style.fontSize = '14px';
-                    wrapper.appendChild(labelDiv);
+                    labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:16px;">[${label}]</span>`;
+                    rowWrapper.appendChild(labelDiv);
 
                     // Balls
                     const ballsRow = document.createElement('div');
@@ -2484,7 +2490,9 @@
                         ball.innerText = n;
                         ballsRow.appendChild(ball);
                     });
-                    wrapper.appendChild(ballsRow);
+                    rowWrapper.appendChild(ballsRow);
+
+                    mainContainer.appendChild(rowWrapper);
 
                     // Link for Manual
                     if (isManual) {
@@ -2500,10 +2508,10 @@
                             e.stopPropagation(); // Prevent modal close if any
                             showStats();
                         };
-                        wrapper.appendChild(linkBtn);
+                        mainContainer.appendChild(linkBtn);
                     }
 
-                    return wrapper;
+                    return mainContainer;
                 };
 
                 ballContainer.appendChild(createRow('자동', resultAuto.numbers));
