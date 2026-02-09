@@ -2326,13 +2326,13 @@
             // updateRecentRounds(maxR); // Removed as per user request
         }
 
-        function refreshRecentRounds() {
+        function refreshRecentRounds(skipNotice = false) {
             const maxR = parseInt(document.getElementById('maxRound').value) || 9999;
             updateRecentRounds(maxR);
 
-            // 261회 이하인 경우 추가 안내 토스트
-            if (maxR <= 261) {
-                showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info");
+            // 261회 이하인 경우 추가 안내 토스트 (skipNotice가 false일 때만)
+            if (!skipNotice && maxR <= 261) {
+                showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info", false, 'filter-notice-toast');
             }
         }
 
@@ -2348,12 +2348,12 @@
 
             // 지도 마커 및 하단 당첨번호 대시보드 즉시 갱신
             applyFilters();
-            refreshRecentRounds();
+            refreshRecentRounds(true); // 알림 중복 방지를 위해 skipNotice=true 전달
 
             if (currentMax <= 261) {
-                showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info");
+                showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info", false, 'filter-notice-toast');
             } else {
-                showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success");
+                showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success", false, 'filter-notice-toast');
             }
         }
 
