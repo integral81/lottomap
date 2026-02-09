@@ -1814,6 +1814,16 @@
             border-top: 1px solid #ffeaa7;
         }
 
+        .roadview-notice {
+            background: #fff8e1;
+            color: #f57c00;
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border-top: 1px solid #ffecb3;
+        }
+
         .roadview-actions {
             padding: 15px;
             display: flex;
@@ -1859,6 +1869,16 @@
 
         .btn-roadview.btn-close:hover {
             background: #757575;
+        }
+
+        .btn-roadview.btn-kakaomap {
+            background: #FF9800;
+            color: white;
+        }
+
+        .btn-roadview.btn-kakaomap:hover {
+            background: #F57C00;
+            transform: translateY(-2px);
         }
 
         @media (max-width: 768px) {
@@ -2278,12 +2298,18 @@
             <div class="roadview-help">
                 💡 마우스로 드래그하여 360도 회전할 수 있습니다
             </div>
+            <div class="roadview-notice">
+                점포가 잘 보이지 않나요? 아래 버튼으로 카카오맵에서 직접 확인하세요
+            </div>
             <div class="roadview-actions">
                 <button class="btn-roadview btn-copy" id="roadviewCopyBtn" style="display:none;">
                     📋 주소 복사하기
                 </button>
                 <button class="btn-roadview btn-navi" id="roadviewNaviBtn" style="display:none;">
                     🚗 길찾기
+                </button>
+                <button class="btn-roadview btn-kakaomap" id="roadviewKakaoMapBtn">
+                    🗺️ 카카오맵에서 보기
                 </button>
                 <button class="btn-roadview btn-close" onclick="closeRoadview()">
                     닫기
@@ -4166,6 +4192,12 @@
                         closeRoadview();
                     };
                 }
+
+                // Setup KakaoMap button
+                const kakaoMapBtn = document.getElementById('roadviewKakaoMapBtn');
+                kakaoMapBtn.onclick = function () {
+                    openKakaoMap(lat, lng, shopName);
+                };
             });
         }
 
@@ -4184,6 +4216,14 @@
 
         function openRoadviewWithNavi(lat, lng, shopName) {
             openRoadview(lat, lng, shopName, 'navi', { lat: lat, lng: lng, name: shopName });
+        }
+
+        function openKakaoMap(lat, lng, shopName) {
+            // Open Kakao Map with coordinates
+            // Mobile: Try to open Kakao Map app, fallback to web
+            // PC: Open Kakao Map web
+            const url = `https://map.kakao.com/link/map/${encodeURIComponent(shopName)},${lat},${lng}`;
+            window.open(url, '_blank');
         }
 
     </script>
