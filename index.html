@@ -3305,8 +3305,8 @@
             }
         }
 
-        // Close modal when clicking outside
-        window.addEventListener('click', function (event) {
+        // Close modal when clicking outside (click + touchstart for mobile)
+        const handleBackdropClick = (event) => {
             const adModal = document.getElementById('adModal');
             const statModal = document.getElementById('statModal');
             const qrModal = document.getElementById('qrModal');
@@ -3319,7 +3319,10 @@
             if (event.target === qrModal) {
                 closeQRScanner();
             }
-        });
+        };
+
+        window.addEventListener('click', handleBackdropClick);
+        window.addEventListener('touchstart', handleBackdropClick, { passive: true });
 
         // Handle Back Button
         window.addEventListener('popstate', function (event) {
