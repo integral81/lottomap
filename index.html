@@ -465,19 +465,19 @@
             background: #f0f0f0;
         }
 
-        /* GPS Button Position */
+        /* Action Button Positions & Standard Branding */
         .gps-button {
-            bottom: 30px;
-            right: 30px;
-            background: var(--primary);
-            color: white;
-            border: none;
+            top: 140px;
+            right: 20px;
+            background: #fff;
+            border: 2px solid #48bb78;
+            /* Green for location */
         }
 
         .gps-button svg {
             width: 24px;
             height: 24px;
-            fill: white;
+            fill: #48bb78;
         }
 
         /* Loading state for GPS */
@@ -738,9 +738,11 @@
             /* Move floating buttons to bottom-right of map area on mobile */
             .gps-button {
                 position: absolute !important;
-                bottom: 20px !important;
+                top: 140px !important;
                 right: 20px !important;
                 z-index: 1001;
+                bottom: auto !important;
+                /* Reset desktop bottom */
             }
 
             .toast {
