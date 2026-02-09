@@ -1532,12 +1532,14 @@
             font-size: 0.95rem;
             color: #1976d2;
             font-weight: 500;
+            justify-content: center;
         }
 
         .freq-filter-item {
             cursor: pointer;
             padding: 2px 5px;
             transition: all 0.2s;
+            text-align: center;
         }
 
         .freq-filter-item.active {
@@ -1869,9 +1871,9 @@
                 <div class="freq-controls">
                     <div class="freq-filter-row">
                         <span class="freq-filter-item active" onclick="setFreqPeriod(0)">전체</span>
-                        <span class="freq-filter-item" onclick="setFreqPeriod(10)">최근 10주</span>
-                        <span class="freq-filter-item" onclick="setFreqPeriod(5)">최근 5주</span>
-                        <span class="freq-filter-item" onclick="setFreqPeriod(3)">최근 3주</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(10)">최근<br class="mobile-br"> 10주</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(5)">최근<br class="mobile-br"> 5주</span>
+                        <span class="freq-filter-item" onclick="setFreqPeriod(3)">최근<br class="mobile-br"> 3주</span>
                     </div>
                     <div class="freq-range-display" id="freqRangeText">
                         데이터 로딩 중...
