@@ -2388,19 +2388,38 @@
             const f3 = document.getElementById('freq3').checked;
             const f1 = document.getElementById('freq1').checked;
 
-            const filtered = allData.filter(d => {
+            // ===== 1단계: 회차 + 당첨방식 필터 =====
+            const roundFiltered = allData.filter(d => {
                 const rMatch = d.r >= minR && d.r <= maxR;
                 let mMatch = false;
                 if (auto && d.m.includes('자동')) mMatch = true;
                 if (manual && d.m.includes('수동')) mMatch = true;
                 if (semi && d.m.includes('반자동')) mMatch = true;
 
-                let fMatch = false;
-                if (f5 && d.totalWins >= 5) fMatch = true;
-                if (f3 && d.totalWins >= 3 && d.totalWins <= 4) fMatch = true;
-                if (f1 && d.totalWins <= 2) fMatch = true;
+                return rMatch && mMatch;
+            });
 
-                return rMatch && mMatch && fMatch;
+            // ===== 2단계: 선택된 회차 범위 내에서 매장별 당첨 횟수 동적 계산 =====
+            const shopWinsInRange = {};
+            roundFiltered.forEach(item => {
+                const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                shopWinsInRange[key] = (shopWinsInRange[key] || 0) + 1;
+            });
+
+            // 각 항목에 범위 내 당첨 횟수 추가
+            roundFiltered.forEach(item => {
+                const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                item.winsInRange = shopWinsInRange[key];
+            });
+
+            // ===== 3단계: Frequency 필터 적용 (선택 범위 내 횟수 기준) =====
+            const filtered = roundFiltered.filter(d => {
+                let fMatch = false;
+                if (f5 && d.winsInRange >= 5) fMatch = true;
+                if (f3 && d.winsInRange >= 3 && d.winsInRange <= 4) fMatch = true;
+                if (f1 && d.winsInRange <= 2) fMatch = true;
+
+                return fMatch;
             });
 
             document.getElementById('filteredCount').innerText = filtered.length.toLocaleString();
