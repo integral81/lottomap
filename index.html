@@ -340,6 +340,62 @@
             }
         }
 
+        /* Zodiac Grid Styles */
+        .zodiac-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 10px;
+        }
+
+        .zodiac-item {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .zodiac-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .zodiac-icon {
+            font-size: 40px;
+        }
+
+        .zodiac-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* Mobile-specific: Change zodiac grid to 3 columns */
+        @media (max-width: 768px) {
+            .zodiac-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .zodiac-item {
+                padding: 12px;
+            }
+
+            .zodiac-icon {
+                font-size: 36px;
+            }
+
+            .zodiac-name {
+                font-size: 13px;
+            }
+        }
+
         .omr-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
