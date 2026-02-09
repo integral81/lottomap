@@ -1387,6 +1387,80 @@
             background-color: #333;
         }
 
+        /* Recent Rounds Dropdown Styles */
+        .recent-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dropdown-toggle:hover {
+            background-color: #1565c0;
+        }
+
+        .dropdown-toggle::after {
+            content: '▼';
+            font-size: 10px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 120px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+
         /* Zodiac Mode Styles */
         .zodiac-grid {
             display: grid;
@@ -1672,7 +1746,16 @@
                     <span>~</span>
                     <input type="number" id="maxRound" value="1210" max="1210"
                         oninput="if(parseInt(this.value) > 1210) this.value = 1210;">
-                    <button class="btn-sm" style="background:#1976d2;" onclick="setRecent10Rounds()">최근10회</button>
+                    <div class="recent-dropdown">
+                        <button class="dropdown-toggle" onclick="toggleRecentDropdown()">최근 10회</button>
+                        <div id="recentDropdownMenu" class="dropdown-menu">
+                            <div class="dropdown-item" onclick="setRecentNRounds(10)">최근 10회</div>
+                            <div class="dropdown-item" onclick="setRecentNRounds(20)">최근 20회</div>
+                            <div class="dropdown-item" onclick="setRecentNRounds(30)">최근 30회</div>
+                            <div class="dropdown-item" onclick="setRecentNRounds(50)">최근 50회</div>
+                            <div class="dropdown-item" onclick="setRecentNRounds(100)">최근 100회</div>
+                        </div>
+                    </div>
                     <button class="btn-sm" onclick="applyFilters()">조회</button>
                 </div>
                 <!-- Data Availability Notice -->
@@ -2335,7 +2418,22 @@
             }
         }
 
-        function setRecent10Rounds() {
+        // Toggle dropdown menu
+        function toggleRecentDropdown() {
+            const menu = document.getElementById('recentDropdownMenu');
+            menu.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.querySelector('.recent-dropdown');
+            const menu = document.getElementById('recentDropdownMenu');
+            if (dropdown && !dropdown.contains(event.target) && menu) {
+                menu.classList.remove('show');
+            }
+        });
+
+        function setRecentNRounds(n) {
             let currentMax = parseInt(document.getElementById('maxRound').value);
             // 입력값이 없거나 유효하지 않으면 기본 최신 회차(1210) 사용
             if (isNaN(currentMax) || currentMax < 1) {
@@ -2343,7 +2441,19 @@
             }
 
             document.getElementById('maxRound').value = currentMax;
-            document.getElementById('minRound').value = Math.max(1, currentMax - 9);
+            document.getElementById('minRound').value = Math.max(1, currentMax - (n - 1));
+
+            // 드롭다운 버튼 텍스트 업데이트
+            const toggleBtn = document.querySelector('.dropdown-toggle');
+            if (toggleBtn) {
+                toggleBtn.childNodes[0].textContent = `최근 ${n}회`;
+            }
+
+            // 드롭다운 닫기
+            const menu = document.getElementById('recentDropdownMenu');
+            if (menu) {
+                menu.classList.remove('show');
+            }
 
             // 지도 마커 및 하단 당첨번호 대시보드 즉시 갱신
             applyFilters();
@@ -2352,8 +2462,13 @@
             if (currentMax <= 261) {
                 showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info", false, 'filter-notice-toast');
             } else {
-                showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success", false, 'filter-notice-toast');
+                showToast(`${currentMax}회 기준 최근${n}회차 데이터로 갱신되었습니다.`, "success", false, 'filter-notice-toast');
             }
+        }
+
+        // 기존 setRecent10Rounds 함수 유지 (하위 호환성)
+        function setRecent10Rounds() {
+            setRecentNRounds(10);
         }
 
         function updateRecentRounds(maxRound) {
