@@ -207,6 +207,8 @@
             font-size: 11px;
             color: #666;
             margin-bottom: 8px;
+            line-height: 1.4;
+            word-break: keep-all;
         }
 
         .iw-tag {
@@ -2308,6 +2310,14 @@
                 const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
                 const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
 
+                // Helper to format address for mobile: break after the street number
+                const formatAddrForMobile = (addr) => {
+                    if (!addr) return "";
+                    // Regex: Find the first sequence of digits followed by a space and insert mobile-only BR
+                    return addr.replace(/(\d+)\s/, '$1<br class="mobile-br"> ');
+                };
+                const displayAddr = formatAddrForMobile(shop.a);
+
                 const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
                 const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
 
@@ -2315,7 +2325,7 @@
                     <div class="infowindow">
                         <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
-                            <span class="iw-addr">${shop.a}</span>
+                            <span class="iw-addr">${displayAddr}</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
