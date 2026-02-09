@@ -2391,44 +2391,6 @@
             document.getElementById('adContent').style.display = 'none';
             document.getElementById('resultContent').style.display = 'block';
 
-            // Logic
-            let result;
-            if (customResult) {
-                result = customResult;
-                // Update text based on result type
-                // Update text based on result type
-                // const container... removed, using ID inside blocks
-
-                if (result.type === 'dream') {
-                    // Use safer selector
-                    const container = document.getElementById('resultInfoText');
-                    if (container) {
-                        container.innerHTML =
-                            `꿈 키워드 <strong style="color:#fae100;">'${result.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
-                    }
-                } else if (result.type === 'horoscope') {
-                    const container = document.getElementById('resultInfoText');
-                    if (container) {
-                        container.innerHTML =
-                            `<div class="horoscope-text-box">
-                                <div style="font-size:24px; margin-bottom:5px;">${result.icon}</div>
-                                <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${result.zodiac}띠 오늘의 운세</div>
-                                ${result.text}
-                            </div>
-                            <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
-                    }
-                }
-            } else {
-                result = generateLuckyNumbers(currentShopData.rounds);
-                // Restore default text (Safely using ID)
-                const container = document.getElementById('resultInfoText');
-                if (container) {
-                    container.innerHTML =
-                        `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${result.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
-                        `(<span id="paramRounds">${result.relatedRounds.join(', ') + (result.historyCount > 5 ? '...' : '')}</span> 등)`;
-                }
-            }
-
             // Legal Disclaimer
             const legalDiv = document.getElementById('legalDisclaimer');
             if (!legalDiv) {
@@ -2439,16 +2401,114 @@
                 document.getElementById('resultContent').appendChild(legal);
             }
 
-            // Render
             const ballContainer = document.getElementById('luckyBalls');
             ballContainer.innerHTML = '';
 
-            result.numbers.forEach(n => {
-                const ball = document.createElement('div');
-                ball.className = 'ball ' + getBallColor(n);
-                ball.innerText = n;
-                ballContainer.appendChild(ball);
-            });
+            // Reset container styles
+            ballContainer.style.flexDirection = 'column';
+            ballContainer.style.gap = '15px';
+
+            if (customResult) {
+                // --- Dream / Horoscope Mode (Single Row) ---
+                if (customResult.type === 'dream') {
+                    const container = document.getElementById('resultInfoText');
+                    if (container) {
+                        container.innerHTML =
+                            `꿈 키워드 <strong style="color:#fae100;">'${customResult.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
+                    }
+                } else if (customResult.type === 'horoscope') {
+                    const container = document.getElementById('resultInfoText');
+                    if (container) {
+                        container.innerHTML =
+                            `<div class="horoscope-text-box">
+                                <div style="font-size:24px; margin-bottom:5px;">${customResult.icon}</div>
+                                <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${customResult.zodiac}띠 오늘의 운세</div>
+                                ${customResult.text}
+                            </div>
+                            <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
+                    }
+                }
+
+                // Render Single Row
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.justifyContent = 'center';
+                row.style.gap = '5px';
+
+                customResult.numbers.forEach(n => {
+                    const ball = document.createElement('div');
+                    ball.className = 'ball ' + getBallColor(n);
+                    ball.innerText = n;
+                    row.appendChild(ball);
+                });
+                ballContainer.appendChild(row);
+
+            } else {
+                // --- Standard Analysis Mode (Auto + Manual) ---
+                // Generate two sets
+                const resultAuto = generateLuckyNumbers(currentShopData.rounds);
+                const resultManual = generateLuckyNumbers(currentShopData.rounds);
+
+                // Update Info Text (Shared stats)
+                const container = document.getElementById('resultInfoText');
+                if (container) {
+                    container.innerHTML =
+                        `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${resultAuto.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
+                        `(<span id="paramRounds">${resultAuto.relatedRounds.join(', ') + (resultAuto.historyCount > 5 ? '...' : '')}</span> 등)`;
+                }
+
+                // Helper to create a unified row component
+                const createRow = (label, numbers, isManual = false) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.display = 'flex';
+                    wrapper.style.flexDirection = 'column';
+                    wrapper.style.alignItems = 'center';
+                    wrapper.style.gap = '5px';
+                    wrapper.style.width = '100%';
+
+                    // Label
+                    const labelDiv = document.createElement('div');
+                    labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold;">[${label}]</span>`;
+                    labelDiv.style.fontSize = '14px';
+                    wrapper.appendChild(labelDiv);
+
+                    // Balls
+                    const ballsRow = document.createElement('div');
+                    ballsRow.style.display = 'flex';
+                    ballsRow.style.justifyContent = 'center';
+                    ballsRow.style.gap = '5px';
+
+                    numbers.forEach(n => {
+                        const ball = document.createElement('div');
+                        ball.className = 'ball ' + getBallColor(n);
+                        ball.innerText = n;
+                        ballsRow.appendChild(ball);
+                    });
+                    wrapper.appendChild(ballsRow);
+
+                    // Link for Manual
+                    if (isManual) {
+                        const linkBtn = document.createElement('div');
+                        linkBtn.innerHTML = '📊 번호별 출현 횟수 참고하기 >';
+                        linkBtn.style.color = '#fff';
+                        linkBtn.style.fontSize = '12px';
+                        linkBtn.style.marginTop = '6px';
+                        linkBtn.style.cursor = 'pointer';
+                        linkBtn.style.textDecoration = 'underline';
+                        linkBtn.style.opacity = '0.9';
+                        linkBtn.onclick = (e) => {
+                            e.stopPropagation(); // Prevent modal close if any
+                            showStats();
+                        };
+                        wrapper.appendChild(linkBtn);
+                    }
+
+                    return wrapper;
+                };
+
+                ballContainer.appendChild(createRow('자동', resultAuto.numbers));
+                ballContainer.appendChild(createRow('수동', resultManual.numbers, true));
+            }
         }
 
         function getBallColor(n) {
