@@ -492,6 +492,19 @@
             border: 2px solid var(--secondary);
         }
 
+        /* QR Quick Button Style */
+        .qr-quick-btn {
+            top: 80px;
+            right: 20px;
+            border: 2px solid var(--primary);
+        }
+
+        .qr-quick-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--primary);
+        }
+
         .hamburger-icon {
             width: 20px;
             height: 14px;
@@ -733,6 +746,13 @@
             .menu-btn {
                 position: absolute !important;
                 top: 20px !important;
+                right: 20px !important;
+                z-index: 1001;
+            }
+
+            .qr-quick-btn {
+                position: absolute !important;
+                top: 80px !important;
                 right: 20px !important;
                 z-index: 1001;
             }
@@ -1608,6 +1628,17 @@
                     <span></span>
                     <span></span>
                 </div>
+            </div>
+
+            <!-- QR Quick Button (Focus Frame Icon) -->
+            <div id="qrQuickBtn" class="floating-btn qr-quick-btn" onclick="showQRScanner()" title="QR코드 당첨확인">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                    <line x1="8" y1="12" x2="16" y2="12" stroke-opacity="0.5"></line>
+                </svg>
             </div>
 
             <!-- GPS Button (Moved inside #map for mobile anchoring) -->
