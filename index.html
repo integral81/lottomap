@@ -129,12 +129,13 @@
         .input-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         input[type="number"] {
-            width: 70px;
-            padding: 8px;
+            width: 48px;
+            padding: 4px;
+            text-align: center;
             border: 1px solid #ddd;
             border-radius: 6px;
         }
@@ -736,6 +737,21 @@
             }
 
             /* Move floating buttons to bottom-right of map area on mobile */
+            .input-row {
+                gap: 5px;
+            }
+
+            input[type="number"] {
+                width: 48px;
+                padding: 4px;
+                font-size: 13px;
+            }
+
+            .btn-sm {
+                padding: 8px 8px;
+                font-size: 12px;
+            }
+
             .gps-button {
                 position: absolute !important;
                 top: 140px !important;
@@ -1624,7 +1640,7 @@
                     <span>~</span>
                     <input type="number" id="maxRound" value="1210" max="1210"
                         oninput="if(parseInt(this.value) > 1210) this.value = 1210;">
-                    <button class="btn-sm" style="background:#1976d2;" onclick="setRecent10Rounds()">최근 10회</button>
+                    <button class="btn-sm" style="background:#1976d2;" onclick="setRecent10Rounds()">최근10회</button>
                     <button class="btn-sm" onclick="refreshRecentRounds()">조회</button>
                 </div>
                 <!-- Data Availability Notice -->
@@ -2293,7 +2309,7 @@
             updateMapMarkers();
             refreshRecentRounds();
 
-            showToast(`최근 10회차(${currentMax - 9}~${currentMax}) 데이터로 갱신되었습니다.`, "success");
+            showToast(`최근10회차(${currentMax - 9}~${currentMax}) 데이터로 갱신되었습니다.`, "success");
         }
 
         function updateRecentRounds(maxRound) {
