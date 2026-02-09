@@ -3080,6 +3080,8 @@
                 .catch(err => {
                     console.error("Error starting QR scanner", err);
                     alert("카메라를 실행할 수 없습니다. 권한을 확인해주세요.\n" + err);
+                    // Return to hamburger menu on permission denial or error
+                    closeQRScanner();
                 });
         }
 
@@ -3092,11 +3094,19 @@
                     html5QrCode.stop().then(() => {
                         html5QrCode.clear();
                         html5QrCode = null;
-                    }).catch(err => console.log("Failed to stop qr code scanner", err));
+                        // Return to hamburger menu
+                        toggleNav();
+                    }).catch(err => {
+                        console.log("Failed to stop qr code scanner", err);
+                        toggleNav();
+                    });
                 } else {
                     html5QrCode.clear();
                     html5QrCode = null;
+                    toggleNav();
                 }
+            } else {
+                toggleNav();
             }
         }
 
