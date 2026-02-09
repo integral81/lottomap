@@ -1882,12 +1882,34 @@
                 const nums = window.lottoHistory[String(targetRound)];
 
                 if (nums && nums.length > 0) {
-                    [...nums].sort((a, b) => a - b).forEach(n => {
+                    // Separate Main (6) and Bonus (1)
+                    // The 7th number is the bonus number in our JSON structure
+                    const mainNums = nums.slice(0, 6).sort((a, b) => a - b);
+                    const bonusNum = nums[6];
+
+                    // Render Main Numbers
+                    mainNums.forEach(n => {
                         const ball = document.createElement('span');
                         ball.className = 'mini-ball ' + getBallColor(n);
                         ball.innerText = n;
                         ballsDiv.appendChild(ball);
                     });
+
+                    // Render Plus Sign
+                    const plusSpan = document.createElement('span');
+                    plusSpan.innerText = '+';
+                    plusSpan.style.color = '#999';
+                    plusSpan.style.fontSize = '12px';
+                    plusSpan.style.fontWeight = 'bold';
+                    plusSpan.style.margin = '0 2px';
+                    ballsDiv.appendChild(plusSpan);
+
+                    // Render Bonus Number
+                    const bonusBall = document.createElement('span');
+                    bonusBall.className = 'mini-ball ' + getBallColor(bonusNum);
+                    bonusBall.innerText = bonusNum;
+                    ballsDiv.appendChild(bonusBall);
+
                 } else {
                     const noData = document.createElement('span');
                     noData.style.fontSize = '11px';
