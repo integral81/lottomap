@@ -2311,7 +2311,7 @@
             document.getElementById('minRound').value = Math.max(1, currentMax - 9);
 
             // 지도 마커 및 하단 당첨번호 대시보드 즉시 갱신
-            updateMapMarkers();
+            applyFilters();
             refreshRecentRounds();
 
             showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success");
