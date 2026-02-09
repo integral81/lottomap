@@ -325,10 +325,12 @@
             background: #fff;
             width: 90%;
             max-width: 350px;
+            max-height: 70vh;
             padding: 20px;
             border-radius: 12px;
             text-align: center;
             position: relative;
+            overflow-y: auto;
         }
 
         .omr-grid {
@@ -3272,6 +3274,11 @@
     <!-- OMR Modal (Re-inserted) -->
     <div id="omrModal" class="omr-modal-overlay" onclick="closeOMR()">
         <div class="omr-modal-content" onclick="event.stopPropagation()">
+            <!-- Close X Button (Top Right) -->
+            <span onclick="closeOMR()"
+                style="position:absolute; top:10px; right:15px; font-size:28px; color:#999; cursor:pointer; line-height:1; transition: color 0.2s;"
+                onmouseover="this.style.color='#333'" onmouseout="this.style.color='#999'">&times;</span>
+
             <h3 style="margin:0; color:#333;">OMR 마킹 도우미</h3>
             <p style="font-size:12px; color:#666; margin:5px 0;">화면을 보고 OMR 카드에 색칠하세요.</p>
             <div id="omrGrid" class="omr-grid">
