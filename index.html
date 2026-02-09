@@ -2969,8 +2969,16 @@
         }
 
         function generateHoroscope(zodiacName) {
-            // Get today's date string YYYY-MM-DD
-            const today = new Date().toISOString().split('T')[0];
+            // Get today's date in Korea Standard Time (UTC+9)
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const koreaTime = new Date(utc + (9 * 60 * 60 * 1000));
+
+            const year = koreaTime.getFullYear();
+            const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
+            const day = String(koreaTime.getDate()).padStart(2, '0');
+            const today = `${year}-${month}-${day}`;
+
             const key = today + zodiacName;
 
             // Generate seeded random based on date + zodiac
