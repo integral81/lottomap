@@ -1673,7 +1673,7 @@
                     <input type="number" id="maxRound" value="1210" max="1210"
                         oninput="if(parseInt(this.value) > 1210) this.value = 1210;">
                     <button class="btn-sm" style="background:#1976d2;" onclick="setRecent10Rounds()">최근10회</button>
-                    <button class="btn-sm" onclick="refreshRecentRounds()">조회</button>
+                    <button class="btn-sm" onclick="applyFilters()">조회</button>
                 </div>
                 <!-- Data Availability Notice -->
                 <div class="data-notice">
@@ -1709,7 +1709,6 @@
                     <label class="checkbox-item"><input type="checkbox" id="methodSemi" checked> 반자동</label>
                 </div>
             </div>
-            <button class="btn-apply" style="margin-bottom: 5px;" onclick="applyFilters()">당첨횟수/당첨방식 적용</button>
             <div class="stats-card">
                 <div class="stat-item"><span>전체 데이터</span> <span id="totalDataCount">0</span></div>
                 <div class="stat-item"><span>필터링 결과</span> <span id="filteredCount" class="stat-value">0</span>
