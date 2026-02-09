@@ -51,7 +51,7 @@
         }
     </script>
     <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=clusterer"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=clusterer,services,roadview"
         onerror="handleScriptError()"></script>
     <!-- Kakao SDK for Sharing -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
@@ -1765,6 +1765,120 @@
                 gap: 26px;
             }
         }
+
+        /* Roadview Modal Styles */
+        .roadview-modal-content {
+            background: white;
+            margin: 2% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .roadview-header {
+            background: linear-gradient(135deg, #80cbc4 0%, #26a69a 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .roadview-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .roadview-close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            line-height: 1;
+            transition: transform 0.2s;
+        }
+
+        .roadview-close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .roadview-help {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 15px;
+            text-align: center;
+            font-size: 13px;
+            border-top: 1px solid #ffeaa7;
+        }
+
+        .roadview-actions {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            background: #f8f9fa;
+        }
+
+        .btn-roadview {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-roadview.btn-copy {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-roadview.btn-copy:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-roadview.btn-navi {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-roadview.btn-navi:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .btn-roadview.btn-close {
+            background: #9E9E9E;
+            color: white;
+        }
+
+        .btn-roadview.btn-close:hover {
+            background: #757575;
+        }
+
+        @media (max-width: 768px) {
+            .roadview-modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            #roadview {
+                height: 300px !important;
+            }
+
+            .roadview-actions {
+                flex-direction: column;
+            }
+
+            .btn-roadview {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -2147,7 +2261,33 @@
                 </div>
                 <div style="text-align:center; margin-top:15px;">
                     <button class="btn-sm" onclick="restartQRScanner()">다시 스캔하기</button>
+                    <button class="btn-sm" onclick="restartQRScanner()">다시 스캔하기</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roadview Modal -->
+    <div id="roadviewModal" class="modal">
+        <div class="roadview-modal-content">
+            <div class="roadview-header">
+                <span class="roadview-title" id="roadviewShopName">매장 로드뷰</span>
+                <span class="roadview-close-btn" onclick="closeRoadview()">✕</span>
+            </div>
+            <div id="roadview" style="width:100%; height:450px; background:#f5f5f5;"></div>
+            <div class="roadview-help">
+                💡 마우스로 드래그하여 360도 회전할 수 있습니다
+            </div>
+            <div class="roadview-actions">
+                <button class="btn-roadview btn-copy" id="roadviewCopyBtn" style="display:none;">
+                    📋 주소 복사하기
+                </button>
+                <button class="btn-roadview btn-navi" id="roadviewNaviBtn" style="display:none;">
+                    🚗 길찾기
+                </button>
+                <button class="btn-roadview btn-close" onclick="closeRoadview()">
+                    닫기
+                </button>
             </div>
         </div>
     </div>
@@ -2155,6 +2295,8 @@
     <script>
         let map, clusterer, allData = [], markers = [];
         let currentInfoWindow = null; // Track the currently open InfoWindow
+        let roadview = null; // Roadview instance
+        let roadviewClient = null; // RoadviewClient instance
 
 
         function handleFileSelect(event) {
@@ -2686,7 +2828,7 @@
                 const content = `
                     <div class="infowindow">
                         <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
-                        <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사">
+                        <div class="iw-addr-box" onclick="openRoadviewWithCopy(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}')" title="주소 복사 (로드뷰 보기)">
                             <span class="iw-addr">${displayAddr}</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                         </div>
@@ -2696,7 +2838,7 @@
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
-                            <button class="btn-iw btn-navi" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
+                            <button class="btn-iw btn-navi" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}')">
                                 🚗 길찾기
                             </button>
                         </div>
@@ -3972,6 +4114,78 @@
                 document.body.removeChild(textarea);
             }
         };
+
+        // ============ Roadview Functions ============
+
+        function openRoadview(lat, lng, shopName, actionType, actionData) {
+            const modal = document.getElementById('roadviewModal');
+            const roadviewContainer = document.getElementById('roadview');
+            const shopNameEl = document.getElementById('roadviewShopName');
+            const copyBtn = document.getElementById('roadviewCopyBtn');
+            const naviBtn = document.getElementById('roadviewNaviBtn');
+
+            // Set shop name
+            shopNameEl.textContent = shopName + ' 로드뷰';
+
+            // Initialize roadview and client if not exists
+            if (!roadview) {
+                roadview = new kakao.maps.Roadview(roadviewContainer);
+            }
+            if (!roadviewClient) {
+                roadviewClient = new kakao.maps.RoadviewClient();
+            }
+
+            const position = new kakao.maps.LatLng(lat, lng);
+
+            // Search for nearest roadview within 50m
+            roadviewClient.getNearestPanoId(position, 50, function (panoId) {
+                if (panoId === null) {
+                    // No roadview available
+                    alert('해당 점포는 로드뷰 정보가 없습니다.');
+                    return;
+                }
+
+                // Display roadview
+                roadview.setPanoId(panoId, position);
+                modal.style.display = 'block';
+
+                // Show appropriate action button
+                copyBtn.style.display = 'none';
+                naviBtn.style.display = 'none';
+
+                if (actionType === 'copy') {
+                    copyBtn.style.display = 'inline-block';
+                    copyBtn.onclick = function () {
+                        copyToClipboard(actionData);
+                        closeRoadview();
+                    };
+                } else if (actionType === 'navi') {
+                    naviBtn.style.display = 'inline-block';
+                    naviBtn.onclick = function () {
+                        openDirections(actionData.lat, actionData.lng, actionData.name);
+                        closeRoadview();
+                    };
+                }
+            });
+        }
+
+        function closeRoadview() {
+            const modal = document.getElementById('roadviewModal');
+            modal.style.display = 'none';
+
+            // Hide action buttons
+            document.getElementById('roadviewCopyBtn').style.display = 'none';
+            document.getElementById('roadviewNaviBtn').style.display = 'none';
+        }
+
+        function openRoadviewWithCopy(lat, lng, shopName, address) {
+            openRoadview(lat, lng, shopName, 'copy', address);
+        }
+
+        function openRoadviewWithNavi(lat, lng, shopName) {
+            openRoadview(lat, lng, shopName, 'navi', { lat: lat, lng: lng, name: shopName });
+        }
+
     </script>
 </body>
 
