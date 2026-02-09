@@ -1761,45 +1761,119 @@
                 });
         }
 
-        /**
-         * 🔮 Lucky Number Generator Algorithm
-         * 1. Store Luck (50%): Numbers that won in this store's history.
-         * 2. Global Hot (30%): Most frequent numbers in recent 100 rounds (Simulated for now).
-         * 3. Random (20%): Pure random luck.
-         */
-        function generateLuckyNumbers(storeWins) {
-            // storeWins: Array of winning rounds for this store e.g., [{r: 1000, m: '자동'}, ...]
+        // --- Advanced Prediction Algorithm ---
+        let globalWeights = null; // Calculated once on load
+
+        function analyzeGlobalHistory() {
+            if (globalWeights) return;
+            globalWeights = {};
+            for (let i = 1; i <= 45; i++) globalWeights[i] = 10; // Base weight
+
             const history = window.lottoHistory || {};
-            const numberWeights = {};
+            const rounds = Object.keys(history).map(Number).sort((a, b) => b - a); // Newest first
 
-            // Initialize weights
-            for (let i = 1; i <= 45; i++) numberWeights[i] = 1; // Base weight
+            // Recency Weighting: Newer rounds have more influence
+            rounds.forEach((r, idx) => {
+                const nums = history[String(r)];
+                if (!nums) return;
 
-            // 1. Analyze Store History
-            let winningNumbers = [];
+                // Weight decay: Recent 10 rounds get +5, others get +1
+                const weightBoost = idx < 10 ? 5 : 1;
+
+                // Only consider main numbers (first 6)
+                for (let i = 0; i < 6; i++) {
+                    if (nums[i]) globalWeights[nums[i]] += weightBoost;
+                }
+            });
+            console.log("Global Analysis Complete:", globalWeights);
+        }
+
+        /**
+         * 🔮 Advanced Lucky Number Generator
+         * Uses Global Weights + Shop Pattern + Statistical Filters
+         */
+        function generateLuckyNumbers(storeWins, mode = 'mix') {
+            // Ensure global analysis is done
+            if (!globalWeights) analyzeGlobalHistory();
+
+            // 1. Clone Global Weights for this session
+            const currentWeights = { ...globalWeights };
+
+            // 2. Apply Shop-Specific Weights based on Mode
+            // storeWins: [{r: 1000, m: '자동'}, ...]
+            const history = window.lottoHistory || {};
+            let matchCount = 0;
+
             storeWins.forEach(win => {
-                const round = win.r;
-                if (history[round]) {
-                    const nums = history[round];
-                    winningNumbers = [...winningNumbers, ...nums];
-                    nums.forEach(n => {
-                        numberWeights[n] += 5; // Boost weight for numbers that appeared in this store's winning rounds
-                    });
+                const isAuto = win.m.includes('자동');
+                const isManual = win.m.includes('수동');
+
+                // Logic: 
+                // If mode is 'auto', heavily boost numbers from 'auto' wins.
+                // If mode is 'manual', heavily boost numbers from 'manual' wins.
+                // If mode is 'mix', boost all.
+                let process = false;
+                if (mode === 'auto' && isAuto) process = true;
+                else if (mode === 'manual' && isManual) process = true;
+                else if (mode === 'mix') process = true;
+
+                if (process) {
+                    const nums = history[String(win.r)];
+                    if (nums) {
+                        nums.slice(0, 6).forEach(n => {
+                            currentWeights[n] += 50; // Massive boost for shop's winning pattern
+                        });
+                        matchCount++;
+                    }
                 }
             });
 
-            // 2. Select 6 numbers based on weights
-            const selected = new Set();
-            while (selected.size < 6) {
-                const n = weightedRandom(numberWeights);
-                selected.add(n);
+            // Fallback: If no matches for mode (e.g., asking for Manual but shop only has Auto wins),
+            // then analyze ALL wins of this shop to find at least some "Shop Energy".
+            if (matchCount === 0 && storeWins.length > 0) {
+                storeWins.forEach(win => {
+                    const nums = history[String(win.r)];
+                    if (nums) {
+                        nums.slice(0, 6).forEach(n => {
+                            currentWeights[n] += 20; // Moderate boost
+                        });
+                    }
+                });
             }
 
+            // 3. Statistical Filter Loop
+            // Try to generate a valid set that meets strict statistical criteria
+            let bestSet = null;
+            let maxAttempts = 200; // Hard limit
+
+            for (let i = 0; i < maxAttempts; i++) {
+                const candidate = drawSet(currentWeights);
+                if (validateSet(candidate)) {
+                    bestSet = candidate;
+                    break;
+                }
+            }
+
+            // If we failed to find a "perfect" set, just take the last raw one
+            if (!bestSet) bestSet = drawSet(currentWeights);
+
             return {
-                numbers: Array.from(selected).sort((a, b) => a - b),
+                numbers: bestSet.sort((a, b) => a - b),
                 historyCount: storeWins.length,
-                relatedRounds: storeWins.map(w => w.r).slice(0, 5) // Top 5 recent rounds
+                relatedRounds: storeWins.map(w => w.r).slice(0, 5)
             };
+        }
+
+        function drawSet(weights) {
+            const selected = new Set();
+            // Safety copy to modify weights during draft (avoid picking same num)
+            // But for simple Weighted Random without replacement, we just check 'has'
+
+            while (selected.size < 6) {
+                const n = weightedRandom(weights);
+                selected.add(n);
+            }
+            return Array.from(selected);
         }
 
         function weightedRandom(weights) {
@@ -1810,7 +1884,41 @@
                 rand -= weights[i];
                 if (rand < 0) return parseInt(i);
             }
-            return Math.floor(Math.random() * 45) + 1; // Fallback
+            return Math.floor(Math.random() * 45) + 1;
+        }
+
+        // --- Probability Booster Filters ---
+        function validateSet(numbers) {
+            // Sort first
+            numbers.sort((a, b) => a - b);
+
+            // 1. Sum Filter: Winning sums usually fall between 100 ~ 175
+            const sum = numbers.reduce((a, b) => a + b, 0);
+            if (sum < 100 || sum > 175) return false;
+
+            // 2. Odd/Even Ratio: Avoid 6:0 or 0:6. Accept 4:2, 3:3, 2:4
+            const odds = numbers.filter(n => n % 2 !== 0).length;
+            if (odds < 2 || odds > 4) return false;
+
+            // 3. High/Low Ratio: (1-22) vs (23-45). Avoid 6:0 or 0:6
+            const low = numbers.filter(n => n <= 22).length;
+            if (low < 2 || low > 4) return false;
+
+            // 4. Consecutive Check: Max 2 consecutive numbers allowed (e.g. 1,2,3 is bad)
+            let consecutiveCnt = 0;
+            for (let i = 0; i < numbers.length - 1; i++) {
+                if (numbers[i] + 1 === numbers[i + 1]) {
+                    consecutiveCnt++;
+                    // If we have 2 pairs (1-2, 5-6) it's ok, but 1-2-3 (2 consecutives in a row) is rare
+                    // Let's strictly disallow 3 consecutive numbers (1,2,3)
+                    if (i > 0 && numbers[i - 1] + 1 === numbers[i]) return false;
+                }
+            }
+
+            // 5. Last Digit Sum (Optimization): Usually ends in 0-9 spread 
+            // (Optional, skip for performance)
+
+            return true;
         }
 
         function applyFilters() {
@@ -2445,9 +2553,9 @@
 
             } else {
                 // --- Standard Analysis Mode (Auto + Manual) ---
-                // Generate two sets
-                const resultAuto = generateLuckyNumbers(currentShopData.rounds);
-                const resultManual = generateLuckyNumbers(currentShopData.rounds);
+                // Generate two sets with specific modes
+                const resultAuto = generateLuckyNumbers(currentShopData.rounds, 'auto');
+                const resultManual = generateLuckyNumbers(currentShopData.rounds, 'manual');
 
                 // Update Info Text (Shared stats)
                 const container = document.getElementById('resultInfoText');
