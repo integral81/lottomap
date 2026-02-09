@@ -1733,6 +1733,11 @@
             margin-top: 5px;
         }
 
+        /* PC: 제목 줄바꿈 숨김 */
+        .freq-title-br {
+            display: none;
+        }
+
         /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             .stats-card {
@@ -1743,6 +1748,11 @@
             .stat-item {
                 padding-right: 15px;
                 /* 오른쪽 여백 증가로 숫자가 화면 왼쪽으로 이동 */
+            }
+
+            /* 모바일에서만 제목 줄바꿈 표시 */
+            .freq-title-br {
+                display: block;
             }
         }
     </style>
@@ -2078,8 +2088,8 @@
                 <div class="back-btn" onclick="closeStatModal()">
                     <span>❮</span> 닫기
                 </div>
-                <div style="flex: 1; text-align: center;">번호별 출현횟수 <span
-                        style="font-size: 10px; opacity: 0.8; vertical-align: middle;">(보너스 제외)</span>
+                <div style="flex: 1; text-align: center;">번호별 출현횟수<br class="freq-title-br"><span
+                        style="font-size: 10px; opacity: 0.7;">(보너스 제외)</span>
                 </div>
                 <div style="width: 45px;"></div>
             </div>
