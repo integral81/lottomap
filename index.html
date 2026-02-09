@@ -1529,6 +1529,10 @@
                 <span class="m-icon">📍</span>
                 <span class="m-text">내 주변 명당 찾기</span>
             </div>
+            <div class="menu-item" onclick="openLastOMR();">
+                <span class="m-icon">📝</span>
+                <span class="m-text">이번 주 1등번호 OMR로 보기</span>
+            </div>
 
             <div class="menu-category">기타</div>
             <div class="menu-item" onclick="shareToKakao()">
@@ -1846,6 +1850,7 @@
 
         // --- Advanced Prediction Algorithm ---
         let globalWeights = null; // Calculated once on load
+        let lastRecommendedNumbers = null; // Store last recommended numbers for quick OMR access
 
         function analyzeGlobalHistory() {
             if (globalWeights) return;
@@ -2687,6 +2692,8 @@
 
                 ballContainer.appendChild(createRowForCustom(customResult.numbers));
 
+                // Store last recommended numbers for quick OMR access
+                lastRecommendedNumbers = customResult.numbers;
 
             } else {
                 // --- Standard Analysis Mode (Auto + Manual) ---
@@ -2795,6 +2802,9 @@
 
                 ballContainer.appendChild(createRow('자동', resultAuto.numbers));
                 ballContainer.appendChild(createRow('수동', resultManual.numbers, true));
+
+                // Store last recommended numbers (Auto mode) for quick OMR access
+                lastRecommendedNumbers = resultAuto.numbers;
             }
         }
 
@@ -3370,6 +3380,17 @@
             const modal = document.getElementById('omrModal');
             modal.className = 'omr-modal-overlay';
             setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        // Quick OMR View from Hamburger Menu
+        function openLastOMR() {
+            if (lastRecommendedNumbers && lastRecommendedNumbers.length === 6) {
+                closeNav();
+                openOMR(lastRecommendedNumbers);
+            } else {
+                closeNav();
+                showToast("지도에서 추천번호를 먼저 받고 오세요~!!", "info", false);
+            }
         }
 
         // Updated Clipboard function (Global)
