@@ -1534,6 +1534,21 @@
                 <span class="m-text">이번 주 1등번호 OMR로 보기</span>
             </div>
 
+            <!-- Alert Box for OMR (Hidden by default) -->
+            <div id="omrAlertBox"
+                style="display:none; margin: 15px 15px 20px 15px; padding: 20px; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); border-radius: 12px; border: 3px solid #ff6b6b; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); animation: pulse-alert 1.5s infinite;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 36px;">⚠️</span>
+                    <div style="flex: 1;">
+                        <div
+                            style="font-size: 21px; font-weight: bold; color: #d32f2f; margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">
+                            알림</div>
+                        <div style="font-size: 16px; color: #333; font-weight: 600; line-height: 1.4;">지도에서 추천번호를<br>먼저
+                            받고 오세요~!!</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="menu-category">기타</div>
             <div class="menu-item" onclick="shareToKakao()">
                 <span class="m-icon">📢</span>
@@ -3388,8 +3403,14 @@
                 closeNav();
                 openOMR(lastRecommendedNumbers);
             } else {
-                closeNav();
-                showToast("지도에서 추천번호를 먼저 받고 오세요~!!", "info", false);
+                // Show alert box in hamburger menu
+                const alertBox = document.getElementById('omrAlertBox');
+                alertBox.style.display = 'block';
+
+                // Auto-hide after 4 seconds
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 4000);
             }
         }
 
