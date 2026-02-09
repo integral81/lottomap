@@ -640,6 +640,15 @@
             .side-nav {
                 width: 80%;
             }
+
+            .mobile-br {
+                display: inline;
+            }
+        }
+
+        /* Hide mobile line breaks on desktop */
+        .mobile-br {
+            display: none;
         }
 
         @keyframes rotate {
@@ -1610,7 +1619,7 @@
             </div>
             <div class="menu-item" onclick="openLastOMR();">
                 <span class="m-icon">📝</span>
-                <span class="m-text">이번 주 1등번호 OMR로 보기</span>
+                <span class="m-text">이번 주 1등번호 OMR로<br class="mobile-br"> 보기</span>
             </div>
 
             <!-- Alert Box for OMR (Hidden by default) -->
