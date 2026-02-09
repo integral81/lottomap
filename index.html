@@ -333,6 +333,13 @@
             overflow-y: auto;
         }
 
+        /* Mobile-specific: Reduce OMR modal height by 5% */
+        @media (max-width: 768px) {
+            .omr-modal-content {
+                max-height: 65vh;
+            }
+        }
+
         .omr-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
