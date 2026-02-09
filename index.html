@@ -2618,19 +2618,73 @@
                     }
                 }
 
-                // Render Single Row
-                const row = document.createElement('div');
-                row.style.display = 'flex';
-                row.style.justifyContent = 'center';
-                row.style.gap = '5px';
 
-                customResult.numbers.forEach(n => {
-                    const ball = document.createElement('div');
-                    ball.className = 'ball ' + getBallColor(n);
-                    ball.innerText = n;
-                    row.appendChild(ball);
-                });
-                ballContainer.appendChild(row);
+                // Render with Copy/OMR buttons using createRow helper
+                const createRowForCustom = (numbers) => {
+                    const mainContainer = document.createElement('div');
+                    mainContainer.style.display = 'flex';
+                    mainContainer.style.flexDirection = 'column';
+                    mainContainer.style.alignItems = 'center';
+                    mainContainer.style.width = '100%';
+
+                    const rowWrapper = document.createElement('div');
+                    rowWrapper.style.display = 'flex';
+                    rowWrapper.style.alignItems = 'center';
+                    rowWrapper.style.justifyContent = 'center';
+                    rowWrapper.style.gap = '15px';
+                    rowWrapper.style.width = '100%';
+
+                    // Balls
+                    const ballsRow = document.createElement('div');
+                    ballsRow.style.display = 'flex';
+                    ballsRow.style.justifyContent = 'center';
+                    ballsRow.style.gap = '5px';
+                    ballsRow.style.flex = '1';
+
+                    numbers.forEach(n => {
+                        const ball = document.createElement('div');
+                        ball.className = 'ball ' + getBallColor(n);
+                        ball.innerText = n;
+                        ballsRow.appendChild(ball);
+                    });
+                    rowWrapper.appendChild(ballsRow);
+
+                    // Buttons Column
+                    const buttonsCol = document.createElement('div');
+                    buttonsCol.style.display = 'flex';
+                    buttonsCol.style.flexDirection = 'column';
+                    buttonsCol.style.gap = '5px';
+                    buttonsCol.style.minWidth = '90px';
+
+                    // Copy Button
+                    const copyBtn = document.createElement('div');
+                    copyBtn.className = 'omr-action-btn';
+                    copyBtn.innerHTML = '📋 복사';
+                    copyBtn.style.justifyContent = 'center';
+                    copyBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        copyToClipboard(numbers);
+                    };
+                    buttonsCol.appendChild(copyBtn);
+
+                    // OMR Button
+                    const omrBtn = document.createElement('div');
+                    omrBtn.className = 'omr-action-btn';
+                    omrBtn.innerHTML = '📝 OMR 보기';
+                    omrBtn.style.justifyContent = 'center';
+                    omrBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openOMR(numbers);
+                    };
+                    buttonsCol.appendChild(omrBtn);
+
+                    rowWrapper.appendChild(buttonsCol);
+                    mainContainer.appendChild(rowWrapper);
+                    return mainContainer;
+                };
+
+                ballContainer.appendChild(createRowForCustom(customResult.numbers));
+
 
             } else {
                 // --- Standard Analysis Mode (Auto + Manual) ---
