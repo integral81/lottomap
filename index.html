@@ -777,6 +777,13 @@
                 /* Mobile: 13px * 1.1 */
             }
 
+            .data-notice {
+                font-size: 12.6px !important;
+                /* Mobile: Maintain 0.9x of 14px */
+                padding: 6px;
+                margin-top: 6px;
+            }
+
             .gps-button {
                 position: absolute !important;
                 top: 140px !important;
@@ -2322,6 +2329,11 @@
         function refreshRecentRounds() {
             const maxR = parseInt(document.getElementById('maxRound').value) || 9999;
             updateRecentRounds(maxR);
+
+            // 261회 이하인 경우 추가 안내 토스트
+            if (maxR <= 261) {
+                showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info");
+            }
         }
 
         function setRecent10Rounds() {
@@ -2338,7 +2350,11 @@
             applyFilters();
             refreshRecentRounds();
 
-            showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success");
+            if (currentMax <= 261) {
+                showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info");
+            } else {
+                showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success");
+            }
         }
 
         function updateRecentRounds(maxRound) {
