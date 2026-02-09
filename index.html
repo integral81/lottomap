@@ -1754,6 +1754,7 @@
                             <div class="dropdown-item" onclick="setRecentNRounds(30)">최근 30회</div>
                             <div class="dropdown-item" onclick="setRecentNRounds(50)">최근 50회</div>
                             <div class="dropdown-item" onclick="setRecentNRounds(100)">최근 100회</div>
+                            <div class="dropdown-item" onclick="setRecentNRounds('all')">전체</div>
                         </div>
                     </div>
                     <button class="btn-sm" onclick="applyFilters()">조회</button>
@@ -2459,13 +2460,26 @@
                 currentMax = 1210;
             }
 
-            document.getElementById('maxRound').value = currentMax;
-            document.getElementById('minRound').value = Math.max(1, currentMax - (n - 1));
+            // "전체" 옵션 처리
+            if (n === 'all') {
+                document.getElementById('maxRound').value = currentMax;
+                document.getElementById('minRound').value = 1;
 
-            // 드롭다운 버튼 텍스트 업데이트
-            const toggleBtn = document.querySelector('.dropdown-toggle');
-            if (toggleBtn) {
-                toggleBtn.childNodes[0].textContent = `최근 ${n}회`;
+                // 드롭다운 버튼 텍스트 업데이트
+                const toggleBtn = document.querySelector('.dropdown-toggle');
+                if (toggleBtn) {
+                    toggleBtn.childNodes[0].textContent = '전체';
+                }
+            } else {
+                // 숫자인 경우 (10, 20, 30, 50, 100)
+                document.getElementById('maxRound').value = currentMax;
+                document.getElementById('minRound').value = Math.max(1, currentMax - (n - 1));
+
+                // 드롭다운 버튼 텍스트 업데이트
+                const toggleBtn = document.querySelector('.dropdown-toggle');
+                if (toggleBtn) {
+                    toggleBtn.childNodes[0].textContent = `최근 ${n}회`;
+                }
             }
 
             // 드롭다운 닫기
@@ -2481,7 +2495,8 @@
             if (currentMax <= 261) {
                 showToast(`1등점 지도제공은<br><strong style="color:red;">262회차</strong>부터<br>제공됩니다`, "info", false, 'filter-notice-toast');
             } else {
-                showToast(`${currentMax}회 기준 최근${n}회차 데이터로 갱신되었습니다.`, "success", false, 'filter-notice-toast');
+                const displayText = n === 'all' ? '전체' : `최근${n}회차`;
+                showToast(`${currentMax}회 기준 ${displayText} 데이터로 갱신되었습니다.`, "success", false, 'filter-notice-toast');
             }
         }
 
