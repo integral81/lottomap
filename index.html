@@ -2301,15 +2301,20 @@
         }
 
         function setRecent10Rounds() {
-            const currentMax = 1210; // TODO: Should be dynamic but 1210 is our current base
-            document.getElementById('maxRound').value = currentMax;
-            document.getElementById('minRound').value = currentMax - 9;
+            let currentMax = parseInt(document.getElementById('maxRound').value);
+            // 입력값이 없거나 유효하지 않으면 기본 최신 회차(1210) 사용
+            if (isNaN(currentMax) || currentMax < 1) {
+                currentMax = 1210;
+            }
 
-            // Apply filter immediately
+            document.getElementById('maxRound').value = currentMax;
+            document.getElementById('minRound').value = Math.max(1, currentMax - 9);
+
+            // 지도 마커 및 하단 당첨번호 대시보드 즉시 갱신
             updateMapMarkers();
             refreshRecentRounds();
 
-            showToast(`최근10회차(${currentMax - 9}~${currentMax}) 데이터로 갱신되었습니다.`, "success");
+            showToast(`${currentMax}회 기준 최근10회차 데이터로 갱신되었습니다.`, "success");
         }
 
         function updateRecentRounds(maxRound) {
