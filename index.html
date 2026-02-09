@@ -1461,8 +1461,8 @@
         </div>
     </div>
 
-    <div id="adModal" class="modal">
-        <div class="modal-content">
+    <div id="adModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="closeModal()">&times;</span>
             <div id="adContent"
                 style="width:100%; height:450px; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
