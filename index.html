@@ -741,6 +741,12 @@
                 bottom: 20px !important;
                 right: 20px !important;
                 z-index: 1001;
+
+                .toast {
+                    padding: 12px 18px !important;
+                    padding-right: 40px !important;
+                    font-size: 13px !important;
+                }
             }
 
             .menu-btn {
@@ -3384,7 +3390,7 @@
             const top3 = sortedByDist.slice(0, 3);
 
             if (top3.length > 0) {
-                let msg = "📍 <strong>주변 1등점<br class=\"mobile-br\">(가까운 순)</strong><br>";
+                let msg = "📍 <strong style=\"white-space: nowrap;\">주변 1등점</strong> <br class=\"mobile-br\"> <strong>(가까운 순)</strong><br>";
                 top3.forEach((item, index) => {
                     const shop = item.marker.shopData;
                     const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
