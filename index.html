@@ -174,7 +174,8 @@
             background: #f9f9f9;
             padding: 15px;
             border-radius: 8px;
-            margin-top: auto;
+            margin-top: 10px;
+            /* Reduced gap from auto to 10px */
         }
 
         .stat-item {
@@ -1634,7 +1635,7 @@
         <div id="sidebar">
             <h1>🎰 KINOV Lotto Map</h1>
             <div class="section">
-                <span class="section-title">📅 회차 필터 (Round)</span>
+                <span class="section-title" style="font-size: 1.2rem; color: #333;">📅 회차 필터 (Round)</span>
                 <div class="input-row">
                     <input type="number" id="minRound" value="1201">
                     <span>~</span>
@@ -1645,7 +1646,7 @@
                 </div>
                 <!-- Data Availability Notice -->
                 <div
-                    style="font-size:14px; font-weight:bold; color:#d32f2f; margin-top:8px; line-height:1.4; background:rgba(255,0,0,0.05); padding:8px; border-radius:4px; border:1px solid rgba(255,0,0,0.1);">
+                    style="font-size:12.6px; font-weight:bold; color:#d32f2f; margin-top:6px; line-height:1.4; background:rgba(255,0,0,0.05); padding:6px; border-radius:4px; border:1px solid rgba(255,0,0,0.1);">
                     1. 1등 당첨번호는 1회차부터 제공<br>
                     2. 1등 판매점현황은 262회차부터 제공
                 </div>
@@ -1678,7 +1679,7 @@
                     <label class="checkbox-item"><input type="checkbox" id="methodSemi" checked> 반자동</label>
                 </div>
             </div>
-            <button class="btn-apply" onclick="applyFilters()">당첨횟수/당첨방식 적용</button>
+            <button class="btn-apply" style="margin-bottom: 5px;" onclick="applyFilters()">당첨횟수/당첨방식 적용</button>
             <div class="stats-card">
                 <div class="stat-item"><span>전체 데이터</span> <span id="totalDataCount">0</span></div>
                 <div class="stat-item"><span>필터링 결과</span> <span id="filteredCount" class="stat-value">0</span>
