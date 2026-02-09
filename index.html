@@ -3452,12 +3452,14 @@
                 };
             }).sort((a, b) => a.distance - b.distance);
 
-            // Take top 3
-            const top3 = sortedByDist.slice(0, 3);
-
-            if (top3.length > 0) {
+            // Take top 3 (top 2 on mobile to prevent overlap)
+            const isMobile = window.innerWidth <= 768;
+            const topCount = isMobile ? 2 : 3;
+            const topShops = sortedByDist.slice(0, topCount);
+            11: 58 PM
+            if (topShops.length > 0) {
                 let msg = "📍 <strong style=\"white-space: nowrap;\">주변 1등점</strong> <br class=\"mobile-br\"> <strong>(가까운 순)</strong><br>";
-                top3.forEach((item, index) => {
+                topShops.forEach((item, index) => {
                     const shop = item.marker.shopData;
                     const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
                     // Add clickable span
@@ -3469,13 +3471,14 @@
                 const bounds = new kakao.maps.LatLngBounds();
                 bounds.extend(new kakao.maps.LatLng(lat, lng));
 
-                top3.forEach(item => {
+                topShops.forEach(item => {
                     if (item.distance < 10) { // Only include within 10km for bounds
                         bounds.extend(item.marker.getPosition());
                     }
                 });
 
-                map.setBounds(bounds, 40, 40, 40, 40);
+                const bottomPad = isMobile ? 180 : 40;
+                map.setBounds(bounds, 40, 40, bottomPad, 40);
             }
         }
 
