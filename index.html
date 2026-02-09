@@ -1581,7 +1581,10 @@
             </div>
         </div>
         <div id="resultContent"
-            style="display:none; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; min-height:420px;">
+            style="display:none; position:relative; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; min-height:420px;">
+            <span
+                style="position:absolute; top:15px; right:20px; color:white; font-size:28px; font-weight:bold; cursor:pointer; z-index:10;"
+                onclick="closeModal()">&times;</span>
             <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.2);">🎉 추천 번호 생성 완료! 🎉</h2>
             <p id="resultInfoText" style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px;">
                 이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
@@ -1597,7 +1600,7 @@
                 🚗 지금 당장 사러 가기 (길찾기)
             </button>
             <button class="btn-sm"
-                style="margin-top:15px; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); padding:8px 20px; border-radius:20px;"
+                style="display:block; margin:15px auto 0; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); padding:8px 20px; border-radius:20px; color:white;"
                 onclick="closeModal()">
                 닫기
             </button>
