@@ -1000,6 +1000,21 @@
             /* Reset cursor for content area */
         }
 
+        /* Mobile Focus Mode: Hide distractions when InfoWindow is open */
+        @media (max-width: 768px) {
+
+            body.iw-open .floating-btn,
+            body.iw-open #toast-container,
+            body.iw-open #qrQuickBtn,
+            body.iw-open .menu-btn,
+            body.iw-open .gps-button {
+                opacity: 0 !important;
+                pointer-events: none !important;
+                visibility: hidden !important;
+                transition: opacity 0.2s;
+            }
+        }
+
         .modal-close {
             position: absolute;
             top: 15px;
@@ -1174,6 +1189,26 @@
             .modal-close {
                 right: 10px !important;
                 top: 10px !important;
+            }
+
+            /* Lucky Number Result Mobile Layout */
+            .result-row-wrapper {
+                flex-wrap: wrap !important;
+                justify-content: flex-start !important;
+                gap: 5px !important;
+                padding: 5px 0;
+            }
+
+            .result-label {
+                width: 100% !important;
+                text-align: left !important;
+                margin-bottom: 5px !important;
+                padding-left: 5px;
+            }
+
+            .result-balls {
+                justify-content: flex-start !important;
+                /* Align balls to left */
             }
         }
 
@@ -1881,6 +1916,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-roadview.btn-naver {
+            background: #03c75a;
+            color: white;
+        }
+
+        .btn-roadview.btn-naver:hover {
+            background: #02b350;
+            transform: translateY(-2px);
+        }
+
         @media (max-width: 768px) {
             .roadview-modal-content {
                 width: 95%;
@@ -1924,7 +1969,7 @@
                             <div class="dropdown-item" onclick="setRecentNRounds('all')">전체</div>
                         </div>
                     </div>
-                    <button class="btn-sm" onclick="applyFilters()">범위수동조회</button>
+                    <button class="btn-sm" style="background:#555;" onclick="applyFilters()">범위수동조회</button>
                 </div>
                 <!-- Data Availability Notice -->
                 <div class="data-notice">
@@ -1958,6 +2003,12 @@
                     <label class="checkbox-item"><input type="checkbox" id="methodAuto" checked> 자동</label>
                     <label class="checkbox-item"><input type="checkbox" id="methodManual" checked> 수동</label>
                     <label class="checkbox-item"><input type="checkbox" id="methodSemi" checked> 반자동</label>
+                </div>
+            </div>
+            <div class="section">
+                <span class="section-title">🏪 운영 상태 (Status)</span>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="excludeClosed"> 🚫 폐업점 제외</label>
                 </div>
             </div>
             <div class="stats-card">
@@ -2295,11 +2346,12 @@
                 <span class="roadview-close-btn" onclick="closeRoadview()">✕</span>
             </div>
             <div id="roadview" style="width:100%; height:450px; background:#f5f5f5;"></div>
-            <div class="roadview-help">
-                💡 마우스로 드래그하여 360도 회전할 수 있습니다
+            <div id="roadviewImageContainer"
+                style="display:none; width:100%; height:450px; background:#000; overflow:hidden; position:relative;">
+                <img id="roadviewStaticImage" src="" style="width:100%; height:100%; object-fit:contain;">
             </div>
-            <div class="roadview-notice">
-                점포가 잘 보이지 않나요? 아래 버튼으로 카카오맵에서 직접 확인하세요
+            <div class="roadview-help" id="roadviewHelpText">
+                💡 마우스로 드래그하여 360도 회전할 수 있습니다
             </div>
             <div class="roadview-actions">
                 <button class="btn-roadview btn-copy" id="roadviewCopyBtn" style="display:none;">
@@ -2311,6 +2363,9 @@
                 <button class="btn-roadview btn-kakaomap" id="roadviewKakaoMapBtn">
                     🗺️ 카카오맵에서 보기
                 </button>
+                <button class="btn-roadview btn-naver" id="roadviewNaverBtn" style="display:none;">
+                    🗺️ 네이버 거리뷰로 보기
+                </button>
                 <button class="btn-roadview btn-close" onclick="closeRoadview()">
                     닫기
                 </button>
@@ -2319,20 +2374,123 @@
     </div>
 
     <script>
-        let map, clusterer, allData = [], markers = [];
+        let map;
+        let clusterer;
+        let allData = [];
+        let markers = [];
         let currentInfoWindow = null; // Track the currently open InfoWindow
         let roadview = null; // Roadview instance
         let roadviewClient = null; // RoadviewClient instance
 
-        // Premium Roadview POV Presets (Optimized for better matching)
+        // Premium Roadview POV Presets (User Verified 260210)
         const ROADVIEW_PRESETS = [
-            { name: "스파", addr: "동일로 1493", pov: { pan: 335, tilt: 5, zoom: 0 } },
-            { name: "부일카서비스", addr: "자성로133번길 35", pov: { pan: 50, tilt: 5, zoom: 0 } },
-            { name: "잠실매점", addr: "올림픽로 269", pov: { pan: 180, tilt: 0, zoom: 0 } },
-            { name: "목화휴게소", addr: "사천대로 912", pov: { pan: 90, tilt: 5, zoom: 0 } },
-            // 문경 왕대박복권방 (사용자 요청: 중앙로 15 1층)
-            { name: "왕대박복권방", addr: "중앙로 15 1층", pov: { pan: 180, tilt: 5, zoom: 0 } },
-            { name: "왕대박복권방", addr: "모전동 81-89", pov: { pan: 180, tilt: 5, zoom: 0 } }
+            { name: "부일카서비스", addr: "부산 동구 범일동", panoId: 1202519412, pov: { pan: 236.39, tilt: 6.54, zoom: -3 } },
+            { name: "일등복권편의점", addr: "대구 달서구 본리동", panoId: 1201526676, pov: { pan: 349.47, tilt: 12.34, zoom: -1 } },
+            { name: "스파", addr: "서울 노원구 상계동", panoId: 1198397843, pov: { pan: 316.53, tilt: 2.76, zoom: -1 } },
+            { name: "로또명당인주점", addr: "충남 아산시 서해로", panoId: 1152034899, pov: { pan: 324.00, tilt: 3.71, zoom: -3 } },
+            { name: "뉴빅마트", addr: "부산 기장군 정관중앙로", panoId: 1202061273, pov: { pan: 113.90, tilt: -1.64, zoom: 1 } },
+            { name: "부일카서비스", addr: "부산 동구 자성로133번길", panoId: 1202519408, pov: { pan: 230.15, tilt: 0.33, zoom: -1 } },
+            { name: "로또휴게실", addr: "경기 용인시 기흥구", panoId: 1199447932, pov: { pan: 260.1, tilt: -1.2, zoom: 3 } },
+            { name: "오천억복권방", addr: "광주 서구 상무대로", panoId: 1200299139, pov: { pan: 342.32, tilt: 2.52, zoom: 1 } },
+            { name: "로또명당인주점", addr: "충남 아산시 인주면", panoId: 1176307856, pov: { pan: 281.23, tilt: 3.29, zoom: 2 } },
+            { name: "스파", addr: "서울 노원구 동일로 1493", panoId: 1198397843, pov: { pan: 318.09, tilt: -0.61, zoom: 0 } },
+            { name: "왕대박복권방", addr: "경북 문경시 중앙로", panoId: 1184892306, pov: { pan: 308.56, tilt: 3.85, zoom: 2 } },
+            { name: "알리바이", addr: "광주 광산구 수등로", panoId: 1199874247, pov: { pan: 70.76, tilt: -0.16, zoom: -3 } },
+            { name: "오케이상사", addr: "서울 서초구 신반포로 176 (반포동)", panoId: 1018301543, pov: { pan: 184.52, tilt: 10.0, zoom: 0 } },
+            { name: "잠실매점", addr: "서울 송파구 올림픽로", panoId: 1197820708, pov: { pan: 333.6, tilt: -4.1, zoom: 1 } },
+            { name: "월드컵복권방", addr: "경기 광주시 경안로 20", panoId: 1202723374, pov: { pan: 11.5, tilt: -0.6, zoom: 0 } },
+            { name: "갈렙분식한식", addr: "서울 중랑구 망우동", panoId: 1198253759, pov: { pan: 108.88, tilt: 0.41, zoom: -3 } },
+            { name: "로또킹", addr: "서울 영등포구 영중로", panoId: 1171055517, pov: { pan: 21.23, tilt: -4.98, zoom: 0 } },
+            { name: "돈벼락맞는곳", addr: "부산 동구 조방로49번길", panoId: 1202542575, pov: { pan: 1.35, tilt: -5.08, zoom: 0 } },
+            { name: "중앙로또", addr: "경북 칠곡군 북삼로", panoId: 1167169878, pov: { pan: 323.40, tilt: 1.02, zoom: -3 } },
+            { name: "또또복권방", addr: "전북 익산시 영등동", panoId: 1179975829, pov: { pan: 357.24, tilt: 0.52, zoom: 1 } },
+            { name: "썬마트", addr: "충북 청주시 흥덕구", panoId: 1170640105, pov: { pan: 272.68, tilt: 4.98, zoom: 1 } },
+            { name: "복권명당(서부점)", addr: "대구 달서구 송현동", panoId: 1201394989, pov: { pan: 133.15, tilt: 0.06, zoom: 1 } },
+            { name: "월드24시", addr: "서울 은평구 갈현1동", panoId: 1197925499, pov: { pan: 174.22, tilt: -0.80, zoom: 0 } },
+            { name: "썬마트", addr: "충북 청주시 흥덕구", panoId: 1170639962, pov: { pan: 332.05, tilt: 1.41, zoom: -3 } },
+            { name: "라이프마트", addr: "인천 중구 항동7가", panoId: 1198808458, pov: { pan: 283.89, tilt: 8.44, zoom: 0 } },
+            { name: "영광정보통신", addr: "서울 성북구 하월곡동 37-18", panoId: 1198189825, pov: { pan: 119.8, tilt: -5.0, zoom: 0 } },
+            { name: "가판점(신문)", addr: "서울 영등포구 당산동6가 331-1", panoId: 1198369749, pov: { pan: 25.60, tilt: 3.30, zoom: 0 } },
+            { name: "묵동식품", addr: "서울 중랑구 묵동 238-11", panoId: 1198447963, pov: { pan: 268.85, tilt: 2.27, zoom: 3 } },
+            { name: "목화휴게소", addr: "경남 사천시 용현면", panoId: 1188432049, pov: { pan: 103.75, tilt: 8.02, zoom: 1 } },
+            { name: "복권백화점", addr: "경기 파주시 평화로", panoId: 1202862935, pov: { pan: 48.22, tilt: 2.81, zoom: 1 } },
+            { name: "복권백화점(대백.한라앞)", addr: "대구 달서구 이곡동", panoId: 1201505680, pov: { pan: 341.21, tilt: 4.46, zoom: 0 } },
+            { name: "영화유통(1등복권방)", addr: "울산 남구 신정로", panoId: 1202168610, pov: { pan: 262.28, tilt: 6.84, zoom: -3 } },
+            { name: "종합복권슈퍼", addr: "경기 시흥시 마유로", panoId: 1175858045, pov: { pan: 129.49, tilt: 4.68, zoom: 3 } },
+            { name: "한꿈복권방", addr: "울산 중구 번영로", panoId: 1202017794, pov: { pan: 168.99, tilt: -1.41, zoom: 3 } },
+            { name: "현대장미슈퍼", addr: "전북 익산시 동서로61길", panoId: 1179925999, pov: { pan: 216.02, tilt: 2.46, zoom: -1 } },
+            { name: "북마산복권전문점", addr: "경남 창원시 마산합포구", panoId: 1204481175, pov: { pan: 94.99, tilt: 4.55, zoom: -3 } },
+            { name: "행운복권방", addr: "경기 포천시 소흘읍 죽엽산로 438", panoId: 1175632287, pov: { pan: 113.99, tilt: -9.48, zoom: 0 } },
+            { name: "행운복권방 보생당건강원", addr: "전북 익산시 무왕로 1268", panoId: 1179789585, pov: { pan: 168.69, tilt: -0.46, zoom: -2 } },
+            { name: "행운복권방", addr: "경기 의정부시 충의로 55", panoId: 1174558837, pov: { pan: 244.4, tilt: 3.8, zoom: 0 } },
+            { name: "일등복권편의점", addr: "대구 달서구 대명천로 220", panoId: 1201526676, pov: { pan: 350.40, tilt: 1.57, zoom: -1 } },
+            { name: "하늘로또", addr: "경기 여주시 세종로475번길", panoId: 1175070156, pov: { pan: 49.17, tilt: 3.23, zoom: 2 } },
+            { name: "빅세일복권방", addr: "부산 부산진구 서면문화로", panoId: 1202698289, pov: { pan: 104.61, tilt: -2.96, zoom: 3 } },
+            { name: "세진전자통신", addr: "대구 서구 서대구로", panoId: 1201585664, pov: { pan: 94.22, tilt: -0.93, zoom: -2 } },
+            { name: "복권나라", addr: "서울 관악구 남부순환로 1739-9", panoId: 1198285612, pov: { pan: 181.9, tilt: 8.3, zoom: 2 } },
+            { name: "다니엘사", addr: "경기 안산시 단원구 원선1로 38 101호", panoId: 1204134596, pov: { pan: 356.2, tilt: -3.0, zoom: 4 } },
+            { name: "이마트24 순천산단점", addr: "전남 순천시 산단1길 6", panoId: 1173643437, pov: { pan: 257.9, tilt: 3.2, zoom: 3 } },
+            { name: "제이복권방", addr: "서울 종로구 종로", panoId: 1197815068, pov: { pan: 356.05, tilt: -1.00, zoom: -1 } },
+            { name: "복권명당", addr: "대전 서구 만년동 112", panoId: 1200850347, pov: { pan: 250.0, tilt: 10.3, zoom: 0 } },
+            { name: "대박마트복권방", addr: "충남 아산시 음봉면", panoId: 1176849717, pov: { pan: 219.56, tilt: 2.64, zoom: 0 } },
+            { name: "평안당", addr: "서울 종로구 종로5가", panoId: 1197815101, pov: { pan: 337.91, tilt: 6.03, zoom: 0 } },
+            { name: "대박복권방", addr: "경기 연천군 전곡읍", panoId: 1175550133, pov: { pan: 258.57, tilt: -1.93, zoom: -3 } },
+            { name: "알리바이(나주점)", addr: "전남 나주시 금성동", panoId: 1191260191, pov: { pan: 104.99, tilt: -1.23, zoom: -3 } },
+            { name: "토큰판매소", addr: "서울 송파구 풍납1동", panoId: 1198482657, pov: { pan: 281.96, tilt: 5.56, zoom: 1 } },
+            { name: "행복충전소", addr: "경기 평택시 지산동", panoId: 1198299520, pov: { pan: 118.12, tilt: 4.47, zoom: -2 } },
+            { name: "NG24", addr: "경북 칠곡군 석적읍", panoId: 1166639892, pov: { pan: 332.83, tilt: 10.69, zoom: -2 } },
+            { name: "소리창고", addr: "서울 강서구 내발산동", panoId: 1198604052, pov: { pan: 104.79, tilt: 1.68, zoom: -1 } },
+            { name: "팡팡복권마트.잡화슈퍼", addr: "전북 전주시 덕진구", panoId: 1171843139, pov: { pan: 340.71, tilt: 2.47, zoom: -1 } },
+            { name: "황금로또", addr: "강원 원주시 태장2동", panoId: 1196038638, pov: { pan: 267.24, tilt: 13.10, zoom: -3 } },
+            { name: "로또복권두정점", addr: "충남 천안시 서북구", panoId: 1195549516, pov: { pan: 4.85, tilt: 6.66, zoom: -3 } },
+            { name: "대산슈퍼", addr: "충남 천안시 동남구", panoId: 1193995561, pov: { pan: 182.45, tilt: 4.26, zoom: -2 } },
+            { name: "에스비 상사", addr: "서울 중구 퇴계로86길", panoId: 1198788741, pov: { pan: 77.31, tilt: 3.31, zoom: -3 } },
+            { name: "청솔서점", addr: "부산 사하구 하신번영로", panoId: 1161907485, pov: { pan: 192.32, tilt: 5.42, zoom: -1 } },
+            { name: "대전우표사", addr: "대전 동구 중앙로204번길", panoId: 1163576030, pov: { pan: 55.45, tilt: 1.93, zoom: -3 } },
+            { name: "주택복권방", addr: "경기 용인시 수지구", panoId: 1199750326, pov: { pan: 141.11, tilt: 3.85, zoom: 1 } },
+            { name: "미나식품(로또판매점)", addr: "서울 강서구 금낭화로", panoId: 1198192808, pov: { pan: 323.87, tilt: -2.11, zoom: -3 } },
+            { name: "나눔로또봉평점", addr: "경남 통영시 도남로 81", panoId: 1204285725, pov: { pan: 15.6, tilt: 2.0, zoom: -1 } },
+            { name: "천하명당", addr: "경기 시흥시 신천3길", panoId: 1175741916, pov: { pan: 335.65, tilt: 6.06, zoom: -2 } },
+            { name: "로터리복권방", addr: "부산 서구 자갈치로 4-1 1층", panoId: 1202119889, pov: { pan: 176.9, tilt: 2.3, zoom: 0 } },
+            { name: "천하명당복권방", addr: "경남 거제시 옥포성안로", panoId: 1204368030, pov: { pan: 96.19, tilt: 6.22, zoom: -1 } },
+            { name: "신문가판점", addr: "서울 용산구 한강대로", panoId: 1197632086, pov: { pan: 256.46, tilt: 4.87, zoom: -3 } },
+            { name: "대운", addr: "경기 김포시 대명항로", panoId: 1203824304, pov: { pan: 177.65, tilt: 9.98, zoom: 0 } },
+            { name: "세계로생활가전", addr: "서울 동작구 보라매로", panoId: 1197780011, pov: { pan: 92.74, tilt: 5.30, zoom: -2 } },
+            { name: "노다지복권방", addr: "인천 미추홀구 한나루로", panoId: 1199931642, pov: { pan: 128.28, tilt: 0.08, zoom: -3 } },
+            { name: "대박천하마트", addr: "인천 부평구 굴포로", panoId: 1198907645, pov: { pan: 105.07, tilt: 4.60, zoom: -2 } },
+            { name: "대박슈퍼", addr: "인천 부평구 경원대로", panoId: 1199058573, pov: { pan: 177.81, tilt: -2.27, zoom: 1 } },
+            { name: "진평양행", addr: "강원 강릉시 임영로", panoId: 1194087150, pov: { pan: 256.26, tilt: -4.05, zoom: -1 } },
+            { name: "운좋은날", addr: "서울 강동구 풍성로", panoId: 1198599079, pov: { pan: 11.15, tilt: 3.08, zoom: -1 } },
+            { name: "바이더웨이녹번중앙점", addr: "서울 은평구 녹번동 155-20", isClosed: true },
+            { name: "포항오거리CU복권", addr: "경북 포항시 북구", panoId: 1187938840, pov: { pan: 54.87, tilt: 4.18, zoom: 0 } },
+            { name: "꾸미로또복권", addr: "서울 강북구 솔샘로67길", panoId: 1197848380, pov: { pan: 106.79, tilt: 4.54, zoom: 0 } },
+            { name: "복권전문점", addr: "경기 시흥시 중심상가로", panoId: 1176040872, pov: { pan: 38.81, tilt: 7.94, zoom: 0 } },
+            { name: "세븐복권방", addr: "경기 파주시 해올2길", panoId: 1203125573, pov: { pan: 331.01, tilt: 4.71, zoom: 0 } },
+            { name: "짱복권", addr: "서울 종로구 종로", panoId: 1197814790, pov: { pan: 1.03, tilt: 5.80, zoom: 0 } },
+            { name: "프렌드24시", addr: "광주 광산구 첨단중앙로", panoId: 1199708556, pov: { pan: 178.98, tilt: 7.22, zoom: 0 } },
+            { name: "알리바이금당점", addr: "전남 순천시 대석길", panoId: 1173674879, pov: { pan: 359.32, tilt: 3.55, zoom: -2 } },
+            { name: "해뜰날", addr: "경기 동두천시 중앙로", panoId: 1175647022, pov: { pan: 167.43, tilt: 0.87, zoom: 0 } },
+            { name: "GS25(계산동경점)", addr: "인천 계양구 계산동", panoId: 1199190145, pov: { pan: 312.16, tilt: -5.08, zoom: 0 } },
+            { name: "창원병원앞매표소", addr: "경남 창원시 성산구 중앙동 104-1 가판", panoId: 1204481691, pov: { pan: 37.1, tilt: 9.5, zoom: 0 } },
+            { name: "역전광장상회", addr: "경기 파주시 금촌1동 329-19", panoId: 1203271882, pov: { pan: 332.7, tilt: 5.0, zoom: 0 } },
+            { name: "대광복권방", addr: "전남 화순군 화순읍 대리 97-3", panoId: 1192902741, pov: { pan: 339.4, tilt: 4.4, zoom: 0 } },
+            { name: "명당골복권방", addr: "경기 수원시 권선구", panoId: 1199751659, pov: { pan: 187.22, tilt: 5.79, zoom: -3 } },
+            { name: "다터져복권방", addr: "경기 평택시 합정동", panoId: 1197642715, pov: { pan: 281.72, tilt: 0.44, zoom: -3 } },
+            { name: "행운의집", addr: "경북 안동시 북문동 23-7", isClosed: true, customMessage: "현재는 폐업상태의 점포입니다" },
+            { name: "지원물산", addr: "서울 노원구 공릉동", panoId: 1198350307, pov: { pan: 61.24, tilt: -1.90, zoom: -3 } },
+            { name: "데이션나잇", addr: "서울 성북구 종암동 132", panoId: 1198236406, pov: { pan: 52.6, tilt: 10.3, zoom: 0 } },
+            { name: "파란만장복권방", addr: "경기 화성시 진안동", panoId: 1198278713, pov: { pan: 156.78, tilt: -2.10, zoom: 3 } },
+            { name: "황실복권방", addr: "충남 천안시 동남구", panoId: 1193993670, pov: { pan: 346.95, tilt: 4.35, zoom: 3 } },
+            { name: "GS25(대전시네마점)", addr: "대전 서구 괴정동", panoId: 1201429942, pov: { pan: 132.97, tilt: 5.70, zoom: -3 } },
+            { name: "로또복권역전점", addr: "경북 경주시 노서동(중부동)", panoId: 1187221443, pov: { pan: 70.95, tilt: 1.86, zoom: -3 } },
+            { name: "셀프카메라", addr: "부산 부산진구 개금동", panoId: 1202587961, pov: { pan: 100.14, tilt: -0.54, zoom: -3 } },
+            { name: "올인(allin)", addr: "경기 화성시 향남읍", panoId: 1197247800, pov: { pan: 301.07, tilt: 9.93, zoom: -3 } },
+            { name: "로또복권방", addr: "경기 용인시 처인구", panoId: 1199530907, pov: { pan: 306.53, tilt: 1.09, zoom: 0 } },
+            { name: "버스판매소", addr: "서울 영등포구 영등포동4가 441-10", panoId: 1198368804, pov: { pan: 64.0, tilt: 0.9, zoom: 0 } },
+            { name: "GS25(양산문성)", addr: "경남 양산시 평산동 31-5", panoId: 1204592950, pov: { pan: 269.6, tilt: 1.0, zoom: 1 } },
+            { name: "우리들공업탑점", addr: "울산 남구 신정동 1233-3", isClosed: true, customMessage: "과거 '영화유통'으로 불리며 1등 당첨자를 10회 이상 배출한 유명 명당이었으나, 현재는 점주 별세 및 자격 문제로 인해 폐업 상태입니다." },
+            { name: "메트로센터점", addr: "대구 중구 달구벌대로 지하 2100", customMessage: "이 매장은 반월당역 지하상가(C412호) 중심부에 위치하고 있습니다.\n로드뷰는 지상 반월당역 14번 출구 인근을 보여드립니다。" },
+            { name: "행복한사람들(흥부네)", addr: "경기 광주시 초월읍 산이리 13-1", imageUrl: "assets/img/happypeople.png", customMessage: "이 점포는 도로 인접성 문제로 로드뷰 제공이 어려워 현장 사진으로 대체합니다。" }
         ];
 
 
@@ -2386,6 +2544,30 @@
             // Initial load of recent rounds
             const initialMax = parseInt(document.getElementById('maxRound').value) || 1210;
             updateRecentRounds(initialMax);
+
+            // --- Add Real-time Event Listeners ---
+            const filterIds = [
+                'minRound', 'maxRound',
+                'freq5', 'freq3', 'freq1',
+                'methodAuto', 'methodManual', 'methodSemi',
+                'excludeClosed'
+            ];
+
+            filterIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+
+                const eventType = el.type === 'checkbox' ? 'change' : 'input';
+                el.addEventListener(eventType, () => {
+                    applyFilters();
+
+                    // Special case: if maxRound changes, also update the bottom dashboard
+                    if (id === 'maxRound') {
+                        const val = parseInt(el.value);
+                        if (!isNaN(val)) updateRecentRounds(val);
+                    }
+                });
+            });
         }
 
         window.onload = function () {
@@ -2397,6 +2579,15 @@
             const mapContainer = document.getElementById('map');
             const mapOption = { center: new kakao.maps.LatLng(36.2683, 127.6358), level: 12 };
             map = new kakao.maps.Map(mapContainer, mapOption);
+
+            // Close InfoWindow when clicking on map background
+            kakao.maps.event.addListener(map, 'click', function () {
+                if (currentInfoWindow) {
+                    currentInfoWindow.close();
+                    currentInfoWindow = null;
+                    document.body.classList.remove('iw-open'); // Restore UI
+                }
+            });
 
             clusterer = new kakao.maps.MarkerClusterer({
                 map: map, averageCenter: true, minLevel: 10,
@@ -2432,7 +2623,7 @@
 
         // --- Advanced Prediction Algorithm ---
         let globalWeights = null; // Calculated once on load
-        let lastRecommendedNumbers = null; // Store last recommended numbers for quick OMR access
+        let lastRecommendedNumbers = JSON.parse(localStorage.getItem('lastLottoNumbers')) || null; // Store last recommended numbers
 
         function analyzeGlobalHistory() {
             if (globalWeights) return;
@@ -2602,9 +2793,13 @@
             const f5 = document.getElementById('freq5').checked;
             const f3 = document.getElementById('freq3').checked;
             const f1 = document.getElementById('freq1').checked;
+            const excludeClosed = document.getElementById('excludeClosed').checked;
 
-            // ===== 1단계: 회차 + 당첨방식 필터 =====
+            // ===== 1단계: 회차 + 당첨방식 + 폐업 여부 필터 =====
             const roundFiltered = allData.filter(d => {
+                // 폐업점 제외 체크 시 폐업 데이터 숨김
+                if (excludeClosed && d.closed) return false;
+
                 const rMatch = d.r >= minR && d.r <= maxR;
                 let mMatch = false;
                 if (auto && d.m.includes('자동')) mMatch = true;
@@ -2818,6 +3013,7 @@
                         lat: d.lat,
                         lng: d.lng,
                         totalWins: d.totalWins, // This is the total wins for the shop
+                        closed: d.closed, // Store closed status
                         rounds: [] // To store individual round details for infowindow
                     };
                 }
@@ -2842,6 +3038,14 @@
                     );
                 }
 
+                // Closed Shop Override
+                if (shop.closed) {
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                        new kakao.maps.Size(31, 35)
+                    );
+                }
+
                 const marker = new kakao.maps.Marker({
                     position: new kakao.maps.LatLng(shop.lat, shop.lng),
                     image: markerImg
@@ -2849,7 +3053,11 @@
                 marker.shopData = shop; // Store shop data for retrieval
 
                 const sortedRounds = shop.rounds.sort((a, b) => b.r - a.r);
-                const roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+                let roundTagsHtml = sortedRounds.map(r => `<span class="iw-tag">${r.r}회(${r.m})</span>`).join('');
+
+                if (shop.closed) {
+                    roundTagsHtml = `<span class="iw-tag" style="background:#ff5252; color:white; font-weight:bold;">⛔ 폐업/휴업</span>` + roundTagsHtml;
+                }
 
                 // Helper to format address for mobile: break after the street number
                 const formatAddrForMobile = (addr) => {
@@ -2864,14 +3072,14 @@
 
                 const content = `
                     <div class="infowindow">
-                        <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''}</div>
+                        <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''} ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}</div>
                         <div class="iw-addr-box" onclick="openRoadviewWithCopy(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}')" title="주소 복사 (로드뷰 보기)">
                             <span class="iw-addr">${displayAddr}</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px;">총 ${shop.totalWins}회 당첨</div>
                         <div class="iw-details">${roundTagsHtml}</div>
-                        <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins})">
+                        <button class="btn-gold" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins}, ${shop.closed})">
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
@@ -2885,17 +3093,31 @@
                 const infowindow = new kakao.maps.InfoWindow({
                     content: content,
                     removable: true,
-                    zIndex: 1500 // Ensure popup is on top of markers
+                    zIndex: 10000 // Ensure popup is on top of everything (User Request)
                 });
 
                 kakao.maps.event.addListener(marker, 'click', () => {
+                    // Force close ALL toasts immediately
+                    closeAllToasts();
+
                     // Close previous InfoWindow if exists
                     if (currentInfoWindow) {
                         currentInfoWindow.close();
+                        document.body.classList.remove('iw-open');
+                    }
+
+                    // Mobile Focus Mode: Hide distractions
+                    if (window.innerWidth <= 768) {
+                        document.body.classList.add('iw-open');
                     }
 
                     infowindow.open(map, marker);
                     currentInfoWindow = infowindow; // Update current
+                });
+
+                // Listen for native close event (e.g. X button)
+                kakao.maps.event.addListener(infowindow, 'close', function () {
+                    document.body.classList.remove('iw-open');
                 });
 
                 markers.push(marker);
@@ -2993,7 +3215,13 @@
         // --- Monetization & Logic ---
         let currentShopData = null; // Store temp data for the modal
 
-        function openAdModal(name, addr, lat, lng, totalWins) {
+        function openAdModal(name, addr, lat, lng, totalWins, isClosed) {
+            // 폐업 점포 체크 (260210)
+            if (isClosed) {
+                alert("현재 폐업점으로 추천번호 제공이 불가능한 점포입니다");
+                return;
+            }
+
             // Re-filter allData for this specific shop to get rounds.
             const rounds = allData.filter(d => d.n === name && d.a === addr).map(d => ({ r: d.r, m: d.m }));
 
@@ -3291,7 +3519,8 @@
 
             // Reset container styles
             ballContainer.style.flexDirection = 'column';
-            ballContainer.style.gap = '15px';
+            ballContainer.style.gap = '5px';
+            console.log("Layout Updated: Gap 5px");
 
             if (customResult) {
                 // --- Dream / Horoscope Mode (Single Row) ---
@@ -3327,7 +3556,7 @@
                     rowWrapper.style.display = 'flex';
                     rowWrapper.style.alignItems = 'center';
                     rowWrapper.style.justifyContent = 'center';
-                    rowWrapper.style.gap = '15px';
+                    rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
                     rowWrapper.style.width = '100%';
 
                     // Balls
@@ -3335,7 +3564,7 @@
                     ballsRow.style.display = 'flex';
                     ballsRow.style.justifyContent = 'center';
                     ballsRow.style.gap = '5px';
-                    ballsRow.style.flex = '1';
+                    ballsRow.style.flex = 'none';
 
                     numbers.forEach(n => {
                         const ball = document.createElement('div');
@@ -3383,6 +3612,7 @@
 
                 // Store last recommended numbers for quick OMR access
                 lastRecommendedNumbers = customResult.numbers;
+                localStorage.setItem('lastLottoNumbers', JSON.stringify(lastRecommendedNumbers));
 
             } else {
                 // --- Standard Analysis Mode (Auto + Manual) ---
@@ -3406,28 +3636,32 @@
                     mainContainer.style.flexDirection = 'column';
                     mainContainer.style.alignItems = 'center';
                     mainContainer.style.width = '100%';
-                    mainContainer.style.marginBottom = '15px';
+                    mainContainer.style.marginBottom = '2px';
 
                     // Row (Label + Balls + Buttons)
                     const rowWrapper = document.createElement('div');
                     rowWrapper.style.display = 'flex';
                     rowWrapper.style.alignItems = 'center';
                     rowWrapper.style.justifyContent = 'center';
-                    rowWrapper.style.gap = '15px';
+                    rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
+                    console.log("Horizontal Layout Updated: Gap 12px");
                     rowWrapper.style.width = '100%';
+                    rowWrapper.className = 'result-row-wrapper'; // Add class for mobile layout
 
                     // Label
                     const labelDiv = document.createElement('div');
+                    labelDiv.className = 'result-label'; // Add class for mobile layout
                     labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:16px;">[${label}]</span>`;
-                    labelDiv.style.minWidth = '50px';
+                    // labelDiv.style.minWidth = '50px'; // Removed min-width to reduce gap
                     rowWrapper.appendChild(labelDiv);
 
                     // Balls
                     const ballsRow = document.createElement('div');
+                    ballsRow.className = 'result-balls'; // Add class for mobile layout
                     ballsRow.style.display = 'flex';
                     ballsRow.style.justifyContent = 'center';
                     ballsRow.style.gap = '5px';
-                    ballsRow.style.flex = '1';
+                    ballsRow.style.flex = 'none';
 
                     numbers.forEach(n => {
                         const ball = document.createElement('div');
@@ -3494,6 +3728,7 @@
 
                 // Store last recommended numbers (Auto mode) for quick OMR access
                 lastRecommendedNumbers = resultAuto.numbers;
+                localStorage.setItem('lastLottoNumbers', JSON.stringify(lastRecommendedNumbers));
             }
         }
 
@@ -3984,6 +4219,12 @@
             }
         }
 
+        // Helper to forcefully clear toasts
+        function closeAllToasts() {
+            const container = document.getElementById('toast-container');
+            if (container) container.innerHTML = '';
+        }
+
         function copyToClipboard(text) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
@@ -4095,6 +4336,10 @@
             const modal = document.getElementById('omrModal');
             modal.style.display = 'flex';
             setTimeout(() => modal.className += ' show', 10);
+
+            // Update global last viewed numbers (Standard logic: "Last checked" means last opened/viewed)
+            lastRecommendedNumbers = numbers;
+            localStorage.setItem('lastLottoNumbers', JSON.stringify(numbers));
         }
 
         function closeOMR() {
@@ -4161,10 +4406,8 @@
             const copyBtn = document.getElementById('roadviewCopyBtn');
             const naviBtn = document.getElementById('roadviewNaviBtn');
 
-            // Set shop name
             shopNameEl.textContent = shopName + ' 로드뷰';
 
-            // Initialize roadview and client if not exists
             if (!roadview) {
                 roadview = new kakao.maps.Roadview(roadviewContainer);
             }
@@ -4172,74 +4415,100 @@
                 roadviewClient = new kakao.maps.RoadviewClient();
             }
 
-            const position = new kakao.maps.LatLng(lat, lng);
+            // Find preset first to check if we have a hardcoded Pano ID
+            const currentShopName = (shopName || "").trim();
+            const currentAddress = (address || "").trim();
+            const preset = ROADVIEW_PRESETS.find(p =>
+                currentShopName.includes(p.name) && currentAddress.includes(p.addr)
+            );
 
-            // Search for nearest roadview within 50m
-            roadviewClient.getNearestPanoId(position, 50, function (panoId) {
-                if (panoId === null) {
-                    // No roadview available
-                    alert('해당 점포는 로드뷰 정보가 없습니다.');
-                    return;
-                }
+            if (preset && preset.isClosed) {
+                alert('현재 폐업점으로 로드뷰 제공이 불가능합니다');
+                return;
+            }
 
-                // Display roadview
-                roadview.setPanoId(panoId, position);
+            if (preset && preset.customMessage) {
+                alert(preset.customMessage);
+            }
+
+            const roadviewEl = document.getElementById('roadview');
+            const imgContainer = document.getElementById('roadviewImageContainer');
+            const staticImg = document.getElementById('roadviewStaticImage');
+            const helpText = document.getElementById('roadviewHelpText');
+
+            if (preset && preset.imageUrl) {
+                // Display Static Image
+                roadviewEl.style.display = 'none';
+                imgContainer.style.display = 'block';
+                staticImg.src = preset.imageUrl;
+                helpText.style.display = 'none';
                 modal.style.display = 'block';
 
-                // Apply Premium POV if preset exists (with flexible matching)
-                const currentShopName = (shopName || "").trim();
-                const currentAddress = (address || "").trim();
-
-                console.log("Roadview Open - Shop:", currentShopName, "Addr:", currentAddress);
-
-                const preset = ROADVIEW_PRESETS.find(p =>
-                    currentShopName.includes(p.name) && currentAddress.includes(p.addr)
-                );
-
-                if (preset) {
-                    console.log("Premium POV Matched:", preset);
-                    // 1.2s delay to ensure roadview is fully interactive and stable
-                    setTimeout(() => {
-                        roadview.setViewpoint(new kakao.maps.Viewpoint(preset.pov.pan, preset.pov.tilt, preset.pov.zoom));
-                        console.log("Viewpoint success (pan/tilt):", preset.pov.pan, preset.pov.tilt);
-                    }, 1200);
-                } else {
-                    console.warn("No POV preset found for:", currentShopName, currentAddress);
-                }
-
-                // Show appropriate action button
+                // Action buttons setup for Image mode
                 copyBtn.style.display = 'none';
                 naviBtn.style.display = 'none';
-
                 if (actionType === 'copy') {
                     copyBtn.style.display = 'inline-block';
-                    copyBtn.onclick = function () {
-                        copyToClipboard(actionData);
-                        closeRoadview();
-                    };
+                    copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
                 } else if (actionType === 'navi') {
                     naviBtn.style.display = 'inline-block';
-                    naviBtn.onclick = function () {
-                        openDirections(actionData.lat, actionData.lng, actionData.name);
-                        closeRoadview();
-                    };
+                    naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
+                }
+                document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
+                return; // End here for image mode
+            }
+
+            // Normal Roadview Mode
+            roadviewEl.style.display = 'block';
+            imgContainer.style.display = 'none';
+            helpText.style.display = 'block';
+
+            const displayRoadview = (finalPanoId, finalPos) => {
+                roadview.setPanoId(finalPanoId, finalPos);
+                modal.style.display = 'block';
+
+                if (preset) {
+                    setTimeout(() => {
+                        roadview.setViewpoint(new kakao.maps.Viewpoint(preset.pov.pan, preset.pov.tilt, preset.pov.zoom));
+                    }, 1200);
                 }
 
-                // Setup KakaoMap button
-                const kakaoMapBtn = document.getElementById('roadviewKakaoMapBtn');
-                kakaoMapBtn.onclick = function () {
-                    openKakaoMap(lat, lng, shopName, address);
-                };
-            });
+                // Action buttons setup
+                copyBtn.style.display = 'none';
+                naviBtn.style.display = 'none';
+                if (actionType === 'copy') {
+                    copyBtn.style.display = 'inline-block';
+                    copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
+                } else if (actionType === 'navi') {
+                    naviBtn.style.display = 'inline-block';
+                    naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
+                }
+                document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
+            };
+
+            if (preset && preset.panoId) {
+                // If we have a verified Pano ID, use it directly (bypass search)
+                const verifiedPos = new kakao.maps.LatLng(lat, lng);
+                displayRoadview(preset.panoId, verifiedPos);
+            } else {
+                // Precise Identification using Places Service
+                const ps = new kakao.maps.services.Places();
+                ps.keywordSearch(`${address} ${shopName}`, function (data, status) {
+                    let targetPos = new kakao.maps.LatLng(lat, lng);
+                    if (status === kakao.maps.services.Status.OK) {
+                        const target = data.find(p => p.category_name.includes('복권') || p.place_name.includes(shopName)) || data[0];
+                        targetPos = new kakao.maps.LatLng(target.y, target.x);
+                    }
+                    roadviewClient.getNearestPanoId(targetPos, 50, function (panoId) {
+                        if (panoId === null) { alert('해당 점포는 로드뷰 정보가 없습니다.'); return; }
+                        displayRoadview(panoId, targetPos);
+                    });
+                });
+            }
         }
 
         function closeRoadview() {
-            const modal = document.getElementById('roadviewModal');
-            modal.style.display = 'none';
-
-            // Hide action buttons
-            document.getElementById('roadviewCopyBtn').style.display = 'none';
-            document.getElementById('roadviewNaviBtn').style.display = 'none';
+            document.getElementById('roadviewModal').style.display = 'none';
         }
 
         function openRoadviewWithCopy(lat, lng, shopName, address) {
@@ -4247,17 +4516,12 @@
         }
 
         function openRoadviewWithNavi(lat, lng, shopName, address) {
-            openRoadview(lat, lng, shopName, address, 'navi', { lat: lat, lng: lng, name: shopName });
+            openRoadview(lat, lng, shopName, address, 'navi', { lat, lng, name: shopName });
         }
 
         function openKakaoMap(lat, lng, shopName, address) {
-            // Open Kakao Map with address search + "복권" keyword
-            // Updated to use the ?q= format as requested by the user
-            const searchQuery = `${address} 복권`;
-            const url = `https://map.kakao.com/?q=${encodeURIComponent(searchQuery)}`;
-            window.open(url, '_blank');
+            window.open(`https://map.kakao.com/?q=${encodeURIComponent(address + ' 복권')}`, '_blank');
         }
-
     </script>
 </body>
 
