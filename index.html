@@ -2,17 +2,6 @@
 <html>
 
 <head>
-    <script>
-        // GitHub Pages subdirectory trailing slash fix (Ensures relative JSON fetches work)
-        (function () {
-            var path = window.location.pathname;
-            // Redirect /lottomap to /lottomap/ (only if no file extension is present)
-            if (path.length > 1 && !path.endsWith('/') && !path.split('/').pop().includes('.')) {
-                var newUrl = window.location.protocol + '//' + window.location.host + path + '/' + window.location.search + window.location.hash;
-                window.location.replace(newUrl);
-            }
-        })();
-    </script>
     <meta charset="utf-8">
     <title>KINOV 로또 명당 지도</title>
     <!-- Library for QR Code Scanning -->
@@ -2614,48 +2603,27 @@
         async function loadData() {
             const countEl = document.getElementById('totalDataCount');
             console.log('Loading data...');
-
-            const filenames = ['lotto_data.json', 'lotto_history.json'];
             const cacheBuster = '?v=' + Date.now();
 
-            // Try different path patterns:
-            const baseDir = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-
-            async function fetchWithRetry(filename) {
-                const paths = [
-                    filename + cacheBuster,
-                    './' + filename + cacheBuster,
-                    baseDir + filename + cacheBuster,
-                    '/lottomap/' + filename + cacheBuster
-                ];
-
-                for (let path of paths) {
-                    try {
-                        console.log('Trying fetch:', path);
-                        const res = await fetch(path);
-                        if (res.ok) {
-                            return await res.json();
-                        }
-                    } catch (e) {
-                        console.warn('Path failed:', path, e);
-                    }
-                }
-                throw new Error(filename + ' 를 찾을 수 없습니다. 경로를 확인해 주세요.');
-            }
-
             try {
+                // Using simple relative paths which are most reliable on GitHub Pages
                 const [lottoData, historyData] = await Promise.all([
-                    fetchWithRetry('lotto_data.json'),
-                    fetchWithRetry('lotto_history.json')
+                    fetch('./lotto_data.json' + cacheBuster).then(res => {
+                        if (!res.ok) throw new Error('Data file not found (404)');
+                        return res.json();
+                    }),
+                    fetch('./lotto_history.json' + cacheBuster).then(res => {
+                        if (!res.ok) throw new Error('History file not found (404)');
+                        return res.json();
+                    })
                 ]);
 
                 window.lottoHistory = historyData;
                 processLoadedData(lottoData);
             } catch (err) {
                 console.error('Data load failed:', err);
-                countEl.innerHTML = `<span style="color:red; font-size:11px; cursor:help;" title="${err.message}">로드 실패</span>`;
-                document.getElementById('manualLoader').style.display = 'block';
-                alert('데이터 파일 로드 중 에러가 발생했습니다.\n\n' + err.message);
+                countEl.innerHTML = `<span style="color:red; font-size:11px;">로드 실패</span>`;
+                alert('데이터 파일 로드 중 에러가 발생했습니다.\n\n주소 끝에 / 를 붙였는지 확인해 주세요.\n(예: k-inov.com/lottomap/)');
             }
         }
 
