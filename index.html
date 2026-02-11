@@ -2608,11 +2608,11 @@
             try {
                 // Using simple relative paths which are most reliable on GitHub Pages
                 const [lottoData, historyData] = await Promise.all([
-                    fetch('./lotto_data.json' + cacheBuster).then(res => {
+                    fetch('https://integral81.github.io/lottomap/lotto_data.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('Data file not found (404)');
                         return res.json();
                     }),
-                    fetch('./lotto_history.json' + cacheBuster).then(res => {
+                    fetch('https://integral81.github.io/lottomap/lotto_history.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('History file not found (404)');
                         return res.json();
                     })
