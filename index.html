@@ -2396,7 +2396,7 @@
             { name: "왕대박복권방", addr: "경북 문경시 중앙로", panoId: 1184892306, pov: { pan: 308.56, tilt: 3.85, zoom: 2 } },
             { name: "알리바이", addr: "광주 광산구 수등로", panoId: 1199874247, pov: { pan: 70.76, tilt: -0.16, zoom: -3 } },
             { name: "오케이상사", addr: "서울 서초구 신반포로 176 (반포동)", panoId: 1018301543, pov: { pan: 184.52, tilt: 10.0, zoom: 0 } },
-            { name: "잠실매점", addr: "서울 송파구 올림픽로", panoId: 1197820708, pov: { pan: 333.6, tilt: -4.1, zoom: 1 } },
+            { name: "잠실매점", addr: "서울 송파구 신천동 7-18번지 잠실역 8번 출구 앞 가판", panoId: 1197820708, pov: { pan: 339.1, tilt: 3.5, zoom: 1 } },
             { name: "월드컵복권방", addr: "경기 광주시 경안로 20", panoId: 1202723374, pov: { pan: 11.5, tilt: -0.6, zoom: 0 } },
             { name: "갈렙분식한식", addr: "서울 중랑구 망우동", panoId: 1198253759, pov: { pan: 108.88, tilt: 0.41, zoom: -3 } },
             { name: "로또킹", addr: "서울 영등포구 영중로", panoId: 1171055517, pov: { pan: 21.23, tilt: -4.98, zoom: 0 } },
@@ -2683,7 +2683,7 @@
             });
         }
 
-        window.onload = function () {
+        window.onload = async function () {
             if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
                 handleScriptError();
                 return;
@@ -2711,7 +2711,11 @@
                 }]
             });
 
-            loadData();
+            await loadData();
+
+            // Auto-reflect GPS location on initial load (User Request)
+            console.log('Initiating automatic GPS request on load...');
+            requestMyLocation();
         };
 
         async function loadData() {
