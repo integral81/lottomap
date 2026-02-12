@@ -2651,8 +2651,12 @@
                 const rounds = data.map(d => d.r);
                 const maxR = Math.max(...rounds);
                 const minR = Math.min(...rounds);
-                document.getElementById('maxRound').value = maxR;
-                document.getElementById('minRound').value = Math.max(1, maxR - 9);
+
+                // Force max round to 1210 as per user request (User Request: 1201 ~ 1210)
+                const targetMax = Math.max(maxR, 1210);
+
+                document.getElementById('maxRound').value = targetMax;
+                document.getElementById('minRound').value = Math.max(1, targetMax - 9);
             }
 
             applyFilters();
