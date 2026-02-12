@@ -1,6 +1,6 @@
-﻿[
+[
     {
-        "shop_name": "텔레콤\u0026로또",
+        "shop_name": "텔레콤&로또",
         "target_shop_address": "전남 장성군 장성읍 영천리 1021-3",
         "double_check": "OPEN",
         "comment": "영천로 150-1로 이전 확인"
@@ -3076,5 +3076,17 @@
         "target_shop_address": "경기 광주시 무들로 211",
         "comment": "폐점 확인",
         "double_check": "CLOSED"
+    },
+    {
+        "shop_name": "베스트 로또",
+        "target_shop_address": "경기 광명시 하안로 168-11 1층 105호",
+        "double_check": "OPEN",
+        "comment": "1099회 1등(수동) 당첨. 현재도 영업 중 확인 (2025기준)"
+    },
+    {
+        "shop_name": "왕대박복권 (구 인더라인 로또)",
+        "target_shop_address": "인천 부평구 십정동 577-6",
+        "double_check": "OPEN",
+        "comment": "746회(인더라인), 654, 642, 562, 531회(왕대박) 당첨. 현재 왕대박복권으로 영업 중"
     }
 ]
