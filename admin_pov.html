@@ -92,6 +92,26 @@
         .shop-addr {
             font-size: 12px;
             color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .copy-btn {
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px 6px;
+            margin-left: 8px;
+            border-radius: 4px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #f5f5f5;
+            color: #333;
         }
 
         .win-count {
@@ -320,16 +340,6 @@
                 "lng": 127.003620888061,
                 "has_coords": true
             },
-            {
-                "name": "영화유통(1등복권방)",
-                "address": "울산 남구 달동 758삼성아파트상가204-101",
-                "wins": 5,
-                "lat": 35.5338146134567,
-                "lng": 129.322041642891,
-                "has_coords": true
-            }
-            ,
-
             {
                 "name": "복권나라",
                 "address": "서울 관악구 남부순환로 1739-9",
@@ -1234,8 +1244,12 @@
                     div.classList.add('active');
                 }
                 div.innerHTML = `
+
                     <div class="shop-name">${shop.name}</div>
-                    <div class="shop-addr">${shop.address}</div>
+                    <div class="shop-addr">
+                        <span>${shop.address}</span>
+                        <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shop.address}')">복사</button>
+                    </div>
                     <div class="win-count">${shop.wins}회 당첨</div>
                 `;
                 div.onclick = () => selectShop(shop, div);
@@ -1350,6 +1364,20 @@
                 localStorage.removeItem('pov_registered_shops');
                 renderShopList();
             }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.createElement('div');
+                toast.innerText = '주소가 복사되었습니다';
+                toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); color:white; padding:8px 16px; border-radius:20px; font-size:13px; z-index:9999; animation: fadeIn 0.3s;';
+                document.body.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s';
+                    setTimeout(() => toast.remove(), 300);
+                }, 1500);
+            });
         }
     </script>
 </body>
