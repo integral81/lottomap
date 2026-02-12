@@ -3204,7 +3204,7 @@
                         </button>
                         <div class="iw-actions">
                             <button class="btn-iw btn-navi" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}')">
-                                🚗 길찾기
+                                로드뷰(ROAD VIEW) 보기
                             </button>
                         </div>
                     </div>
@@ -4642,6 +4642,10 @@
         }
 
         function openRoadviewWithNavi(lat, lng, shopName, address) {
+            if (shopName.includes('인터넷 복권판매사이트')) {
+                window.open('https://www.dhlottery.co.kr/userGuide', '_blank');
+                return;
+            }
             openRoadview(lat, lng, shopName, address, 'navi', { lat, lng, name: shopName });
         }
 

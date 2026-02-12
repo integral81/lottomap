@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotto POV Admin - 수기 등록 도구</title>
+    <script>
+        function handleSDKError() {
+            console.error('Kakao Maps SDK Load Failed');
+            alert('카카오 지도 SDK를 불러오지 못했습니다. 인터넷 연결 및 도메인 설정을 확인해주세요.');
+            // Even if SDK fails, try to render the list
+            if (typeof renderShopList === 'function') renderShopList();
+        }
+    </script>
+    <script type="text/javascript"
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"
+        onerror="handleSDKError()"></script>
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --sidebar-width: 350px;
+            --header-height: 60px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #f0f2f5;
+        }
+
+        header {
+            height: var(--header-height);
+            background: #333;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 18px;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .shop-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .shop-item:hover {
+            background: #f5f5f5;
+        }
+
+        .shop-item.active {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .shop-name {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .shop-addr {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .win-count {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #viewer-container {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        #map {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #roadview {
+            flex: 2;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #control-panel {
+            height: 250px;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 15px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .control-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group h3 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .input-row label {
+            width: 60px;
+            color: #555;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #result-area {
+            flex: 1.5;
+            background: #2d2d2d;
+            color: #a9dc76;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 12px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+        }
+
+        .btn-update {
+            padding: 8px 16px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .btn-update:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🎰 POV 관리 어드민 (Admin Template)</h1>
+        <div>
+            <span id="status-text" style="font-size: 13px; opacity: 0.8;">대상 데이터를 불러오는 중...</span>
+        </div>
+    </header>
+
+    <main>
+        <div id="sidebar">
+            <div
+                style="padding: 10px; font-size: 13px; font-weight: bold; color: #333; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+                POI 누락 리스트 (<span id="missing-count">0</span>)
+            </div>
+            <div id="shop-list"></div>
+        </div>
+
+        <div id="content">
+            <div id="viewer-container">
+                <div id="map"></div>
+                <div id="roadview"></div>
+            </div>
+
+            <div id="control-panel">
+                <div class="control-group">
+                    <h3>POV 실시간 좌표</h3>
+                    <div class="input-row">
+                        <label>Lat</label>
+                        <input type="text" id="cur-lat" readonly>
+                    </div>
+                    <div class="input-row">
+                        <label>Lng</label>
+                        <input type="text" id="cur-lng" readonly>
+                    </div>
+                    <button class="btn-update" onclick="syncMapToRV()">로드뷰 위치로 지도 이동</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>POV 파라미터</h3>
+                    <div class="input-row">
+                        <label>PanoID</label>
+                        <input type="text" id="rv-pano" readonly>
+                    </div>
+                    <div class="input-row">
+                        <label>Pan</label>
+                        <input type="text" id="rv-pan">
+                    </div>
+                    <div class="input-row">
+                        <label>Tilt</label>
+                        <input type="text" id="rv-tilt">
+                    </div>
+                    <div class="input-row">
+                        <label>Zoom</label>
+                        <input type="text" id="rv-zoom">
+                    </div>
+                </div>
+
+                <div class="control-group" style="flex: 1.5;">
+                    <h3>등록 코드 생성</h3>
+                    <div id="result-area">
+                        <button class="copy-btn" onclick="copyCode()">복사</button>
+                        <pre id="code-output">// 상점을 선택해주세요</pre>
+                    </div>
+                    <!-- New Button for marking as registered -->
+                    <button class="btn-update" style="margin-top:10px; background: #4caf50; width: 100%;"
+                        onclick="markAsRegistered()">이 상점 등록 완료 (리스트에서 제거)</button>
+                    <button onclick="resetRegistered()"
+                        style="margin-top:10px; font-size:11px; background:none; border:none; color:#999; text-decoration:underline; cursor:pointer;">등록
+                        완료 리스트 초기화</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let map, rv, rvClient, marker;
+        let currentShop = null;
+        let allMissingShops = [
+            {
+                "name": "세진전자통신",
+                "address": "대구 서구 평리동 1094-4",
+                "wins": 16,
+                "lat": 35.8718884870855,
+                "lng": 128.555196544539,
+                "has_coords": true
+            },
+            {
+                "name": "오케이상사",
+                "address": "서울 서초구 신반포로 176 센트럴시티내100호매점",
+                "wins": 8,
+                "lat": 37.5039351769908,
+                "lng": 127.002413006799,
+                "has_coords": true
+            },
+            {
+                "name": "복권백화점",
+                "address": "경기 파주시 금촌2동 329-135",
+                "wins": 7,
+                "lat": 37.3984223865984,
+                "lng": 126.726256461664,
+                "has_coords": true
+            },
+            {
+                "name": "잠실매점",
+                "address": "서울 송파구 신천동 7-18번지 잠실역 8번출구 앞 가판",
+                "wins": 7,
+                "lat": 37.5144542739603,
+                "lng": 127.1007349885,
+                "has_coords": true
+            },
+            {
+                "name": "목화휴게소",
+                "address": "경남 사천시 사천대로 912",
+                "wins": 6,
+                "lat": 35.0017600909728,
+                "lng": 128.054209521477,
+                "has_coords": true
+            },
+            {
+                "name": "대박천하마트",
+                "address": "인천 부평구 갈산동 367번지",
+                "wins": 6,
+                "lat": 37.5115855704108,
+                "lng": 126.726366374514,
+                "has_coords": true
+            },
+            {
+                "name": "노다지복권방",
+                "address": "경기 용인시 처인구 마평동 735-1",
+                "wins": 6,
+                "lat": 37.2350997738575,
+                "lng": 127.210525773714,
+                "has_coords": true
+            },
+            {
+                "name": "행복한사람들 (흥부네)",
+                "address": "경기 광주시 경충대로 763",
+                "wins": 5,
+                "lat": 37.3555798712105,
+                "lng": 127.32540015887,
+                "has_coords": true
+            },
+            {
+                "name": "노다지복권방",
+                "address": "경기 용인시 처인구 금령로 130",
+                "wins": 5,
+                "lat": 37.2351637037009,
+                "lng": 127.210500032181,
+                "has_coords": true
+            },
+            {
+                "name": "알리바이(나주점)",
+                "address": "전남 나주시 나주로 142 알리바이",
+                "wins": 5,
+                "lat": 35.0313297380285,
+                "lng": 126.717157991346,
+                "has_coords": true
+            },
+            {
+                "name": "노다지복권방",
+                "address": "경기 시흥시 대야동 345-16 1층상가",
+                "wins": 5,
+                "lat": 37.448416258611,
+                "lng": 126.791926293123,
+                "has_coords": true
+            },
+            {
+                "name": "오케이상사",
+                "address": "서울 서초구 반포동 19-3번지 센트럴시티내100호매점",
+                "wins": 5,
+                "lat": 37.5043641148563,
+                "lng": 127.003620888061,
+                "has_coords": true
+            },
+            {
+                "name": "오천억복권방",
+                "address": "광주 서구 화정동 782-14",
+                "wins": 5,
+                "lat": 35.1529734232587,
+                "lng": 126.88072111789,
+                "has_coords": true
+            },
+            {
+                "name": "미나식품(로또판매점)",
+                "address": "서울 강서구 방화동 484-23",
+                "wins": 5,
+                "lat": 37.5735042394953,
+                "lng": 126.810684180076,
+                "has_coords": true
+            },
+            {
+                "name": "복권전문점",
+                "address": "인천 부평구 청천동 236-20",
+                "wins": 5,
+                "lat": 37.5038435469501,
+                "lng": 126.715130703363,
+                "has_coords": true
+            },
+            {
+                "name": "복권명당",
+                "address": "충남 공주시 신관동 585-12",
+                "wins": 5,
+                "lat": 36.471840773738,
+                "lng": 127.133136987861,
+                "has_coords": true
+            },
+            {
+                "name": "영화유통(1등복권방)",
+                "address": "울산 남구 달동 758삼성아파트상가204-101",
+                "wins": 5,
+                "lat": 35.5338146134567,
+                "lng": 129.322041642891,
+                "has_coords": true
+            }
+        ];
+        let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            try {
+                // Initialize Map
+                if (typeof kakao !== 'undefined' && kakao.maps) {
+                    const mapContainer = document.getElementById('map');
+                    const mapOption = { center: new kakao.maps.LatLng(37.4815, 127.0145), level: 3 };
+                    map = new kakao.maps.Map(mapContainer, mapOption);
+
+                    const rvContainer = document.getElementById('roadview');
+                    rv = new kakao.maps.Roadview(rvContainer);
+                    rvClient = new kakao.maps.RoadviewClient();
+
+                    marker = new kakao.maps.Marker({
+                        position: map.getCenter(),
+                        map: map,
+                        draggable: true
+                    });
+
+                    // Roadview Events
+                    kakao.maps.event.addListener(rv, 'init', updatePOVUI);
+                    kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
+                    kakao.maps.event.addListener(rv, 'position_changed', updatePOVUI);
+
+                    // Map Marker Events
+                    kakao.maps.event.addListener(marker, 'dragend', function () {
+                        const pos = marker.getPosition();
+                        loadRoadview(pos.getLat(), pos.getLng());
+                    });
+
+                    // Manual Input Events
+                    ['rv-pan', 'rv-tilt', 'rv-zoom'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', applyPOV);
+                    });
+                } else {
+                    console.warn('Kakao SDK not loaded, map features disabled.');
+                    document.getElementById('status-text').innerText = '지도 SDK 로드 실패 (리스트는 확인 가능)';
+                }
+            } catch (err) {
+                console.error('Error during init:', err);
+                document.getElementById('status-text').innerText = '초기화 중 오류 발생 (리스트는 확인 가능)';
+            }
+
+            // Render the list always
+            renderShopList();
+        }
+
+        function renderShopList() {
+            // Filter out registered shops
+            const filteredList = allMissingShops.filter(shop => {
+                const key = `${shop.name}|${shop.address}`;
+                return !registeredKeys.includes(key);
+            });
+
+            document.getElementById('missing-count').innerText = filteredList.length;
+            document.getElementById('status-text').innerText = `남은 대상: ${filteredList.length}개 / 전체: ${allMissingShops.length}개`;
+
+            const listContainer = document.getElementById('shop-list');
+            listContainer.innerHTML = '';
+
+            filteredList.forEach((shop, index) => {
+                const div = document.createElement('div');
+                div.className = 'shop-item';
+                if (currentShop && currentShop.name === shop.name && currentShop.address === shop.address) {
+                    div.classList.add('active');
+                }
+                div.innerHTML = `
+                    <div class="shop-name">${shop.name}</div>
+                    <div class="shop-addr">${shop.address}</div>
+                    <div class="win-count">${shop.wins}회 당첨</div>
+                `;
+                div.onclick = () => selectShop(shop, div);
+                listContainer.appendChild(div);
+            });
+
+            if (filteredList.length === 0 && allMissingShops.length > 0) {
+                listContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">🎉 모든 상점의 등록이 완료되었습니다!</div>';
+            }
+        }
+
+        function selectShop(shop, element) {
+            document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            currentShop = shop;
+
+            const moveLatLon = new kakao.maps.LatLng(shop.lat, shop.lng);
+            map.setCenter(moveLatLon);
+            marker.setPosition(moveLatLon);
+
+            loadRoadview(shop.lat, shop.lng);
+        }
+
+        function loadRoadview(lat, lng) {
+            const position = new kakao.maps.LatLng(lat, lng);
+            rvClient.getNearestPanoId(position, 100, function (panoId) {
+                if (panoId) {
+                    rv.setPanoId(panoId, position);
+                } else {
+                    alert('반경 100m 이내에 로드뷰 데이터가 없습니다.');
+                }
+            });
+        }
+
+        function updatePOVUI() {
+            if (!rv.getPanoId()) return;
+
+            const panoId = rv.getPanoId();
+            const viewpoint = rv.getViewpoint();
+            const position = rv.getPosition();
+
+            document.getElementById('rv-pano').value = panoId;
+            document.getElementById('rv-pan').value = viewpoint.pan.toFixed(2);
+            document.getElementById('rv-tilt').value = viewpoint.tilt.toFixed(2);
+            document.getElementById('rv-zoom').value = viewpoint.zoom;
+
+            if (position) {
+                document.getElementById('cur-lat').value = position.getLat().toFixed(6);
+                document.getElementById('cur-lng').value = position.getLng().toFixed(6);
+            }
+
+            updateCodeOutput();
+        }
+
+        function applyPOV() {
+            const pan = parseFloat(document.getElementById('rv-pan').value);
+            const tilt = parseFloat(document.getElementById('rv-tilt').value);
+            const zoom = parseInt(document.getElementById('rv-zoom').value);
+
+            if (!isNaN(pan) && !isNaN(tilt)) {
+                rv.setViewpoint({ pan, tilt, zoom });
+            }
+        }
+
+        function syncMapToRV() {
+            const pos = rv.getPosition();
+            if (pos) {
+                map.setCenter(pos);
+                marker.setPosition(pos);
+            }
+        }
+
+        function updateCodeOutput() {
+            if (!currentShop) return;
+
+            const panoId = rv.getPanoId();
+            const vp = rv.getViewpoint();
+
+            const addr = currentShop.address;
+            const code = `{ name: "${currentShop.name}", addr: "${addr}", panoId: ${panoId}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${vp.zoom} } },`;
+            document.getElementById('code-output').innerText = code;
+        }
+
+        function copyCode() {
+            const text = document.getElementById('code-output').innerText;
+            if (text.startsWith('//')) return;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('코드가 클립보드에 복사되었습니다.');
+            });
+        }
+
+        function markAsRegistered() {
+            if (!currentShop) {
+                alert('먼저 상점을 선택해주세요.');
+                return;
+            }
+
+            const key = `${currentShop.name}|${currentShop.address}`;
+            if (!registeredKeys.includes(key)) {
+                registeredKeys.push(key);
+                localStorage.setItem('pov_registered_shops', JSON.stringify(registeredKeys));
+                alert(`'${currentShop.name}' 상점이 등록 완료 처리되었습니다.`);
+                currentShop = null;
+                renderShopList();
+                document.getElementById('code-output').innerText = '// 상점을 선택해주세요';
+            }
+        }
+
+        function resetRegistered() {
+            if (confirm('모든 등록 완료 기록을 초기화하시겠습니까? (삭제된 리스트가 다시 나타납니다)')) {
+                registeredKeys = [];
+                localStorage.removeItem('pov_registered_shops');
+                renderShopList();
+            }
+        }
+    </script>
+</body>
+
+</html>
