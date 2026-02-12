@@ -1,0 +1,7 @@
+# Shop Verification Progress Tracking
+- Total Target: 5808 shops (Wins 4 to 1)
+- Priority: Wins 4 > 3 > 2 > 1
+- Current Status: Automated API verification in progress (Parallel mode)
+- Script: verify_shops_api.py (Running with 10 workers)
+- Logic: API Check -> Suspect Extraction -> Web Search/Gemini Double Check -> Final Update
+- model_trust: High (User trust affirmed)

@@ -1,0 +1,722 @@
+[
+  {
+    "address": "경남 김해시 인제로170번길 15-6 편의점 내",
+    "total_wins": 5,
+    "variations": [
+      {
+        "name": "씨스페이스 어방점",
+        "rounds": [
+          1081,
+          1084,
+          1202,
+          1202
+        ]
+      },
+      {
+        "name": "드림마트",
+        "rounds": [
+          1014
+        ]
+      }
+    ]
+  },
+  {
+    "address": "인천 서구 서곶로 788",
+    "total_wins": 4,
+    "variations": [
+      {
+        "name": "당하복권명당",
+        "rounds": [
+          1085,
+          1127,
+          1157
+        ]
+      },
+      {
+        "name": "수 종합인테리어",
+        "rounds": [
+          969
+        ]
+      }
+    ]
+  },
+  {
+    "address": "서울 도봉구 창동 134-36번지 우림빌딩106",
+    "total_wins": 4,
+    "variations": [
+      {
+        "name": "행운복권방",
+        "rounds": [
+          900
+        ]
+      },
+      {
+        "name": "럭키복권방",
+        "rounds": [
+          604,
+          727,
+          836
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경남 진주시 하대동 126-17번지",
+    "total_wins": 4,
+    "variations": [
+      {
+        "name": "로또복권 하대점",
+        "rounds": [
+          852
+        ]
+      },
+      {
+        "name": "로또복권하대점",
+        "rounds": [
+          629,
+          738,
+          836
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경기 화성시 3.1만세로 1147",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "올인 (all in)",
+        "rounds": [
+          1209
+        ]
+      },
+      {
+        "name": "올인(allin)",
+        "rounds": [
+          938,
+          1119
+        ]
+      }
+    ]
+  },
+  {
+    "address": "강원 홍천군 홍천로 409 1층",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "복권마트 & 씨스페이스 홍천점",
+        "rounds": [
+          1186
+        ]
+      },
+      {
+        "name": "복권마트",
+        "rounds": [
+          984,
+          1045
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경남 양산시 웅상대로 955",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "지에스(GS25)뉴양산혜인점",
+        "rounds": [
+          1016
+        ]
+      },
+      {
+        "name": "GS25(양산혜인점)",
+        "rounds": [
+          982,
+          994
+        ]
+      }
+    ]
+  },
+  {
+    "address": "전북 전주시 덕진구 인후동1가 904-1번지",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "Letsgo복권유통",
+        "rounds": [
+          883,
+          907
+        ]
+      },
+      {
+        "name": "Let'sgo복권유통",
+        "rounds": [
+          661
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경기 고양시 일산동구 장항동 893 마두역상행선가판대",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "마두역상행선 가판대",
+        "rounds": [
+          853,
+          859
+        ]
+      },
+      {
+        "name": "마두역상행선가판대",
+        "rounds": [
+          774
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경기 수원시 영통구 매탄동 1267-7번지 중앙프라자104호",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "GS25(수원삼성점)",
+        "rounds": [
+          808,
+          828
+        ]
+      },
+      {
+        "name": "GS25(수원삼성)",
+        "rounds": [
+          616
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경남 김해시 한림면 병동리 980-7",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "빙그레 돈벼락 맞는곳",
+        "rounds": [
+          800
+        ]
+      },
+      {
+        "name": "돈벼락맞는곳",
+        "rounds": [
+          480,
+          568
+        ]
+      }
+    ]
+  },
+  {
+    "address": "서울 강동구 천호동 406-9",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "행운의집",
+        "rounds": [
+          499,
+          543
+        ]
+      },
+      {
+        "name": "행운의 집",
+        "rounds": [
+          281
+        ]
+      }
+    ]
+  },
+  {
+    "address": "강원 춘천시 중앙로2가 11",
+    "total_wins": 3,
+    "variations": [
+      {
+        "name": "명동열쇠",
+        "rounds": [
+          424,
+          501
+        ]
+      },
+      {
+        "name": "명동복권",
+        "rounds": [
+          389
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경북 구미시 구미중앙로 72",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "역전로또",
+        "rounds": [
+          1184
+        ]
+      },
+      {
+        "name": "복권명당",
+        "rounds": [
+          930
+        ]
+      }
+    ]
+  },
+  {
+    "address": "부산 중구 자갈치로 33 501502호",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "자갈치도깨비명당",
+        "rounds": [
+          1183
+        ]
+      },
+      {
+        "name": "자갈치 도깨비명당",
+        "rounds": [
+          1097
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경기 안산시 상록구 수인로 2020 103호",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "천하명당안산",
+        "rounds": [
+          1157
+        ]
+      },
+      {
+        "name": "인앤아웃",
+        "rounds": [
+          1062
+        ]
+      }
+    ]
+  },
+  {
+    "address": "전남 여수시 학동서5길 2 큐마트내",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "큐마트학동점복권",
+        "rounds": [
+          1152
+        ]
+      },
+      {
+        "name": "큐마트학동점로또",
+        "rounds": [
+          1015
+        ]
+      }
+    ]
+  },
+  {
+    "address": "충남 아산시 아산밸리남로 81 816동 106호",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "행복로또",
+        "rounds": [
+          1150
+        ]
+      },
+      {
+        "name": "영순로또점",
+        "rounds": [
+          1058
+        ]
+      }
+    ]
+  },
+  {
+    "address": "대전 중구 대종로 301-1",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "진플러스",
+        "rounds": [
+          1113
+        ]
+      },
+      {
+        "name": "진플러스안경",
+        "rounds": [
+          1020
+        ]
+      }
+    ]
+  },
+  {
+    "address": "인천 남동구 구월남로 212 동원프라자 101호",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "위너로또 더킹전자담배 구월점",
+        "rounds": [
+          1079
+        ]
+      },
+      {
+        "name": "위너로또",
+        "rounds": [
+          1039
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경남 거제시 거제중앙로19길 8 102호",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "고현시장만남의광장복권방",
+        "rounds": [
+          1016
+        ]
+      },
+      {
+        "name": "블루진 로또점",
+        "rounds": [
+          960
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경기 양주시 산북동 333-13",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "샘내 편의점",
+        "rounds": [
+          909
+        ]
+      },
+      {
+        "name": "샘내로또판매",
+        "rounds": [
+          558
+        ]
+      }
+    ]
+  },
+  {
+    "address": "서울 강남구 삼성동 168번지",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "GS25(삼성역점)",
+        "rounds": [
+          901
+        ]
+      },
+      {
+        "name": "GS25(삼성역)",
+        "rounds": [
+          312
+        ]
+      }
+    ]
+  },
+  {
+    "address": "인천 연수구 송도동 2-6번지 송도프라자108호",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "씨유송도프라자",
+        "rounds": [
+          894
+        ]
+      },
+      {
+        "name": "훼미리마트송도프라자",
+        "rounds": [
+          585
+        ]
+      }
+    ]
+  },
+  {
+    "address": "대전 동구 자양동 198-17",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "복권로또판매점",
+        "rounds": [
+          875
+        ]
+      },
+      {
+        "name": "로또복권",
+        "rounds": [
+          370
+        ]
+      }
+    ]
+  },
+  {
+    "address": "서울 강서구 화곡동(화곡본동) 29-52",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "세븐일레븐강서화곡예스점",
+        "rounds": [
+          865
+        ]
+      },
+      {
+        "name": "예스마트",
+        "rounds": [
+          707
+        ]
+      }
+    ]
+  },
+  {
+    "address": "충남 서산시 동문동(동문2동) 797-13 미림화랑 옆 1층 상가",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "복권판매점",
+        "rounds": [
+          841
+        ]
+      },
+      {
+        "name": "로또복권방",
+        "rounds": [
+          726
+        ]
+      }
+    ]
+  },
+  {
+    "address": "제주 서귀포시 성산읍 고성리 1197-8",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "성산복권방",
+        "rounds": [
+          828
+        ]
+      },
+      {
+        "name": "일등복권방",
+        "rounds": [
+          533
+        ]
+      }
+    ]
+  },
+  {
+    "address": "울산 남구 삼산동 166-8번지",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "위드미울산삼산본동점",
+        "rounds": [
+          811
+        ]
+      },
+      {
+        "name": "우리들삼산본동점",
+        "rounds": [
+          612
+        ]
+      }
+    ]
+  },
+  {
+    "address": "제주 서귀포시 중문동 1964-4",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "GS25(서귀중문점)",
+        "rounds": [
+          794
+        ]
+      },
+      {
+        "name": "GS25(서귀중문)",
+        "rounds": [
+          312
+        ]
+      }
+    ]
+  },
+  {
+    "address": "서울 마포구 아현동 267-1 아현역3번출구앞",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "아현역3번출구앞가판점",
+        "rounds": [
+          788
+        ]
+      },
+      {
+        "name": "산업정보고등학교앞가판점",
+        "rounds": [
+          761
+        ]
+      }
+    ]
+  },
+  {
+    "address": "부산 동래구 온천동 156-1",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "세븐일레븐부산온천장역점",
+        "rounds": [
+          533
+        ]
+      },
+      {
+        "name": "조이풀이삭토스트",
+        "rounds": [
+          290
+        ]
+      }
+    ]
+  },
+  {
+    "address": "대전 유성구 원내동 228-8번지",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "씨유 대전원내점",
+        "rounds": [
+          527
+        ]
+      },
+      {
+        "name": "훼미리마트 대전원내동",
+        "rounds": [
+          398
+        ]
+      }
+    ]
+  },
+  {
+    "address": "부산 중구 동광동3가 17-2",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "씨스페이스(중앙제일점)",
+        "rounds": [
+          494
+        ]
+      },
+      {
+        "name": "㈜ Cspace 중앙제일점",
+        "rounds": [
+          290
+        ]
+      }
+    ]
+  },
+  {
+    "address": "서울 양천구 신정동 89-26",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "신정복권",
+        "rounds": [
+          475
+        ]
+      },
+      {
+        "name": "신정마트",
+        "rounds": [
+          323
+        ]
+      }
+    ]
+  },
+  {
+    "address": "부산 기장군 기장읍 동부리162-20",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "기장슈퍼",
+        "rounds": [
+          464
+        ]
+      },
+      {
+        "name": "미니스톱기장점",
+        "rounds": [
+          264
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경남 거제시 옥포1동 582",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "천하명당복권방.텔레콤",
+        "rounds": [
+          431
+        ]
+      },
+      {
+        "name": "천하명당 복권방",
+        "rounds": [
+          300
+        ]
+      }
+    ]
+  },
+  {
+    "address": "경기 의정부시 호원동 423 대명빌딩 1층",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "일등복권방",
+        "rounds": [
+          420
+        ]
+      },
+      {
+        "name": "희망복권방",
+        "rounds": [
+          354
+        ]
+      }
+    ]
+  },
+  {
+    "address": "충남 아산시 인주면 공세리 114-21",
+    "total_wins": 2,
+    "variations": [
+      {
+        "name": "행운마트",
+        "rounds": [
+          372
+        ]
+      },
+      {
+        "name": "돈벼락복권방",
+        "rounds": [
+          318
+        ]
+      }
+    ]
+  }
+]

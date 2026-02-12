@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KINOV 신규 5회 당첨지 POV 수집 (9개소)</title>
+    <script
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services"></script>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background: #f0f2f5;
+        }
+
+        #sidebar {
+            width: 350px;
+            background: white;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #2c3e50;
+            color: white;
+        }
+
+        #search-box {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #shop-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .shop-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .shop-item:hover {
+            background: #f8f9fa;
+        }
+
+        .shop-item.active {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .shop-name {
+            font-weight: bold;
+            font-size: 15px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .shop-addr {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .shop-wins {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #rv-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #roadview {
+            width: 100%;
+            height: 100%;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-move {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-capture {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        #output-area {
+            height: 250px;
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            border-top: 2px solid #636e72;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #636e72;
+            padding-bottom: 5px;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn-copy {
+            background: #00b894;
+            color: white;
+        }
+
+        .btn-paste {
+            background: #0984e3;
+            color: white;
+        }
+
+        /* Modal Style */
+        #paste-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        #paste-area {
+            width: 100%;
+            height: 300px;
+            margin: 10px 0;
+            font-family: monospace;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading">데이터 로딩 중...</div>
+
+    <!-- Paste Modal -->
+    <div id="paste-modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0;">📋 프리셋 데이터 일괄 붙여넣기</h3>
+            <p style="font-size:12px; color:#666;">캡처된 로그 형식({ name: "..." })을 그대로 붙여넣으세요.</p>
+            <textarea id="paste-area"
+                placeholder='{ name: "부일카서비스", addr: "...", panoId: ..., pov: { ... } },'></textarea>
+            <div style="display:flex; justify-content: flex-end; gap:10px;">
+                <button class="btn" style="background:#eee;" onclick="closePasteModal()">취소</button>
+                <button class="btn" style="background:#0984e3; color:white;" onclick="importData()">가져오기</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <h2 style="margin:0; font-size: 18px;">🏅 명당 로드뷰 관리 (4회)</h2>
+            <p style="margin:5px 0 0 0; font-size: 12px; opacity: 0.8;">총 115개소 (10개씩 작업)</p>
+        </div>
+        <div id="batch-control"
+            style="padding: 10px; display: flex; justify-content: space-between; align-items: center; background: #f0f0f0; border-bottom: 1px solid #ddd;">
+            <button onclick="changeBatch(-1)" style="padding: 5px 10px; cursor: pointer;">◀ 이전</button>
+            <span id="batch-info" style="font-size: 13px; font-weight: bold;">1 - 10</span>
+            <button onclick="changeBatch(1)" style="padding: 5px 10px; cursor: pointer;">다음 ▶</button>
+        </div>
+        <div id="search-box">
+            <input type="text" id="search-input" placeholder="점포명 또는 주소 검색...">
+        </div>
+        <div id="shop-list"></div>
+    </div>
+
+    <div id="main-content">
+        <div id="rv-container">
+            <div id="roadview"></div>
+            <div id="controls">
+                <button class="btn btn-move" onclick="shiftRV(360)">⬆️ 북</button>
+                <button class="btn btn-move" onclick="shiftRV(180)">⬇️ 남</button>
+                <button class="btn btn-move" onclick="shiftRV(270)">⬅️ 서</button>
+                <button class="btn btn-move" onclick="shiftRV(90)">➡️ 동</button>
+                <div style="width: 2px; background: #eee; margin: 0 10px;"></div>
+                <button class="btn btn-capture" onclick="capturePOV()">📸 현재 POV 캡처</button>
+            </div>
+        </div>
+        <div id="output-area">
+            <div class="output-header">
+                <span>📋 수집된 프리셋 (JSON)</span>
+                <div class="header-btns">
+                    <button class="btn-small btn-paste" onclick="openPasteModal()">📥 일괄 붙여넣기</button>
+                    <button class="btn-small btn-copy" onclick="copyAllOutput()">로그 전체 복사</button>
+                </div>
+            </div>
+            <div id="output-content"></div>
+        </div>
+    </div>
+
+    <script>
+
+
+        let roadview, rvClient;
+        let shops = [{"n": "25시슈퍼", "a": "경남 창원시 마산회원구 봉암동 462-30", "w": 4, "lat": 35.221142783256575, "lng": 128.59536744057274}, {"n": "25시슈퍼", "a": "경기 시흥시 정왕동 1882-11홍익프라자1층107호", "w": 4, "lat": 37.3624825577737, "lng": 126.72995551003}, {"n": "CU(대림중앙점)", "a": "서울 영등포구 대림3동 775-7 서초한강아파트", "w": 4, "lat": 37.4992842484815, "lng": 126.897704642697}, {"n": "GS25(두정메트로점)", "a": "충남 천안시 서북구 성정동 1451", "w": 4, "lat": 36.8265041259081, "lng": 127.141364212763}, {"n": "GS25(양산혜인점)", "a": "경남 양산시 평산동 31-5", "w": 4, "lat": 35.384586102557215, "lng": 129.15503345857658}, {"n": "GS25(종로낙원)", "a": "서울 종로구 낙원동 230", "w": 4, "lat": 37.5722657951174, "lng": 126.988621256241}, {"n": "GS25(중촌현대)", "a": "대전 중구 중촌동 17-2", "w": 4, "lat": 36.3374236359498, "lng": 127.412499285155}, {"n": "G마트", "a": "서울 영등포구 디지털로 387", "w": 4, "lat": 37.49168720963678, "lng": 126.90225391677112}, {"n": "HX복권방", "a": "경기 이천시 부발읍 아미리 726-9 현대시티플라자106호", "w": 4, "lat": 37.2527985722684, "lng": 127.489415629017}, {"n": "NBA(엔비에이)", "a": "인천 중구 신도시남로142번길 6 1동 1층 128호", "w": 4, "lat": 37.49368828753151, "lng": 126.49163883026826}, {"n": "교통카드판매대", "a": "서울 강동구 고덕동 210-1 구서울승합종점앞", "w": 4, "lat": 37.5576094801473, "lng": 127.170103050262}, {"n": "럭키슈퍼", "a": "서울 용산구 후암동 446", "w": 4, "lat": 37.5543759425223, "lng": 126.976755883096}, {"n": "메트로센터점", "a": "대구 중구 덕산동 88 메트로센터C412호", "w": 4, "lat": 35.8644215787926, "lng": 128.593341393289}, {"n": "왕대박복권", "a": "인천 부평구 십정동 577-6", "w": 4, "lat": 37.4773513046613, "lng": 126.709834722586}];
+        let currentShop = null;
+        let currentBatch = 0;
+        const BATCH_SIZE = 10;
+        let capturedShops = new Set(JSON.parse(localStorage.getItem('captured_shops') || '[]'));
+
+        window.onload = async () => {
+            const rvContainer = document.getElementById('roadview');
+            roadview = new kakao.maps.Roadview(rvContainer);
+            rvClient = new kakao.maps.RoadviewClient();
+            renderBatch();
+            document.getElementById('loading').style.display = 'none';
+        };
+
+        function saveProgress() {
+            localStorage.setItem('captured_shops', JSON.stringify(Array.from(capturedShops)));
+        }
+
+        function resetProgress() {
+            if (confirm('모든 작업 내역을 초기화하고 처음부터 다시 시작할까요?')) {
+                localStorage.removeItem('captured_shops');
+                capturedShops = new Set();
+                renderBatch();
+            }
+        }
+
+        function changeBatch(delta) {
+            // 현재 화면에 보이는 점포들을 완료 처리함
+            const remainingShops = shops.filter(s => !capturedShops.has(s.n + '|' + s.a));
+            const end = Math.min(BATCH_SIZE, remainingShops.length);
+
+            for (let i = 0; i < end; i++) {
+                const shop = remainingShops[i];
+                capturedShops.add(shop.n + '|' + shop.a);
+            }
+
+            saveProgress();
+
+            const nextRemaining = shops.filter(s => !capturedShops.has(s.n + '|' + s.a));
+            if (nextRemaining.length === 0) {
+                alert('모든 작업을 완료했습니다!');
+            }
+
+            renderBatch();
+        }
+
+        function renderBatch() {
+            const remainingShops = shops.filter(s => !capturedShops.has(s.n + '|' + s.a));
+            const end = Math.min(BATCH_SIZE, remainingShops.length);
+            const batchShops = remainingShops.slice(0, end);
+
+            document.getElementById('batch-info').innerHTML = `
+                남은 작업: ${remainingShops.length}개소 
+                <button onclick="resetProgress()" style="margin-left:10px; font-size:10px; padding:2px 5px;">진행 리셋</button>
+            `;
+            renderList(batchShops);
+        }
+
+
+        function renderList(list) {
+            const container = document.getElementById('shop-list');
+            container.innerHTML = '';
+            list.forEach(shop => {
+                const item = document.createElement('div');
+                item.className = 'shop-item';
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <span class="shop-name">${shop.n}</span>
+                            <span class="shop-addr">${shop.a}</span>
+                            <span class="shop-wins">${shop.w}회 당첨</span>
+                        </div>
+                        <button class="btn-small" style="background:#e0e0e0; font-size:10px; padding:4px 8px; margin-left:5px;" 
+                                onclick="event.stopPropagation(); copyAddress('${shop.a}')">주소 복사</button>
+                    </div>
+                `;
+                item.onclick = () => selectShop(shop, item);
+                container.appendChild(item);
+            });
+        }
+
+        // Search Filter
+        document.getElementById('search-input').oninput = (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = shops.filter(s =>
+                s.n.toLowerCase().includes(query) || s.a.toLowerCase().includes(query)
+            );
+            renderList(filtered);
+        };
+
+        function selectShop(shop, element) {
+            // UI Toggle
+            document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            currentShop = shop;
+
+            console.log(`Loading Shop: ${shop.n} at (${shop.lat}, ${shop.lng})`);
+
+            // 1. If special startPano is defined in JSON, use it first (For Jamsil Maejeom)
+            if (shop.startPano) {
+                roadview.setPanoId(shop.startPano, new kakao.maps.LatLng(shop.lat, shop.lng));
+                // Set initial viewpoint to look at the shop direction (Approximately North for Jamsil)
+                roadview.setViewpoint({ pan: 350, tilt: 3, zoom: 0 });
+                return;
+            }
+
+            // 2. Otherwise use direct coordinates
+            if (shop.lat && shop.lng) {
+                const targetPos = new kakao.maps.LatLng(shop.lat, shop.lng);
+                loadRV(targetPos);
+            } else {
+                // Fallback: Search by clean address if lat/lng is missing
+                const cleanAddr = shop.a.split(' ').filter(part =>
+                    !part.includes('출구') && !part.includes('가판') && !part.includes('지하')
+                ).join(' ');
+
+                const ps = new kakao.maps.services.Places();
+                ps.keywordSearch(`${cleanAddr} ${shop.n}`, (data, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const first = data.find(p => p.category_name.includes('복권')) || data[0];
+                        loadRV(new kakao.maps.LatLng(first.y, first.x));
+                    } else {
+                        alert('위치 정보를 찾을 수 없습니다.');
+                    }
+                });
+            }
+        }
+
+        function loadRV(pos) {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').innerText = '로드뷰 탐색 중...';
+
+            // Increased radius and added manual input fallback
+            rvClient.getNearestPanoId(pos, 150, (panoId) => {
+                document.getElementById('loading').style.display = 'none';
+                if (panoId) {
+                    roadview.setPanoId(panoId, pos);
+                } else {
+                    const manualPano = prompt('주변 150m 이내에 로드뷰 정보가 없습니다.\n카카오맵 공유 링크 등에서 확인한 Pano ID가 있다면 입력해 보세요.\n(비워두면 gray 화면 유지)');
+                    if (manualPano) {
+                        roadview.setPanoId(Number(manualPano), pos);
+                    }
+                }
+            });
+        }
+
+        // Move Roadview Position (North/South/East/West)
+        function shiftRV(angle) {
+            const currentPos = roadview.getPosition();
+            const step = 0.00008; // 약 10m
+            const r = angle * (Math.PI / 180);
+            const lat = currentPos.getLat() + (step * Math.cos(r));
+            const lng = currentPos.getLng() + (step * Math.sin(r));
+            const nextPos = new kakao.maps.LatLng(lat, lng);
+
+            rvClient.getNearestPanoId(nextPos, 50, (panoId) => {
+                if (panoId) {
+                    roadview.setPanoId(panoId, nextPos);
+                }
+            });
+        }
+
+        function capturePOV() {
+            if (!currentShop || !roadview) return;
+            const vp = roadview.getViewpoint();
+            const panoId = roadview.getPanoId();
+
+            // Clean up address (use shortest identifiable part)
+            const miniAddr = currentShop.a.split(' ').slice(0, 3).join(' '); // "서울 노원구 상계동" 등
+
+            const entry = `{ name: "${currentShop.n}", addr: "${miniAddr}", panoId: ${panoId}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${vp.zoom} } },`;
+
+            const logItem = document.createElement('div');
+            logItem.style.marginBottom = '5px';
+            logItem.style.color = '#55efc4';
+            logItem.innerText = entry;
+            document.getElementById('output-content').appendChild(logItem);
+
+            // Scroll to bottom
+            const area = document.getElementById('output-area');
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function copyAllOutput() {
+            const content = document.getElementById('output-content').innerText;
+            if (!content.trim()) { alert('수집된 데이터가 없습니다.'); return; }
+            navigator.clipboard.writeText(content).then(() => {
+                alert('클립보드에 복사되었습니다. index.html의 ROADVIEW_PRESETS에 붙여넣으세요.');
+            });
+        }
+
+        // Paste Modal Functions
+        function openPasteModal() {
+            document.getElementById('paste-modal').style.display = 'flex';
+            document.getElementById('paste-area').focus();
+        }
+
+        function closePasteModal() {
+            document.getElementById('paste-modal').style.display = 'none';
+            document.getElementById('paste-area').value = '';
+        }
+
+        function importData() {
+            const rawText = document.getElementById('paste-area').value;
+            if (!rawText.trim()) return;
+
+            const lines = rawText.split('\n');
+            let count = 0;
+            const container = document.getElementById('output-content');
+
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('{') && trimmed.endsWith('},')) {
+                    const logItem = document.createElement('div');
+                    logItem.style.marginBottom = '5px';
+                    logItem.style.color = '#55efc4';
+                    logItem.innerText = trimmed;
+                    container.appendChild(logItem);
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                alert(`${count}개의 항목을 가져왔습니다.`);
+                const area = document.getElementById('output-area');
+                area.scrollTop = area.scrollHeight;
+                closePasteModal();
+            } else {
+                alert('유효한 데이터 형식이 없습니다. { name: "...", ... }, 형식을 확인해 주세요.');
+            }
+        }
+
+        // Copy Address Function
+        function copyAddress(addr) {
+            navigator.clipboard.writeText(addr).then(() => {
+                // Show temporary toast or alert
+                const toast = document.createElement('div');
+                toast.innerText = '주소가 복사되었습니다: ' + addr;
+                Object.assign(toast.style, {
+                    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+                    background: 'rgba(0,0,0,0.8)', color: 'white', padding: '10px 20px', borderRadius: '20px',
+                    zIndex: 3000, fontSize: '13px'
+                });
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
