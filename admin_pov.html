@@ -237,56 +237,7 @@
         let accumulatedCodes = JSON.parse(localStorage.getItem('pov_accumulated_codes') || '[]');
         let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
 
-        let allMissingShops = [
-            {
-                "name": "교통카드판매대",
-                "address": "서울 강동구 고덕동 210-1 구서울승합종점앞",
-                "wins": 4,
-                "lat": 37.5576094801473,
-                "lng": 127.170103050262,
-                "has_coords": true
-            },
-            {
-                "name": "행운복권",
-                "address": "경기 군포시 대야미동 374-2번지",
-                "wins": 4,
-                "lat": 37.3262517548679,
-                "lng": 126.919154626123,
-                "has_coords": true
-            },
-            {
-                "name": "행운복권방",
-                "address": "경기 의정부시 용현동 14",
-                "wins": 4,
-                "lat": 37.7367784023592,
-                "lng": 127.087140258519,
-                "has_coords": true
-            },
-            {
-                "name": "행운복권방",
-                "address": "강원 인제군 북면 원통리 681-5",
-                "wins": 4,
-                "lat": 38.122442469,
-                "lng": 128.1979319489,
-                "has_coords": true
-            },
-            {
-                "name": "행운을주는사람들",
-                "address": "충북 충주시 연수동 923번지 1층 복권방",
-                "wins": 4,
-                "lat": 36.9876349059116,
-                "lng": 127.931630238358,
-                "has_coords": true
-            },
-            {
-                "name": "형제상회",
-                "address": "대전 서구 용문동 256-3",
-                "wins": 4,
-                "lat": 36.3367982167553,
-                "lng": 127.394728218247,
-                "has_coords": true
-            }
-        ];
+        let allMissingShops = [];
 
         document.addEventListener('DOMContentLoaded', init);
 
