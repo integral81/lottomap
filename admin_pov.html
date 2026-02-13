@@ -5,17 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lotto POV Admin - 수기 등록 도구</title>
-    <script>
-        function handleSDKError() {
-            console.error('Kakao Maps SDK Load Failed');
-            alert('카카오 지도 SDK를 불러오지 못했습니다. 인터넷 연결 및 도메인 설정을 확인해주세요.');
-            // Even if SDK fails, try to render the list
-            if (typeof renderShopList === 'function') renderShopList();
-        }
-    </script>
     <script type="text/javascript"
-        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"
-        onerror="handleSDKError()"></script>
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
     <style>
         :root {
             --primary: #d32f2f;
@@ -97,21 +88,14 @@
             justify-content: space-between;
         }
 
-        .copy-btn {
-            border: 1px solid #ddd;
-            background: white;
+        .addr-copy-btn {
+            border: 1px solid #2196f3;
+            background: #e3f2fd;
             cursor: pointer;
-            font-size: 11px;
-            padding: 2px 6px;
-            margin-left: 8px;
-            border-radius: 4px;
-            color: #555;
-            white-space: nowrap;
-        }
-
-        .copy-btn:hover {
-            background: #f5f5f5;
-            color: #333;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: #1976d2;
         }
 
         .win-count {
@@ -135,9 +119,11 @@
             display: flex;
             gap: 10px;
             padding: 10px;
+            min-height: 0;
         }
 
-        #map {
+        #map,
+        #roadview {
             flex: 1;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -145,12 +131,10 @@
 
         #roadview {
             flex: 2;
-            border: 1px solid #ddd;
-            border-radius: 8px;
         }
 
         #control-panel {
-            height: 250px;
+            height: 350px;
             background: white;
             border-top: 1px solid #ddd;
             padding: 15px;
@@ -167,1209 +151,228 @@
 
         .control-group h3 {
             font-size: 14px;
-            margin-bottom: 5px;
             color: #333;
             border-bottom: 2px solid #eee;
             padding-bottom: 5px;
         }
 
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-
-        .input-row label {
-            width: 60px;
-            color: #555;
-        }
-
-        .input-row input {
+        #stack-area {
             flex: 1;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        #result-area {
-            flex: 1.5;
-            background: #2d2d2d;
-            color: #a9dc76;
+            background: #222;
+            color: #ccc;
             padding: 10px;
             border-radius: 6px;
             font-family: monospace;
-            font-size: 12px;
-            position: relative;
+            font-size: 11px;
             overflow-y: auto;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px 12px;
-            background: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .copy-btn:hover {
-            background: #45a049;
+            white-space: pre-wrap;
         }
 
         .btn-update {
-            padding: 8px 16px;
+            padding: 10px;
             background: #2196f3;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
             font-weight: bold;
-        }
-
-        .btn-update:hover {
-            background: #1976d2;
         }
     </style>
 </head>
 
 <body>
     <header>
-        <h1>🎰 POV 관리 어드민 (Admin Template)</h1>
-        <div>
-            <span id="status-text" style="font-size: 13px; opacity: 0.8;">대상 데이터를 불러오는 중...</span>
-        </div>
+        <h1>🎰 POV 관리 (Simple Mode)</h1>
     </header>
-
     <main>
         <div id="sidebar">
             <div
-                style="padding: 10px; font-size: 13px; font-weight: bold; color: #333; border-bottom: 1px solid #eee; margin-bottom: 10px;">
-                POI 누락 리스트 (<span id="missing-count">0</span>)
+                style="padding: 10px; font-size: 13px; font-weight: bold; color: #333; border-bottom: 2px solid #333; margin-bottom: 10px;">
+                대상 리스트 (<span id="missing-count">0</span>)
             </div>
             <div id="shop-list"></div>
         </div>
-
         <div id="content">
             <div id="viewer-container">
                 <div id="map"></div>
                 <div id="roadview"></div>
             </div>
-
             <div id="control-panel">
                 <div class="control-group">
-                    <h3>POV 실시간 좌표</h3>
-                    <div class="input-row">
-                        <label>Lat</label>
-                        <input type="text" id="cur-lat" readonly>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <h3 style="color:#d32f2f;">1. 현재 코드 (한 줄)</h3>
+                        <span style="font-size:11px; color:#999;">화면을 움직이면 자동 갱신됩니다</span>
                     </div>
-                    <div class="input-row">
-                        <label>Lng</label>
-                        <input type="text" id="cur-lng" readonly>
+                    <div id="current-code-area"
+                        style="background:#222; color:#00ff00; padding:12px; border-radius:6px; font-family:monospace; font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+                        <span id="current-code-text">// 상점을 선택해주세요</span>
                     </div>
-                    <button class="btn-update" onclick="syncMapToRV()">로드뷰 위치로 지도 이동</button>
-                </div>
 
-                <div class="control-group">
-                    <h3>POV 파라미터</h3>
-                    <div class="input-row">
-                        <label>PanoID</label>
-                        <input type="text" id="rv-pano" readonly>
-                    </div>
-                    <div class="input-row">
-                        <label>Pan</label>
-                        <input type="text" id="rv-pan">
-                    </div>
-                    <div class="input-row">
-                        <label>Tilt</label>
-                        <input type="text" id="rv-tilt">
-                    </div>
-                    <div class="input-row">
-                        <label>Zoom</label>
-                        <input type="text" id="rv-zoom">
-                    </div>
-                </div>
+                    <button class="btn-update" onclick="markAsRegistered()"
+                        style="font-size:16px; padding:15px; margin: 10px 0; background:#1976d2;">
+                        ⬇️ 아래 리스트로 추가 (누적)
+                    </button>
 
-                <div class="control-group" style="flex: 1.5;">
-                    <h3>등록 코드 생성</h3>
-                    <div id="result-area">
-                        <button class="copy-btn" onclick="copyCode()">복사</button>
-                        <pre id="code-output">// 상점을 선택해주세요</pre>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="color:#333;">2. 누적 리스트 (<span id="stack-count">0</span>개)</h3>
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="copyStack()"
+                                style="background:#4caf50; color:white; border:none; padding:8px 16px; border-radius:4px; font-weight:bold; cursor:pointer;">📋
+                                결과 전체 복사</button>
+                            <button onclick="clearStack()"
+                                style="background:#999; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">🧹
+                                비우기</button>
+                        </div>
                     </div>
-                    <!-- New Button for marking as registered -->
-                    <button class="btn-update" style="margin-top:10px; background: #4caf50; width: 100%;"
-                        onclick="markAsRegistered()">이 상점 등록 완료 (리스트에서 제거)</button>
-                    <button onclick="resetRegistered()"
-                        style="margin-top:10px; font-size:11px; background:none; border:none; color:#999; text-decoration:underline; cursor:pointer;">등록
-                        완료 리스트 초기화</button>
+                    <div id="stack-area" style="flex:1; background:#1e1e1e; border:2px solid #333;">
+                        <pre id="stack-output" style="margin:0; padding:5px; color:#eee;"></pre>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
-
     <script>
         let map, rv, rvClient, marker;
         let currentShop = null;
-        let allMissingShops = [
+        let accumulatedCodes = JSON.parse(localStorage.getItem('pov_accumulated_codes') || '[]');
+        let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
 
+        let allMissingShops = [
             {
-                "name": "오케이상사",
-                "address": "서울 서초구 신반포로 176 센트럴시티내100호매점",
-                "wins": 13,
-                "lat": 37.5039351769908,
-                "lng": 127.002413006799,
-                "has_coords": true
-            },
-            {
-                "name": "복권백화점",
-                "address": "경기 파주시 금촌2동 329-135",
-                "wins": 7,
-                "lat": 37.3984223865984,
-                "lng": 126.726256461664,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 관악구 남부순환로 1739-9",
-                "wins": 6,
-                "lat": 37.4828013647636,
-                "lng": 126.943500830574,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 관악구 은천로 40-1",
+                "name": "교통카드판매대",
+                "address": "서울 강동구 고덕동 210-1 구서울승합종점앞",
                 "wins": 4,
-                "lat": 37.4860180512095,
-                "lng": 126.939843355048,
+                "lat": 37.5576094801473,
+                "lng": 127.170103050262,
                 "has_coords": true
             },
             {
-                "name": "복권나라",
-                "address": "경북 포항시 북구 장량로140번길 9",
-                "wins": 3,
-                "lat": 36.0807952248086,
-                "lng": 129.396033290327,
+                "name": "행운복권",
+                "address": "경기 군포시 대야미동 374-2번지",
+                "wins": 4,
+                "lat": 37.3262517548679,
+                "lng": 126.919154626123,
                 "has_coords": true
             },
             {
-                "name": "복권나라",
-                "address": "강원 원주시 평원로 23",
-                "wins": 3,
-                "lat": 37.348928526007,
-                "lng": 127.952670718954,
+                "name": "행운복권방",
+                "address": "경기 의정부시 용현동 14",
+                "wins": 4,
+                "lat": 37.7367784023592,
+                "lng": 127.087140258519,
                 "has_coords": true
             },
             {
-                "name": "복권나라",
-                "address": "충북 증평군 증평읍 중동리 15-3",
-                "wins": 3,
-                "lat": 36.7839438665052,
-                "lng": 127.580889865585,
+                "name": "행운복권방",
+                "address": "강원 인제군 북면 원통리 681-5",
+                "wins": 4,
+                "lat": 38.122442469,
+                "lng": 128.1979319489,
                 "has_coords": true
             },
             {
-                "name": "복권나라",
-                "address": "서울 관악구 봉천동(은천동) 926-25",
-                "wins": 3,
-                "lat": 37.4827911801255,
-                "lng": 126.943494054423,
+                "name": "행운을주는사람들",
+                "address": "충북 충주시 연수동 923번지 1층 복권방",
+                "wins": 4,
+                "lat": 36.9876349059116,
+                "lng": 127.931630238358,
                 "has_coords": true
             },
             {
-                "name": "복권나라",
-                "address": "서울 성동구 용답동 14-1",
-                "wins": 3,
-                "lat": 37.5644409842752,
-                "lng": 127.053859448354,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전남 여수시 교동 448-2",
-                "wins": 3,
-                "lat": 34.7399222761121,
-                "lng": 127.734331898863,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "인천 서구 석남동 586-2",
-                "wins": 3,
-                "lat": 37.5030148858875,
-                "lng": 126.670726575652,
-                "has_coords": true
-            },
-            {
-                "name": "학동복권나라",
-                "address": "전남 여수시 흥국로 6",
-                "wins": 3,
-                "lat": 34.7635691680105,
-                "lng": 127.663464230519,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 오산시 성호대로93번길 27",
-                "wins": 2,
-                "lat": 37.1513170334452,
-                "lng": 127.071478824279,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 남양주시 도농로 13",
-                "wins": 2,
-                "lat": 37.6072364396042,
-                "lng": 127.156816291708,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 증평군 중앙로 199-1",
-                "wins": 2,
-                "lat": 36.7839561792603,
-                "lng": 127.580914940543,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 포천시 소흘읍 죽엽산로35번길 1",
-                "wins": 2,
-                "lat": 37.8267398343763,
-                "lng": 127.15268359735,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 성동구 용답중앙15길 12-1",
-                "wins": 2,
-                "lat": 37.5644524282652,
-                "lng": 127.053856513732,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "대전 대덕구 신탄진동로 1",
-                "wins": 2,
-                "lat": 36.4475864451575,
-                "lng": 127.429908883694,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전남 목포시 옥암동 1153-5 103호 복권나라",
-                "wins": 2,
-                "lat": 34.8076009918631,
-                "lng": 126.437162197145,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충남 계룡시 엄사면 엄사리 184-4",
-                "wins": 2,
-                "lat": 36.2890793367871,
-                "lng": 127.241625850133,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 삼척시 도계읍 도계리 393-1",
-                "wins": 2,
-                "lat": 37.2349037505995,
-                "lng": 129.044671351744,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전북 군산시 대야면 지경리 731-2",
-                "wins": 2,
-                "lat": 35.946735046441,
-                "lng": 126.810382525551,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "인천 중구 신흥동2가 16-37",
-                "wins": 2,
-                "lat": 37.4673557278352,
-                "lng": 126.63370998796,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 포천시 소흘읍 이가팔리 309-1",
-                "wins": 2,
-                "lat": 37.8267608309957,
-                "lng": 127.152680233021,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 송파구 잠실동 40-1 롯데월드쇼핑몰 지하1층 1-73",
-                "wins": 2,
-                "lat": 37.5111038313694,
-                "lng": 127.093918656887,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 중구 남대문로5가 12-5",
-                "wins": 2,
-                "lat": 37.3860144678258,
-                "lng": 126.980930148662,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 청주시 상당구 율량동 율량동 882-1",
-                "wins": 2,
-                "lat": 36.6689470045804,
-                "lng": 127.488724533603,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라(매곡동)",
-                "address": "광주 북구 서하로 117 101호 (매곡동)",
-                "wins": 2,
-                "lat": 35.1875664330488,
-                "lng": 126.893374006345,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라동성점",
-                "address": "전남 순천시 연향번영길 94 동성아파트 상가113호",
-                "wins": 2,
-                "lat": 34.9496505359864,
-                "lng": 127.518470820555,
-                "has_coords": true
-            },
-            {
-                "name": "서창복권나라",
-                "address": "경남 양산시 서창서2길 3",
-                "wins": 2,
-                "lat": 35.4162007541456,
-                "lng": 129.172241773542,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라",
-                "address": "부산 사하구 하단동 590-7 GS25편의점",
-                "wins": 2,
-                "lat": 35.1054424737126,
-                "lng": 128.966552477705,
-                "has_coords": true
-            },
-            {
-                "name": "운천점(복권나라)",
-                "address": "광주 서구 쌍촌동 876-14",
-                "wins": 2,
-                "lat": 35.146331779351,
-                "lng": 126.856630513204,
-                "has_coords": true
-            },
-            {
-                "name": "풍향동복권나라",
-                "address": "광주 북구 풍향동 581-15",
-                "wins": 2,
-                "lat": 35.1627074581564,
-                "lng": 126.92826750498,
-                "has_coords": true
-            },
-            {
-                "name": "광양복권나라(로터리)",
-                "address": "전남 광양시 백운로 1",
-                "wins": 1,
-                "lat": 34.9712632148982,
-                "lng": 127.589778883895,
-                "has_coords": true
-            },
-            {
-                "name": "광양복권나라(로터리)",
-                "address": "전남 광양시 광양읍 백운로 1",
-                "wins": 1,
-                "lat": 34.9712632148982,
-                "lng": 127.589778883895,
-                "has_coords": true
-            },
-            {
-                "name": "로또복권나라",
-                "address": "전북 정읍시 연지동 315-15",
-                "wins": 1,
-                "lat": 35.5739697093755,
-                "lng": 126.845361369947,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전남 여수시 중앙로 62",
-                "wins": 1,
-                "lat": 34.7399319441762,
-                "lng": 127.73434301317,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전남 목포시 당가두로14번길 47-1 103호 복권나라",
-                "wins": 1,
-                "lat": 34.8075375629071,
-                "lng": 126.437032140788,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 청주시 상당구 상당로 9",
-                "wins": 1,
-                "lat": 36.6291930748368,
-                "lng": 127.491054146657,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 중랑구 봉화산로 30",
-                "wins": 1,
-                "lat": 37.6014405004367,
-                "lng": 127.077566914738,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 속초시 중앙로 28",
-                "wins": 1,
-                "lat": 38.1988927143669,
-                "lng": 128.580261467148,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전북 군산시 번영로 891",
-                "wins": 1,
-                "lat": 35.946539167222,
-                "lng": 126.810357390789,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "대구 달성군 논공읍 논공중앙로 106",
-                "wins": 1,
-                "lat": 35.7268184405189,
-                "lng": 128.44766013498,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 제천시 청풍호로 52",
-                "wins": 1,
-                "lat": 37.1265267151665,
-                "lng": 128.202751056928,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 수원시 장안구 장안로 288 수단란주점",
-                "wins": 1,
-                "lat": 37.3073855553469,
-                "lng": 126.990337282378,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 청주시 청원구 율봉로176번길 8-2",
-                "wins": 1,
-                "lat": 36.6685380944359,
-                "lng": 127.488258400203,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 고양시 일산동구 하늘마을1로 9 하늘마을4단지 104호",
-                "wins": 1,
-                "lat": 37.6751521063689,
-                "lng": 126.786516413064,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "인천 미추홀구 토금북로 47",
-                "wins": 1,
-                "lat": 37.4536176267821,
-                "lng": 126.639337423492,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "부산 중구 해관로 47-2",
-                "wins": 1,
-                "lat": 35.1031625223027,
-                "lng": 129.035424136545,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 중랑구 중화동 312-1",
-                "wins": 1,
-                "lat": 37.6014163666359,
-                "lng": 127.077547525141,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 관악구 봉천동 926-25",
-                "wins": 1,
-                "lat": 37.4827911801255,
-                "lng": 126.943494054423,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 광진구 군자동 66-3",
-                "wins": 1,
-                "lat": 37.5544014096211,
-                "lng": 127.075616848966,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 춘천시 후평동(후평2동) 687-20",
-                "wins": 1,
-                "lat": 37.8805353472471,
-                "lng": 127.744962708671,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 관악구 봉천동(은천동) 941-18",
-                "wins": 1,
-                "lat": 37.4859980490674,
-                "lng": 126.93984382336,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 중구 남대문로5가(회현동) 21-1",
-                "wins": 1,
-                "lat": 37.5589629957983,
-                "lng": 126.97492243505,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경남 창원시 진해구 용원동 1121-11 CU편의점 내",
-                "wins": 1,
-                "lat": 35.098502407655,
-                "lng": 128.820837919735,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 청주시 청원구 율량동 912",
-                "wins": 1,
-                "lat": 36.6685077092537,
-                "lng": 127.488240646242,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 정선군 정선읍 봉양리 329-4",
-                "wins": 1,
-                "lat": 37.3796429509685,
-                "lng": 128.662153004716,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전북 전주시 완산구 삼천동1가 602-4",
-                "wins": 1,
-                "lat": 35.7978507945479,
-                "lng": 127.117073008651,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 동작구 상도동 370-27",
-                "wins": 1,
-                "lat": 37.5054198677438,
-                "lng": 126.939823379761,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 안산시 단원구 원곡동 801-4",
-                "wins": 1,
-                "lat": 37.3299241944505,
-                "lng": 126.793629862924,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "인천 서구 마전동(검단4동) 1029-5 검단2지구59블럭검단1차피오레아파트상가B동제비107호",
-                "wins": 1,
-                "lat": 35.2465193822099,
-                "lng": 129.090849758352,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "충북 청주시 상당구 남문로1가 137-2",
-                "wins": 1,
-                "lat": 36.6292370815022,
-                "lng": 127.491046487833,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 정선군 정선읍 봉양리 329-6",
-                "wins": 1,
-                "lat": 37.3796234283135,
-                "lng": 128.662029291295,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "대구 달성군 논공읍 북리 833-152",
-                "wins": 1,
-                "lat": 35.7268194688317,
-                "lng": 128.447657059082,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 춘천시 후평동 687-1920",
-                "wins": 1,
-                "lat": 37.6049299589116,
-                "lng": 126.907795976095,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "부산 동래구 명장2동 489-38",
-                "wins": 1,
-                "lat": 35.2101984563282,
-                "lng": 129.104462088841,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 송파구 삼전동 삼전동 1751층복권나라",
-                "wins": 1,
-                "lat": 35.8898860287954,
-                "lng": 128.642631475541,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "대구 달성군 논공읍 북리833-152",
-                "wins": 1,
-                "lat": 35.7268194688317,
-                "lng": 128.447657059082,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "부산 동구 범일동 44-13",
-                "wins": 1,
-                "lat": 35.1416650735539,
-                "lng": 129.055351659393,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경기 의왕시 삼동 193-1",
-                "wins": 1,
-                "lat": 37.3206033999016,
-                "lng": 126.949824091213,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 원주시 중앙동 151-5",
-                "wins": 1,
-                "lat": 37.3488674783205,
-                "lng": 127.952665771774,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전남 여수시 교동 448-1",
-                "wins": 1,
-                "lat": 34.7399191658559,
-                "lng": 127.734399245065,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 속초시 교동 645-45",
-                "wins": 1,
-                "lat": 38.2008976812592,
-                "lng": 128.582406520618,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "광주 북구 용봉동 1251-16",
-                "wins": 1,
-                "lat": 35.1776727781232,
-                "lng": 126.900893531378,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 광진구 중곡동 341-5",
-                "wins": 1,
-                "lat": 37.5569331088627,
-                "lng": 127.08198202499,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 관악구 봉천본동 926-25",
-                "wins": 1,
-                "lat": 37.4827911801255,
-                "lng": 126.943494054423,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "인천 남구 용현동 611-1",
-                "wins": 1,
-                "lat": 37.4534408705648,
-                "lng": 126.639078893857,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "전남 목포시 용해동 718-4",
-                "wins": 1,
-                "lat": 34.8135223020167,
-                "lng": 126.399531402172,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "강원 원주시 학성동 436-15",
-                "wins": 1,
-                "lat": 37.3559804816736,
-                "lng": 127.943933258247,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "경북 경산시 삼남동 132-4",
-                "wins": 1,
-                "lat": 35.8145916169308,
-                "lng": 128.738666649634,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라",
-                "address": "서울 강서구 등촌1동 654-44",
-                "wins": 1,
-                "lat": 37.5550163344576,
-                "lng": 126.855910019959,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라(가좌사)",
-                "address": "인천 서구 원적로 73",
-                "wins": 1,
-                "lat": 37.4936571016794,
-                "lng": 126.680615310851,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라(들안길)",
-                "address": "대구 수성구 중동 133-3",
-                "wins": 1,
-                "lat": 35.8446831111501,
-                "lng": 128.616335645917,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라(중흥점)",
-                "address": "광주 북구 우치로 26-1",
-                "wins": 1,
-                "lat": 37.470482,
-                "lng": 126.6383959,
-                "has_coords": true
-            },
-            {
-                "name": "복권나라동성점",
-                "address": "전남 순천시 연향동 1347동성아파트 상가113호",
-                "wins": 1,
-                "lat": 34.9501004690263,
-                "lng": 127.518922282928,
-                "has_coords": true
-            },
-            {
-                "name": "서창복권나라",
-                "address": "경남 양산시 삼호동 528-1",
-                "wins": 1,
-                "lat": 35.4162015083399,
-                "lng": 129.172239922477,
-                "has_coords": true
-            },
-            {
-                "name": "수퍼복권나라",
-                "address": "경남 김해시 율하동 1352-1 101호 복권판매점",
-                "wins": 1,
-                "lat": 35.172796348886,
-                "lng": 128.815637664775,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라",
-                "address": "부산 부산진구 가야동(가야제1동) 377-10",
-                "wins": 1,
-                "lat": 35.1546084194796,
-                "lng": 129.037430885391,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라",
-                "address": "부산 부산진구 가야동 377-10GS25가야점 내",
-                "wins": 1,
-                "lat": 35.1546084194796,
-                "lng": 129.037430885391,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라",
-                "address": "부산 사하구 하단동 590-7",
-                "wins": 1,
-                "lat": 35.1054424737126,
-                "lng": 128.966552477705,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라",
-                "address": "부산 부산진구 범천동 845-95",
-                "wins": 1,
-                "lat": 35.1428303887418,
-                "lng": 129.061088856564,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라수정점",
-                "address": "부산 동구 수정1동 309-7",
-                "wins": 1,
-                "lat": 36.8778493127528,
-                "lng": 126.8982919075,
-                "has_coords": true
-            },
-            {
-                "name": "슈퍼복권나라수정점",
-                "address": "부산 동구 수정1동 312-7",
-                "wins": 1,
-                "lat": 37.5798141316398,
-                "lng": 127.045949088013,
-                "has_coords": true
-            },
-            {
-                "name": "신나라복권나라",
-                "address": "서울 동대문구 이문동(이문제1동) 258-51",
-                "wins": 1,
-                "lat": 37.6000811172932,
-                "lng": 127.062138467607,
-                "has_coords": true
-            },
-            {
-                "name": "심봤다복권나라",
-                "address": "대구 북구 침산동 826",
-                "wins": 1,
-                "lat": 35.9006546548689,
-                "lng": 128.585678483802,
-                "has_coords": true
-            },
-            {
-                "name": "종합복권나라",
-                "address": "강원 원주시 남원로 619",
-                "wins": 1,
-                "lat": 37.338522505806,
-                "lng": 127.951433962212,
-                "has_coords": true
-            },
-            {
-                "name": "종합복권나라",
-                "address": "경기 양평군 양평읍 양근리 양근리 176-14",
-                "wins": 1,
-                "lat": 37.4905296761419,
-                "lng": 127.495935182678,
-                "has_coords": true
-            },
-            {
-                "name": "파워마트 복권나라",
-                "address": "광주 북구 운암동 252 1층 13호 파워마트내",
-                "wins": 1,
-                "lat": 35.1819754303627,
-                "lng": 126.876854779113,
-                "has_coords": true
-            },
-            {
-                "name": "평창복권나라",
-                "address": "강원 평창군 평창읍 하리 148-13",
-                "wins": 1,
-                "lat": 37.367639494599,
-                "lng": 128.395066869892,
-                "has_coords": true
-            },
-            {
-                "name": "풍향동복권나라",
-                "address": "광주 북구 풍향동 581-19",
-                "wins": 1,
-                "lat": 35.1628241204059,
-                "lng": 126.927856566903,
-                "has_coords": true
-            },
-            {
-                "name": "학동복권나라",
-                "address": "전남 여수시 학동 69-2",
-                "wins": 1,
-                "lat": 34.7635264403985,
-                "lng": 127.663447941462,
-                "has_coords": true
-            },
-            {
-                "name": "해든복권나라",
-                "address": "경기 부천시 소향로 239 대야하이빌투 106호",
-                "wins": 1,
-                "lat": 37.5008571918308,
-                "lng": 126.774349625251,
-                "has_coords": true
-            },
-            {
-                "name": "해든복권나라",
-                "address": "경기 부천시 원미구 중동 중동 1152 1층 109호 예스25시편의점내",
-                "wins": 1,
-                "lat": 37.5015569512805,
-                "lng": 126.769055278574,
-                "has_coords": true
-            },
-            {
-                "name": "행운복권나라",
-                "address": "전남 광양시 대림오성로 146-1",
-                "wins": 1,
-                "lat": 34.9647592140868,
-                "lng": 127.577753154758,
-                "has_coords": true
-            },
-            {
-                "name": "황금대박복권나라",
-                "address": "경기 용인시 처인구 김량장동 133-200",
-                "wins": 1,
-                "lat": 37.2367932618193,
-                "lng": 127.205772836216,
+                "name": "형제상회",
+                "address": "대전 서구 용문동 256-3",
+                "wins": 4,
+                "lat": 36.3367982167553,
+                "lng": 127.394728218247,
                 "has_coords": true
             }
-
         ];
-        let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
 
         document.addEventListener('DOMContentLoaded', init);
 
         async function init() {
             try {
-                // Initialize Map
-                if (typeof kakao !== 'undefined' && kakao.maps) {
-                    const mapContainer = document.getElementById('map');
-                    const mapOption = { center: new kakao.maps.LatLng(37.4815, 127.0145), level: 3 };
-                    map = new kakao.maps.Map(mapContainer, mapOption);
+                const mapContainer = document.getElementById('map');
+                map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.4815, 127.0145), level: 3 });
+                rv = new kakao.maps.Roadview(document.getElementById('roadview'));
+                rvClient = new kakao.maps.RoadviewClient();
+                marker = new kakao.maps.Marker({ position: map.getCenter(), map: map, draggable: true });
 
-                    const rvContainer = document.getElementById('roadview');
-                    rv = new kakao.maps.Roadview(rvContainer);
-                    rvClient = new kakao.maps.RoadviewClient();
+                kakao.maps.event.addListener(rv, 'init', updatePOVUI);
+                kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
+                kakao.maps.event.addListener(marker, 'dragend', () => loadRoadview(marker.getPosition().getLat(), marker.getPosition().getLng()));
 
-                    marker = new kakao.maps.Marker({
-                        position: map.getCenter(),
-                        map: map,
-                        draggable: true
-                    });
-
-                    // Roadview Events
-                    kakao.maps.event.addListener(rv, 'init', updatePOVUI);
-                    kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
-                    kakao.maps.event.addListener(rv, 'position_changed', updatePOVUI);
-
-                    // Map Marker Events
-                    kakao.maps.event.addListener(marker, 'dragend', function () {
-                        const pos = marker.getPosition();
-                        loadRoadview(pos.getLat(), pos.getLng());
-                    });
-
-                    // Manual Input Events
-                    ['rv-pan', 'rv-tilt', 'rv-zoom'].forEach(id => {
-                        document.getElementById(id).addEventListener('input', applyPOV);
-                    });
-                } else {
-                    console.warn('Kakao SDK not loaded, map features disabled.');
-                    document.getElementById('status-text').innerText = '지도 SDK 로드 실패 (리스트는 확인 가능)';
-                }
-            } catch (err) {
-                console.error('Error during init:', err);
-                document.getElementById('status-text').innerText = '초기화 중 오류 발생 (리스트는 확인 가능)';
-            }
-
-            // Render the list always
-            renderShopList();
+                renderShopList();
+                updateCodeOutput();
+            } catch (e) { console.error(e); }
         }
 
         function renderShopList() {
-            // Filter out registered shops
-            const filteredList = allMissingShops.filter(shop => {
-                const key = `${shop.name}|${shop.address}`;
-                return !registeredKeys.includes(key);
-            });
-
+            const filteredList = allMissingShops.filter(s => !registeredKeys.includes(`${s.name}|${s.address}`));
             document.getElementById('missing-count').innerText = filteredList.length;
-            document.getElementById('status-text').innerText = `남은 대상: ${filteredList.length}개 / 전체: ${allMissingShops.length}개`;
-
-            const listContainer = document.getElementById('shop-list');
-            listContainer.innerHTML = '';
-
-            filteredList.forEach((shop, index) => {
+            const container = document.getElementById('shop-list');
+            container.innerHTML = '';
+            filteredList.forEach(shop => {
                 const div = document.createElement('div');
-                div.className = 'shop-item';
-                if (currentShop && currentShop.name === shop.name && currentShop.address === shop.address) {
-                    div.classList.add('active');
-                }
-                div.innerHTML = `
-
-                    <div class="shop-name">${shop.name}</div>
-                    <div class="shop-addr">
-                        <span>${shop.address}</span>
-                        <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shop.address}')">복사</button>
-                    </div>
-                    <div class="win-count">${shop.wins}회 당첨</div>
-                `;
+                div.className = 'shop-item' + (currentShop?.name === shop.name && currentShop?.address === shop.address ? ' active' : '');
                 div.onclick = () => selectShop(shop, div);
-                listContainer.appendChild(div);
+                div.innerHTML = `<div class="shop-name">${shop.name}</div><div class="shop-addr"><span>${shop.address}</span><button class="addr-copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shop.address}')">복사</button></div><div class="win-count">${shop.wins}회 당첨</div>`;
+                container.appendChild(div);
             });
-
-            if (filteredList.length === 0 && allMissingShops.length > 0) {
-                listContainer.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">🎉 모든 상점의 등록이 완료되었습니다!</div>';
-            }
         }
 
-        function selectShop(shop, element) {
-            document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+        function selectShop(shop, el) {
+            document.querySelectorAll('.shop-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
             currentShop = shop;
-
-            const moveLatLon = new kakao.maps.LatLng(shop.lat, shop.lng);
-            map.setCenter(moveLatLon);
-            marker.setPosition(moveLatLon);
-
+            const pos = new kakao.maps.LatLng(shop.lat, shop.lng);
+            map.setCenter(pos);
+            marker.setPosition(pos);
             loadRoadview(shop.lat, shop.lng);
         }
 
         function loadRoadview(lat, lng) {
-            const position = new kakao.maps.LatLng(lat, lng);
-            rvClient.getNearestPanoId(position, 100, function (panoId) {
-                if (panoId) {
-                    rv.setPanoId(panoId, position);
-                } else {
-                    alert('반경 100m 이내에 로드뷰 데이터가 없습니다.');
-                }
-            });
+            const pos = new kakao.maps.LatLng(lat, lng);
+            rvClient.getNearestPanoId(pos, 100, (id) => { if (id) rv.setPanoId(id, pos); else alert('로드뷰 불가'); });
         }
 
-        function updatePOVUI() {
-            if (!rv.getPanoId()) return;
-
-            const panoId = rv.getPanoId();
-            const viewpoint = rv.getViewpoint();
-            const position = rv.getPosition();
-
-            document.getElementById('rv-pano').value = panoId;
-            document.getElementById('rv-pan').value = viewpoint.pan.toFixed(2);
-            document.getElementById('rv-tilt').value = viewpoint.tilt.toFixed(2);
-            document.getElementById('rv-zoom').value = viewpoint.zoom;
-
-            if (position) {
-                document.getElementById('cur-lat').value = position.getLat().toFixed(6);
-                document.getElementById('cur-lng').value = position.getLng().toFixed(6);
-            }
-
-            updateCodeOutput();
-        }
-
-        function applyPOV() {
-            const pan = parseFloat(document.getElementById('rv-pan').value);
-            const tilt = parseFloat(document.getElementById('rv-tilt').value);
-            const zoom = parseInt(document.getElementById('rv-zoom').value);
-
-            if (!isNaN(pan) && !isNaN(tilt)) {
-                rv.setViewpoint({ pan, tilt, zoom });
-            }
-        }
-
-        function syncMapToRV() {
-            const pos = rv.getPosition();
-            if (pos) {
-                map.setCenter(pos);
-                marker.setPosition(pos);
-            }
-        }
+        function updatePOVUI() { updateCodeOutput(); }
 
         function updateCodeOutput() {
-            if (!currentShop) return;
-
-            const panoId = rv.getPanoId();
-            const vp = rv.getViewpoint();
-
-            const addr = currentShop.address;
-            const code = `{ name: "${currentShop.name}", addr: "${addr}", panoId: ${panoId}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${vp.zoom} } },`;
-            document.getElementById('code-output').innerText = code;
-        }
-
-        function copyCode() {
-            const text = document.getElementById('code-output').innerText;
-            if (text.startsWith('//')) return;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('코드가 클립보드에 복사되었습니다.');
-            });
+            if (currentShop && rv.getPanoId()) {
+                const vp = rv.getViewpoint();
+                const code = `{ name: "${currentShop.name}", addr: "${currentShop.address.split(' ').slice(0, 3).join(' ')}", panoid: ${rv.getPanoId()}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${Math.floor(vp.zoom)} } },`;
+                document.getElementById('current-code-text').textContent = code;
+            }
+            document.getElementById('stack-output').textContent = accumulatedCodes.join('\n');
+            document.getElementById('stack-count').innerText = accumulatedCodes.length;
+            const sa = document.getElementById('stack-area'); sa.scrollTop = sa.scrollHeight;
         }
 
         function markAsRegistered() {
-            if (!currentShop) {
-                alert('먼저 상점을 선택해주세요.');
-                return;
-            }
-
+            if (!currentShop || !rv.getPanoId()) return;
+            const code = document.getElementById('current-code-text').textContent;
+            if (!accumulatedCodes.includes(code)) accumulatedCodes.push(code);
+            localStorage.setItem('pov_accumulated_codes', JSON.stringify(accumulatedCodes));
             const key = `${currentShop.name}|${currentShop.address}`;
-            if (!registeredKeys.includes(key)) {
-                registeredKeys.push(key);
-                localStorage.setItem('pov_registered_shops', JSON.stringify(registeredKeys));
-                alert(`'${currentShop.name}' 상점이 등록 완료 처리되었습니다.`);
-                currentShop = null;
-                renderShopList();
-                document.getElementById('code-output').innerText = '// 상점을 선택해주세요';
-            }
+            if (!registeredKeys.includes(key)) registeredKeys.push(key);
+            localStorage.setItem('pov_registered_shops', JSON.stringify(registeredKeys));
+            showToast('추가되었습니다');
+            renderShopList();
+            updateCodeOutput();
         }
 
-        function resetRegistered() {
-            if (confirm('모든 등록 완료 기록을 초기화하시겠습니까? (삭제된 리스트가 다시 나타납니다)')) {
-                registeredKeys = [];
-                localStorage.removeItem('pov_registered_shops');
-                renderShopList();
-            }
+        function copyStack() {
+            navigator.clipboard.writeText(accumulatedCodes.join('\n')).then(() => showToast('복사 완료'));
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const toast = document.createElement('div');
-                toast.innerText = '주소가 복사되었습니다';
-                toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); color:white; padding:8px 16px; border-radius:20px; font-size:13px; z-index:9999; animation: fadeIn 0.3s;';
-                document.body.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.3s';
-                    setTimeout(() => toast.remove(), 300);
-                }, 1500);
-            });
+        function clearStack() { if (confirm('비우시겠습니까?')) { accumulatedCodes = []; localStorage.setItem('pov_accumulated_codes', '[]'); updateCodeOutput(); } }
+        function resetRegistered() { if (confirm('초기화하시겠습니까?')) { localStorage.removeItem('pov_registered_shops'); registeredKeys = []; renderShopList(); } }
+        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => showToast('복사됨')); }
+        function showToast(m) {
+            const t = document.createElement('div'); t.innerText = m;
+            t.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; z-index: 9999;';
+            document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
         }
     </script>
 </body>

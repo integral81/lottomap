@@ -2383,6 +2383,7 @@
 
         // Premium Roadview POV Presets (User Verified 260210)
         const ROADVIEW_PRESETS = [
+            { name: "교통카드판매대", addr: "서울 강동구 고덕동 210-1", isClosed: true, customMessage: "현재 폐점되었습니다 (구서울승합종점앞 가판대)." },
             { name: "부일카서비스", addr: "부산 동구 범일동", panoId: 1202519412, pov: { pan: 236.39, tilt: 6.54, zoom: -3 } },
             { name: "일등복권편의점", addr: "대구 달서구 본리동", panoId: 1201526676, pov: { pan: 349.47, tilt: 12.34, zoom: -1 } },
             { name: "스파", addr: "서울 노원구 상계동", panoId: 1198397843, pov: { pan: 316.53, tilt: 2.76, zoom: -1 } },
@@ -2422,7 +2423,7 @@
             { name: "북마산복권전문점", addr: "경남 창원시 마산합포구", panoId: 1204481175, pov: { pan: 94.99, tilt: 4.55, zoom: -3 } },
             { name: "행운복권방", addr: "경기 포천시 소흘읍 죽엽산로 438", panoId: 1175632287, pov: { pan: 113.99, tilt: -9.48, zoom: 0 } },
             { name: "행운복권방 보생당건강원", addr: "전북 익산시 무왕로 1268", panoId: 1179789585, pov: { pan: 168.69, tilt: -0.46, zoom: -2 } },
-            { name: "행운복권방", addr: "경기 의정부시 충의로 55", panoId: 1174558837, pov: { pan: 244.4, tilt: 3.8, zoom: 0 } },
+            { name: "행운복권방", addr: "경기 의정부시 용현동", panoId: 1174558837, pov: { pan: 255.27, tilt: -1.13, zoom: -3 } },
             { name: "일등복권편의점", addr: "대구 달서구 대명천로 220", panoId: 1201526676, pov: { pan: 350.40, tilt: 1.57, zoom: -1 } },
             { name: "하늘로또", addr: "경기 여주시 세종로475번길", panoId: 1175070156, pov: { pan: 49.17, tilt: 3.23, zoom: 2 } },
             { name: "빅세일복권방", addr: "부산 부산진구 서면문화로", panoId: 1202698289, pov: { pan: 104.61, tilt: -2.96, zoom: 3 } },
@@ -2465,6 +2466,7 @@
             { name: "복권전문점", addr: "인천 부평구 청천동 236-20", panoId: 1199144048, pov: { pan: 341.21, tilt: 2.94, zoom: -3 } },
             { name: "복권명당", addr: "충남 공주시 신관동 585-12", panoId: 1179373419, pov: { pan: 305.44, tilt: 0.77, zoom: -3 } },
             { name: "영화유통(1등복권방)", addr: "울산 남구 달동 758삼성아파트상가204-101", panoId: 1202168610, pov: { pan: 245.1, tilt: 2.0, zoom: 0 } },
+            { name: "복권나라", addr: "서울 관악구 남부순환로 1739-9", panoId: 1198432279, pov: { pan: 157.71, tilt: 11.97, zoom: -3 } },
             { name: "대박천하마트", addr: "인천 부평구 굴포로", panoId: 1198907645, pov: { pan: 105.07, tilt: 4.60, zoom: -2 } },
             { name: "대박천하마트", addr: "인천 부평구 갈산동 367번지", panoId: 1199224040, pov: { pan: 190.56, tilt: -6.41, zoom: -3 } },
             { name: "대박슈퍼", addr: "인천 부평구 경원대로", panoId: 1199058573, pov: { pan: 177.81, tilt: -2.27, zoom: 1 } },
@@ -2498,7 +2500,7 @@
             { name: "버스판매소", addr: "서울 영등포구 영등포동4가 441-10", panoId: 1198368804, pov: { pan: 64.0, tilt: 0.9, zoom: 0 } },
             { name: "GS25(양산문성)", addr: "경남 양산시 평산동 31-5", panoId: 1204592950, pov: { pan: 269.6, tilt: 1.0, zoom: 1 } },
             { name: "우리들공업탑점", addr: "울산 남구 신정동 1233-3", isClosed: true, customMessage: "과거 '영화유통'으로 불리며 1등 당첨자를 10회 이상 배출한 유명 명당이었으나, 현재는 점주 별세 및 자격 문제로 인해 폐업 상태입니다." },
-            { name: "메트로센터점", addr: "대구 중구 달구벌대로 지하 2100", customMessage: "이 매장은 반월당역 지하상가(C412호) 중심부에 위치하고 있습니다.\n로드뷰는 지상 반월당역 14번 출구 인근을 보여드립니다。" },
+            { name: "메트로센터점", addr: "대구 중구 덕산동 88 메트로센터C412호", imageUrl: "assets/img/metro_260213.jpg", customMessage: "반월당역 지하상가(C412호) 중심부에 위치하고 있습니다." },
             { name: "행복한사람들(흥부네)", addr: "경기 광주시 초월읍 산이리 13-1", imageUrl: "assets/img/happypeople_260213.jpg", customMessage: "이 점포는 도로 인접성 문제로 로드뷰 제공이 어려워 현장 사진으로 대체합니다。" },
             { name: "인터넷 복권판매사이트", addr: "서울특별시 서초구 남부순환로", customLink: "https://www.dhlottery.co.kr/userGuide", customMessage: "동 판매점은 온라인 구매가능한 동행복권 싸이트로 연결드립니다." },
             { name: "25시슈퍼", addr: "함송로14번길 13-17", panoId: 1176030807, pov: { pan: 310.46, tilt: 0.85, zoom: -1 } },
@@ -2596,24 +2598,25 @@
             { name: "천하명당복권방", addr: "충남 홍성군 홍성읍", panoId: 1161022469, pov: { pan: 191.39, tilt: 10.32, zoom: 1 } },
             { name: "탑로또", addr: "경남 거제시 상동동(상문동)", panoId: 1204694341, pov: { pan: 210.88, tilt: -2.11, zoom: 2 } },
             { name: "팡팡복권방", addr: "충북 진천군 광혜원면", panoId: 1185181826, pov: { pan: 116.28, tilt: 6.65, zoom: -1 } },
-            { name: "패밀리복권방", addr: "경기 남양주시 늘을1로16번길", panoId: 1203140248, pov: { pan: 263.69, tilt: -2.78, zoom: -1 } },
-            { name: "편의점사랑", addr: "서울 강서구 곰달래로25길", panoId: 1198688107, pov: { pan: 208.17, tilt: 2.01, zoom: 1 } },
-            { name: "프로토베팅샵", addr: "부산 중구 국제시장2길", panoId: 1132643336, pov: { pan: 236.09, tilt: 3.43, zoom: -2 } },
+            { name: "패밀리복권방", addr: "경기 남양주시 늘을1로16번길", panoId: 1203140248, pov: { pan: 243.5, tilt: -1.1, zoom: 0 } },
+            { name: "편의점사랑", addr: "서울 강서구 곰달래로25길", panoId: 1198753892, pov: { pan: 147.44, tilt: -2.70, zoom: -3 } },
+            { name: "프로토베팅샵", addr: "부산 중구 국제시장2길", panoId: 1132643336, pov: { pan: 240.67, tilt: 2.55, zoom: -3 } },
             { name: "하늘과바다", addr: "인천 부평구 부개동", panoId: 1199223112, pov: { pan: 0.36, tilt: -0.01, zoom: -2 } },
-            { name: "하당복권방", addr: "전남 목포시 옥암동", panoId: 1192538904, pov: { pan: 41.70, tilt: -0.67, zoom: -3 } },
-            { name: "하영", addr: "인천 서구 청라에메랄드로", panoId: 1199762293, pov: { pan: 255.29, tilt: 1.55, zoom: -3 } },
-            { name: "해수로또", addr: "충북 청주시 상당구", panoId: 1168821889, pov: { pan: 78.39, tilt: 0.85, zoom: -3 } },
-            { name: "행복미니슈퍼", addr: "경기 부천시 원미구", panoId: 1203727264, pov: { pan: 36.10, tilt: 2.95, zoom: 2 } },
-            { name: "행복복권방", addr: "경남 창원시 의창구", panoId: 1205303190, pov: { pan: 323.00, tilt: 4.49, zoom: 2 } },
+            { name: "하당복권방", addr: "전남 목포시 옥암동", panoId: 1192600420, pov: { pan: 304.76, tilt: 1.45, zoom: -3 } },
+            { name: "하영", addr: "인천 서구 청라에메랄드로", panoId: 1199762293, pov: { pan: 254.5, tilt: -13.8, zoom: 1 } },
+            { name: "해수로또", addr: "충북 청주시 상당구 산성로", panoId: 1168821889, pov: { pan: 87.7, tilt: -8.7, zoom: 0 } },
+            { name: "행복미니슈퍼", addr: "경기 부천시 원미구", panoId: 1203727268, pov: { pan: 6.0, tilt: 2.8, zoom: 5 } },
+            { name: "행복복권방", addr: "경남 창원시 의창구", panoId: 1205303190, pov: { pan: 306.09, tilt: 0.16, zoom: 2 } },
             { name: "행운방", addr: "경기 용인시 기흥구 보정동", panoId: 1194380962, pov: { pan: 99.2, tilt: 3.0, zoom: -1 } },
-            { name: "행운복권", addr: "충북 제천시 의림동", panoId: 1184953796, pov: { pan: 354.68, tilt: -2.45, zoom: -3 } },
-            { name: "행운복권", addr: "경기 군포시 대야1로", panoId: 1103004351, pov: { pan: 25.8, tilt: 1.5, zoom: 0 } },
-            { name: "행운복권방", addr: "부산 중구 남포동5가", panoId: 1202742263, pov: { pan: 155.48, tilt: 4.28, zoom: -3 } },
-            { name: "행운복권방", addr: "경기 의정부시 용현동", panoId: 1174558837, pov: { pan: 250.50, tilt: -2.32, zoom: -3 } },
-            { name: "행운복권방", addr: "강원 인제군 북면", panoId: 1196203773, pov: { pan: 200.81, tilt: -2.33, zoom: -3 } },
-            { name: "행운을주는사람들", addr: "충북 충주시 연수동", panoId: 1165060593, pov: { pan: 241.75, tilt: 4.97, zoom: -1 } },
-            { name: "형제상회", addr: "대전 서구 용문동", panoId: 1201229162, pov: { pan: 241.38, tilt: 0.93, zoom: -1 } },
-            { name: "현대사", addr: "경기 성남시 분당구 구미동 144-1 102호", panoId: 1199011246, pov: { pan: 359.56, tilt: 1.25, zoom: -3 } }
+            { name: "행운복권", addr: "충북 제천시 의림동", panoId: 1184953799, pov: { pan: 14.56, tilt: 5.01, zoom: 0 } },
+            { name: "행운복권", addr: "경기 군포시 대야미동", panoId: 1175680167, pov: { pan: 302.4, tilt: 7.5, zoom: -1 } },
+            { name: "행운복권방", addr: "부산 중구 남포동5가", panoId: 1202742263, pov: { pan: 162.33, tilt: -1.85, zoom: -2 } },
+            { name: "행운복권방", addr: "경기 의정부시 용현동", panoId: 1174558837, pov: { pan: 255.27, tilt: -1.13, zoom: -3 } },
+            { name: "행운복권방", addr: "강원 인제군 북면", panoId: 1196203792, pov: { pan: 216.8, tilt: -5.2, zoom: 0 } },
+            { name: "행운을주는사람들", addr: "충북 충주시 연수동", panoId: 1165060593, pov: { pan: 232.92, tilt: 3.33, zoom: -3 } },
+            { name: "형제상회", addr: "대전 서구 용문동", panoId: 1201235032, pov: { pan: 231.57, tilt: 11.75, zoom: -3 } },
+            { name: "현대사", addr: "경기 성남시 분당구 구미동 144-1 102호", panoId: 1199011246, pov: { pan: 359.56, tilt: 1.25, zoom: -3 } },
+            { name: "행운복권방", addr: "서울 도봉구 창동", panoId: 1197759123, pov: { pan: 334.7, tilt: -0.9, zoom: 0 } },
         ];
 
 
@@ -2726,6 +2729,16 @@
             });
 
             await loadData();
+
+            // --- Add Map Idle Listener for "Nearby Sync" (Fix iPhone/Mobile desync issue) ---
+            kakao.maps.event.addListener(map, 'idle', function () {
+                const toast = document.getElementById('nearby-shops-toast');
+                if (toast) {
+                    const center = map.getCenter();
+                    // Update list based on map center, but don't re-pan (prevent infinite loop)
+                    findNearestShop(center.getLat(), center.getLng(), "지도 중심", false);
+                }
+            });
 
             // Auto-reflect GPS location on initial load (User Request)
             console.log('Initiating automatic GPS request on load...');
@@ -4253,10 +4266,12 @@
             }
         }
 
-        function findNearestShop(lat, lng) {
+        function findNearestShop(lat, lng, label = "내 위치", shouldPan = true) {
             // Find nearest among ACTIVE markers (filtered ones on the map)
             if (!markers || markers.length === 0) {
-                showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
+                // If it's a map drag, don't show toast if no markers. 
+                // Only show if it's a specific request or shouldn't pan.
+                if (shouldPan) showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
                 return;
             }
 
@@ -4274,27 +4289,28 @@
             const topCount = isMobile ? 2 : 3;
             const topShops = sortedByDist.slice(0, topCount);
             if (topShops.length > 0) {
-                let msg = "📍 <strong style=\"white-space: nowrap;\">주변 1등점</strong> <br class=\"mobile-br\"> <strong>(가까운 순)</strong><br>";
+                let msg = `📍 <strong style="white-space: nowrap;">${label} 주변 1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
                 topShops.forEach((item, index) => {
                     const shop = item.marker.shopData;
                     const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
                     // Add clickable span
                     msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
                 });
-                // REMOVED old showToast call from here to put it after setBounds for better sync
 
-                // Adaptive Zoom: Fit my location and top nearest shops
-                const bounds = new kakao.maps.LatLngBounds();
-                bounds.extend(new kakao.maps.LatLng(lat, lng));
+                if (shouldPan) {
+                    // Adaptive Zoom: Fit my location and top nearest shops
+                    const bounds = new kakao.maps.LatLngBounds();
+                    bounds.extend(new kakao.maps.LatLng(lat, lng));
 
-                topShops.forEach(item => {
-                    if (item.distance < 10) { // Only include within 10km for bounds
-                        bounds.extend(item.marker.getPosition());
-                    }
-                });
+                    topShops.forEach(item => {
+                        if (item.distance < 10) { // Only include within 10km for bounds
+                            bounds.extend(item.marker.getPosition());
+                        }
+                    });
 
-                const bottomPad = isMobile ? 180 : 40;
-                map.setBounds(bounds, 40, 40, bottomPad, 40);
+                    const bottomPad = isMobile ? 180 : 40;
+                    map.setBounds(bounds, 40, 40, bottomPad, 40);
+                }
 
                 showToast(msg, "success", true, 'nearby-shops-toast'); // Use ID to prevent duplicates
             }
