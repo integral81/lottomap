@@ -7,6 +7,7 @@
     <title>Lotto POV Admin - 수기 등록 도구</title>
     <script type="text/javascript"
         src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
+    <script src="admin_targets.js"></script>
     <style>
         :root {
             --primary: #d32f2f;
@@ -236,7 +237,6 @@
         let currentShop = null;
         let accumulatedCodes = JSON.parse(localStorage.getItem('pov_accumulated_codes') || '[]');
         let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
-
         let allMissingShops = [];
 
         document.addEventListener('DOMContentLoaded', init);
@@ -253,9 +253,18 @@
                 kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
                 kakao.maps.event.addListener(marker, 'dragend', () => loadRoadview(marker.getPosition().getLat(), marker.getPosition().getLng()));
 
+                if (window.allMissingShops && window.allMissingShops.length > 0) {
+                    allMissingShops = window.allMissingShops;
+                } else {
+                    console.error("No data found in window.allMissingShops");
+                }
+
                 renderShopList();
                 updateCodeOutput();
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+                alert('초기화 중 에러 발생: ' + e.message);
+            }
         }
 
         function renderShopList() {
@@ -267,7 +276,14 @@
                 const div = document.createElement('div');
                 div.className = 'shop-item' + (currentShop?.name === shop.name && currentShop?.address === shop.address ? ' active' : '');
                 div.onclick = () => selectShop(shop, div);
-                div.innerHTML = `<div class="shop-name">${shop.name}</div><div class="shop-addr"><span>${shop.address}</span><button class="addr-copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shop.address}')">복사</button></div><div class="win-count">${shop.wins}회 당첨</div>`;
+                div.innerHTML = `
+                    <div class="shop-name">${shop.name}</div>
+                    <div class="shop-addr">
+                        <span>${shop.address}</span>
+                        <button class="addr-copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shop.address}')">복사</button>
+                    </div>
+                    <div class="win-count">${shop.wins}회 당첨</div>
+                `;
                 container.appendChild(div);
             });
         }
@@ -284,7 +300,10 @@
 
         function loadRoadview(lat, lng) {
             const pos = new kakao.maps.LatLng(lat, lng);
-            rvClient.getNearestPanoId(pos, 100, (id) => { if (id) rv.setPanoId(id, pos); else alert('로드뷰 불가'); });
+            rvClient.getNearestPanoId(pos, 100, (id) => {
+                if (id) rv.setPanoId(id, pos);
+                else alert('로드뷰 불가');
+            });
         }
 
         function updatePOVUI() { updateCodeOutput(); }
@@ -297,7 +316,8 @@
             }
             document.getElementById('stack-output').textContent = accumulatedCodes.join('\n');
             document.getElementById('stack-count').innerText = accumulatedCodes.length;
-            const sa = document.getElementById('stack-area'); sa.scrollTop = sa.scrollHeight;
+            const sa = document.getElementById('stack-area');
+            sa.scrollTop = sa.scrollHeight;
         }
 
         function markAsRegistered() {
@@ -317,13 +337,32 @@
             navigator.clipboard.writeText(accumulatedCodes.join('\n')).then(() => showToast('복사 완료'));
         }
 
-        function clearStack() { if (confirm('비우시겠습니까?')) { accumulatedCodes = []; localStorage.setItem('pov_accumulated_codes', '[]'); updateCodeOutput(); } }
-        function resetRegistered() { if (confirm('초기화하시겠습니까?')) { localStorage.removeItem('pov_registered_shops'); registeredKeys = []; renderShopList(); } }
-        function copyToClipboard(t) { navigator.clipboard.writeText(t).then(() => showToast('복사됨')); }
+        function clearStack() {
+            if (confirm('비우시겠습니까?')) {
+                accumulatedCodes = [];
+                localStorage.setItem('pov_accumulated_codes', '[]');
+                updateCodeOutput();
+            }
+        }
+
+        function resetRegistered() {
+            if (confirm('초기화하시겠습니까?')) {
+                localStorage.removeItem('pov_registered_shops');
+                registeredKeys = [];
+                renderShopList();
+            }
+        }
+
+        function copyToClipboard(t) {
+            navigator.clipboard.writeText(t).then(() => showToast('복사됨'));
+        }
+
         function showToast(m) {
-            const t = document.createElement('div'); t.innerText = m;
+            const t = document.createElement('div');
+            t.innerText = m;
             t.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; z-index: 9999;';
-            document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 1500);
         }
     </script>
 </body>
