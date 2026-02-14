@@ -2963,18 +2963,20 @@
                 return rMatch && mMatch;
             });
 
-            // ===== 2단계: 선택된 회차 범위 내에서 매장별 당첨 횟수 동적 계산 =====
+            // ===== 2단계: 매장별 전체 당첨 횟수 계산 (회차 범위 필터와 상관없이 상점 인식) =====
             const shopWinsInRange = {};
-            roundFiltered.forEach(item => {
+            allData.forEach(item => {
+                // roundFiltered 대신 allData를 사용하여 해당 상점의 역대 모든 당첨 횟수를 집계합니다.
                 const key = (item.n || '').trim() + '|' + (item.a || '').trim();
                 shopWinsInRange[key] = (shopWinsInRange[key] || 0) + 1;
             });
 
-            // 각 항목에 범위 내 당첨 횟수 추가
+            // 필터링된 데이터(회차 범위 내)에 위에서 계산한 전체 당첨 횟수를 부여합니다.
             roundFiltered.forEach(item => {
                 const key = (item.n || '').trim() + '|' + (item.a || '').trim();
                 item.winsInRange = shopWinsInRange[key];
             });
+
 
             // ===== 3단계: Frequency 필터 적용 (선택 범위 내 횟수 기준) =====
             const filtered = roundFiltered.filter(d => {
@@ -3351,273 +3353,281 @@
                     }
                     showToast(msg, "error");
                 },
-                { enableHighAccuracy: false, timeout: 15000, maximumAge: 0 }
+                // 정확도를 true로 변경하고 타임아웃을 조정하여 응답성을 높입니다.
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         }
 
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
-        }
-
-        // --- Monetization & Logic ---
-        let currentShopData = null; // Store temp data for the modal
-
-        function openAdModal(name, addr, lat, lng, totalWins, isClosed) {
-            // 폐업 점포 체크 (260210)
-            if (isClosed) {
-                alert("현재 폐업점으로 추천번호 제공이 불가능한 점포입니다");
-                return;
+        // 주변 상점 로직 보강: 필터링된 마커가 없더라도 가장 가까운 곳을 검색 시도
+        function findNearestShop(lat, lng, label = "내 위치", shouldPan = true) {
+            if (!markers || markers.length === 0) {
+                console.log("표시된 마커 없음 - 전체 데이터에서 재검색 시도");
+                applyFilters(); // 마커가 하나도 없다면 필터를 다시 적용해 마커를 생성시킵니다.
             }
 
-            // Re-filter allData for this specific shop to get rounds.
-            const rounds = allData.filter(d => d.n === name && d.a === addr).map(d => ({ r: d.r, m: d.m }));
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // km
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            }
 
-            currentShopData = { name, addr, lat, lng, totalWins, rounds };
+            // --- Monetization & Logic ---
+            let currentShopData = null; // Store temp data for the modal
 
-            // Show Modal
-            const modal = document.getElementById('adModal');
-            const adContent = document.getElementById('adContent');
-            const resultContent = document.getElementById('resultContent');
+            function openAdModal(name, addr, lat, lng, totalWins, isClosed) {
+                // 폐업 점포 체크 (260210)
+                if (isClosed) {
+                    alert("현재 폐업점으로 추천번호 제공이 불가능한 점포입니다");
+                    return;
+                }
 
-            // Mode Containers
-            const modeSelection = document.getElementById('modeSelection');
-            const analysisLoading = document.getElementById('analysisLoading');
-            const modeDreamInput = document.getElementById('modeDreamInput');
-            const modeHoroscopeSelect = document.getElementById('modeHoroscopeSelect');
+                // Re-filter allData for this specific shop to get rounds.
+                const rounds = allData.filter(d => d.n === name && d.a === addr).map(d => ({ r: d.r, m: d.m }));
 
-            modal.style.display = 'flex';
-            adContent.style.display = 'flex'; // Changed to flex for centering
-            resultContent.style.display = 'none';
+                currentShopData = { name, addr, lat, lng, totalWins, rounds };
 
-            // Reset UI State (CRITICAL: Reset result text structure)
-            const resultInfo = document.getElementById('resultInfoText');
-            if (resultInfo) {
-                resultInfo.innerHTML = `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
+                // Show Modal
+                const modal = document.getElementById('adModal');
+                const adContent = document.getElementById('adContent');
+                const resultContent = document.getElementById('resultContent');
+
+                // Mode Containers
+                const modeSelection = document.getElementById('modeSelection');
+                const analysisLoading = document.getElementById('analysisLoading');
+                const modeDreamInput = document.getElementById('modeDreamInput');
+                const modeHoroscopeSelect = document.getElementById('modeHoroscopeSelect');
+
+                modal.style.display = 'flex';
+                adContent.style.display = 'flex'; // Changed to flex for centering
+                resultContent.style.display = 'none';
+
+                // Reset UI State (CRITICAL: Reset result text structure)
+                const resultInfo = document.getElementById('resultInfoText');
+                if (resultInfo) {
+                    resultInfo.innerHTML = `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
                     (<span id="paramRounds"></span> 등)`;
+                }
+
+                modeSelection.style.display = 'block';
+                if (analysisLoading) analysisLoading.style.display = 'none';
+                if (modeDreamInput) modeDreamInput.style.display = 'none';
+                if (modeHoroscopeSelect) modeHoroscopeSelect.style.display = 'none';
+
+                // Push history state to support Back Button closing
+                history.pushState({ modalOpen: true }, null, "");
             }
 
-            modeSelection.style.display = 'block';
-            if (analysisLoading) analysisLoading.style.display = 'none';
-            if (modeDreamInput) modeDreamInput.style.display = 'none';
-            if (modeHoroscopeSelect) modeHoroscopeSelect.style.display = 'none';
+            // --- Phase 10: Selection Handlers ---
 
-            // Push history state to support Back Button closing
-            history.pushState({ modalOpen: true }, null, "");
-        }
+            function selectAnalysisMode() {
+                // Hide selection, show loading
+                document.getElementById('modeSelection').style.display = 'none';
+                const loader = document.getElementById('analysisLoading');
+                if (loader) {
+                    loader.style.display = 'flex';
+                    // Reset text if needed
+                    loader.querySelector('h3').innerText = '데이터 분석 중...';
+                    loader.querySelector('p').innerText = '명당의 기운을 모으고 있습니다';
+                }
 
-        // --- Phase 10: Selection Handlers ---
-
-        function selectAnalysisMode() {
-            // Hide selection, show loading
-            document.getElementById('modeSelection').style.display = 'none';
-            const loader = document.getElementById('analysisLoading');
-            if (loader) {
-                loader.style.display = 'flex';
-                // Reset text if needed
-                loader.querySelector('h3').innerText = '데이터 분석 중...';
-                loader.querySelector('p').innerText = '명당의 기운을 모으고 있습니다';
+                // Simulate Analysis Delay (3 seconds)
+                setTimeout(() => {
+                    showResult();
+                }, 3000);
             }
 
-            // Simulate Analysis Delay (3 seconds)
-            setTimeout(() => {
-                showResult();
-            }, 3000);
-        }
-
-        function selectDreamMode() {
-            document.getElementById('modeSelection').style.display = 'none';
-            document.getElementById('modeDreamInput').style.display = 'block';
-        }
-
-        function resetToModeSelection() {
-            document.getElementById('modeDreamInput').style.display = 'none';
-            document.getElementById('modeHoroscopeSelect').style.display = 'none';
-            document.getElementById('modeSelection').style.display = 'block';
-        }
-
-        function handleDreamTag(keyword) {
-            document.getElementById('dreamInput').value = keyword;
-            handleDreamSubmit();
-        }
-
-        function handleDreamSubmit() {
-            const input = document.getElementById('dreamInput');
-            const keyword = input.value.trim();
-
-            if (!keyword) {
-                alert('꿈 내용을 입력해주세요!');
-                return;
+            function selectDreamMode() {
+                document.getElementById('modeSelection').style.display = 'none';
+                document.getElementById('modeDreamInput').style.display = 'block';
             }
 
-            // Show loading state
-            document.getElementById('modeDreamInput').style.display = 'none';
-            const loader = document.getElementById('analysisLoading');
-            if (loader) {
-                loader.style.display = 'flex';
-                loader.querySelector('h3').innerText = '꿈 해몽 중...';
-                loader.querySelector('p').innerText = '꿈 속에 숨겨진 행운을 찾고 있습니다';
+            function resetToModeSelection() {
+                document.getElementById('modeDreamInput').style.display = 'none';
+                document.getElementById('modeHoroscopeSelect').style.display = 'none';
+                document.getElementById('modeSelection').style.display = 'block';
             }
 
-            setTimeout(() => {
-                const luckyNumbers = generateDreamNumbers(keyword);
-                showResult(luckyNumbers);
-            }, 2000);
-        }
+            function handleDreamTag(keyword) {
+                document.getElementById('dreamInput').value = keyword;
+                handleDreamSubmit();
+            }
 
-        function generateDreamNumbers(keyword) {
-            // 1. Traditional Dream Mappings (Simple Version)
-            const dreamMap = {
-                '돼지': [8, 12, 23, 33, 38, 41],
-                '똥': [6, 17, 24, 35, 36, 42],
-                '조상': [1, 3, 15, 27, 39, 41],
-                '불': [2, 11, 22, 33, 40, 44],
-                '물': [4, 9, 21, 26, 31, 37],
-                '뱀': [5, 10, 16, 28, 34, 45],
-                '용': [7, 18, 20, 30, 42, 45]
-            };
+            function handleDreamSubmit() {
+                const input = document.getElementById('dreamInput');
+                const keyword = input.value.trim();
 
-            // If keyword exists in map, return it (with small variation if needed, but fixed for now)
-            if (dreamMap[keyword]) {
+                if (!keyword) {
+                    alert('꿈 내용을 입력해주세요!');
+                    return;
+                }
+
+                // Show loading state
+                document.getElementById('modeDreamInput').style.display = 'none';
+                const loader = document.getElementById('analysisLoading');
+                if (loader) {
+                    loader.style.display = 'flex';
+                    loader.querySelector('h3').innerText = '꿈 해몽 중...';
+                    loader.querySelector('p').innerText = '꿈 속에 숨겨진 행운을 찾고 있습니다';
+                }
+
+                setTimeout(() => {
+                    const luckyNumbers = generateDreamNumbers(keyword);
+                    showResult(luckyNumbers);
+                }, 2000);
+            }
+
+            function generateDreamNumbers(keyword) {
+                // 1. Traditional Dream Mappings (Simple Version)
+                const dreamMap = {
+                    '돼지': [8, 12, 23, 33, 38, 41],
+                    '똥': [6, 17, 24, 35, 36, 42],
+                    '조상': [1, 3, 15, 27, 39, 41],
+                    '불': [2, 11, 22, 33, 40, 44],
+                    '물': [4, 9, 21, 26, 31, 37],
+                    '뱀': [5, 10, 16, 28, 34, 45],
+                    '용': [7, 18, 20, 30, 42, 45]
+                };
+
+                // If keyword exists in map, return it (with small variation if needed, but fixed for now)
+                if (dreamMap[keyword]) {
+                    return {
+                        numbers: dreamMap[keyword],
+                        historyCount: 0, // Not based on history
+                        type: 'dream',
+                        keyword: keyword
+                    };
+                }
+
+                // 2. Hash-based Generation for unknown keywords
+                // This ensures the same keyword always yields the same numbers
+                let hash = 0;
+                for (let i = 0; i < keyword.length; i++) {
+                    hash = ((hash << 5) - hash) + keyword.charCodeAt(i);
+                    hash |= 0; // Convert to 32bit integer
+                }
+
+                // Seeding logic using text hash
+                const seededRandom = (seed) => {
+                    var x = Math.sin(seed++) * 10000;
+                    return x - Math.floor(x);
+                };
+
+                const selected = new Set();
+                let seed = Math.abs(hash);
+
+                while (selected.size < 6) {
+                    const n = Math.floor(seededRandom(seed) * 45) + 1;
+                    selected.add(n);
+                    seed++;
+                }
+
                 return {
-                    numbers: dreamMap[keyword],
-                    historyCount: 0, // Not based on history
+                    numbers: Array.from(selected).sort((a, b) => a - b),
+                    historyCount: 0,
                     type: 'dream',
                     keyword: keyword
                 };
             }
 
-            // 2. Hash-based Generation for unknown keywords
-            // This ensures the same keyword always yields the same numbers
-            let hash = 0;
-            for (let i = 0; i < keyword.length; i++) {
-                hash = ((hash << 5) - hash) + keyword.charCodeAt(i);
-                hash |= 0; // Convert to 32bit integer
+            function selectHoroscopeMode() {
+                document.getElementById('modeSelection').style.display = 'none';
+                document.getElementById('modeHoroscopeSelect').style.display = 'block';
             }
 
-            // Seeding logic using text hash
-            const seededRandom = (seed) => {
-                var x = Math.sin(seed++) * 10000;
-                return x - Math.floor(x);
-            };
+            function handleZodiacClick(zodiacName, icon) {
+                // Show loading
+                document.getElementById('modeHoroscopeSelect').style.display = 'none';
+                const loader = document.getElementById('analysisLoading');
+                if (loader) {
+                    loader.style.display = 'flex';
+                    loader.querySelector('h3').innerText = '오늘의 운세 분석 중...';
+                    loader.querySelector('p').innerText = '별들의 기운을 읽고 있습니다';
+                }
 
-            const selected = new Set();
-            let seed = Math.abs(hash);
-
-            while (selected.size < 6) {
-                const n = Math.floor(seededRandom(seed) * 45) + 1;
-                selected.add(n);
-                seed++;
+                // Simulate and Generate
+                setTimeout(() => {
+                    const horoscopeData = generateHoroscope(zodiacName);
+                    showResult({
+                        type: 'horoscope',
+                        zodiac: zodiacName,
+                        icon: icon,
+                        ...horoscopeData
+                    });
+                }, 2000);
             }
 
-            return {
-                numbers: Array.from(selected).sort((a, b) => a - b),
-                historyCount: 0,
-                type: 'dream',
-                keyword: keyword
-            };
-        }
+            function generateHoroscope(zodiacName) {
+                // Get today's date in Korea Standard Time (UTC+9)
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const koreaTime = new Date(utc + (9 * 60 * 60 * 1000));
 
-        function selectHoroscopeMode() {
-            document.getElementById('modeSelection').style.display = 'none';
-            document.getElementById('modeHoroscopeSelect').style.display = 'block';
-        }
+                const year = koreaTime.getFullYear();
+                const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
+                const day = String(koreaTime.getDate()).padStart(2, '0');
+                const today = `${year}-${month}-${day}`;
 
-        function handleZodiacClick(zodiacName, icon) {
-            // Show loading
-            document.getElementById('modeHoroscopeSelect').style.display = 'none';
-            const loader = document.getElementById('analysisLoading');
-            if (loader) {
-                loader.style.display = 'flex';
-                loader.querySelector('h3').innerText = '오늘의 운세 분석 중...';
-                loader.querySelector('p').innerText = '별들의 기운을 읽고 있습니다';
-            }
+                const key = today + zodiacName;
 
-            // Simulate and Generate
-            setTimeout(() => {
-                const horoscopeData = generateHoroscope(zodiacName);
-                showResult({
-                    type: 'horoscope',
-                    zodiac: zodiacName,
-                    icon: icon,
-                    ...horoscopeData
-                });
-            }, 2000);
-        }
+                // Generate seeded random based on date + zodiac
+                let hash = 0;
+                for (let i = 0; i < key.length; i++) {
+                    hash = ((hash << 5) - hash) + key.charCodeAt(i);
+                    hash |= 0;
+                }
+                const seededRandom = (seed) => {
+                    var x = Math.sin(seed++) * 10000;
+                    return x - Math.floor(x);
+                };
+                let seed = Math.abs(hash);
 
-        function generateHoroscope(zodiacName) {
-            // Get today's date in Korea Standard Time (UTC+9)
-            const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const koreaTime = new Date(utc + (9 * 60 * 60 * 1000));
+                // 1. Horoscope Text Pools
+                const genFortunes = [
+                    "금기(金氣)의 영향으로 신중함이 요구되는 하루입니다.",
+                    "오늘은 당신의 날입니다. 무엇을 해도 술술 풀릴 것입니다.",
+                    "직감이 매우 뛰어난 날입니다. 당신의 느낌을 믿어보세요.",
+                    "귀인의 도움을 받아 어려움이 해결될 것입니다. 긍정적인 마음을 가지세요.",
+                    "행운의 여신이 당신을 보고 미소 짓고 있습니다.",
+                    "뜻밖의 행운이 찾아올 수 있습니다. 주변을 잘 살펴보세요.",
+                    "차분하게 내실을 다지면 더 큰 기회가 찾아올 것입니다.",
+                    "새로운 변화를 시도하기에 아주 적절한 시기입니다."
+                ];
 
-            const year = koreaTime.getFullYear();
-            const month = String(koreaTime.getMonth() + 1).padStart(2, '0');
-            const day = String(koreaTime.getDate()).padStart(2, '0');
-            const today = `${year}-${month}-${day}`;
+                const loveFortunes = [
+                    "말의 표현을 조절하세요. 배려가 필요한 시기입니다.",
+                    "소중한 사람과 즐거운 시간을 보내기에 좋은 날입니다.",
+                    "솔직한 감정 표현이 상대방의 마음을 움직일 것입니다.",
+                    "작은 오해가 생길 수 있으니 충분한 대화를 나누세요.",
+                    "새로운 인연이 나타날 수 있는 기운이 강합니다.",
+                    "서로에 대한 신뢰가 깊어지는 따뜻한 하루가 될 것입니다.",
+                    "당신의 매력이 돋보이는 날입니다. 자신감을 가지세요.",
+                    "가까운 사람과의 갈등은 먼저 손을 내미는 것이 좋습니다."
+                ];
 
-            const key = today + zodiacName;
+                const moneyFortunes = [
+                    "예상치 못한 지출에 대비하세요. 신중한 소비가 필요합니다.",
+                    "금전운이 매우 좋습니다. 작은 투자도 결실을 맺을 수 있습니다.",
+                    "재물운이 상승하는 시기입니다. 로또 구매하기 딱 좋은 날!",
+                    "지갑 관리에 신경 써야 하는 하루입니다. 충동구매를 주의하세요.",
+                    "생각지 못한 곳에서 작은 수익이 발생할 수 있습니다.",
+                    "계획적인 소비가 당신에게 더 큰 행운을 불러올 것입니다.",
+                    "금전적인 이득보다는 인맥을 쌓는 것이 장기적으로 유리합니다.",
+                    "뿌린 대로 거두는 날입니다. 성실함이 보상으로 돌아옵니다."
+                ];
 
-            // Generate seeded random based on date + zodiac
-            let hash = 0;
-            for (let i = 0; i < key.length; i++) {
-                hash = ((hash << 5) - hash) + key.charCodeAt(i);
-                hash |= 0;
-            }
-            const seededRandom = (seed) => {
-                var x = Math.sin(seed++) * 10000;
-                return x - Math.floor(x);
-            };
-            let seed = Math.abs(hash);
+                const luckyColors = ["빨강", "파랑", "노랑", "초록", "보라", "금색", "은색", "흰색", "검정", "주황"];
 
-            // 1. Horoscope Text Pools
-            const genFortunes = [
-                "금기(金氣)의 영향으로 신중함이 요구되는 하루입니다.",
-                "오늘은 당신의 날입니다. 무엇을 해도 술술 풀릴 것입니다.",
-                "직감이 매우 뛰어난 날입니다. 당신의 느낌을 믿어보세요.",
-                "귀인의 도움을 받아 어려움이 해결될 것입니다. 긍정적인 마음을 가지세요.",
-                "행운의 여신이 당신을 보고 미소 짓고 있습니다.",
-                "뜻밖의 행운이 찾아올 수 있습니다. 주변을 잘 살펴보세요.",
-                "차분하게 내실을 다지면 더 큰 기회가 찾아올 것입니다.",
-                "새로운 변화를 시도하기에 아주 적절한 시기입니다."
-            ];
+                const genIdx = Math.floor(seededRandom(seed) * genFortunes.length);
+                const loveIdx = Math.floor(seededRandom(seed + 1) * loveFortunes.length);
+                const moneyIdx = Math.floor(seededRandom(seed + 2) * moneyFortunes.length);
+                const colorIdx = Math.floor(seededRandom(seed + 3) * luckyColors.length);
 
-            const loveFortunes = [
-                "말의 표현을 조절하세요. 배려가 필요한 시기입니다.",
-                "소중한 사람과 즐거운 시간을 보내기에 좋은 날입니다.",
-                "솔직한 감정 표현이 상대방의 마음을 움직일 것입니다.",
-                "작은 오해가 생길 수 있으니 충분한 대화를 나누세요.",
-                "새로운 인연이 나타날 수 있는 기운이 강합니다.",
-                "서로에 대한 신뢰가 깊어지는 따뜻한 하루가 될 것입니다.",
-                "당신의 매력이 돋보이는 날입니다. 자신감을 가지세요.",
-                "가까운 사람과의 갈등은 먼저 손을 내미는 것이 좋습니다."
-            ];
-
-            const moneyFortunes = [
-                "예상치 못한 지출에 대비하세요. 신중한 소비가 필요합니다.",
-                "금전운이 매우 좋습니다. 작은 투자도 결실을 맺을 수 있습니다.",
-                "재물운이 상승하는 시기입니다. 로또 구매하기 딱 좋은 날!",
-                "지갑 관리에 신경 써야 하는 하루입니다. 충동구매를 주의하세요.",
-                "생각지 못한 곳에서 작은 수익이 발생할 수 있습니다.",
-                "계획적인 소비가 당신에게 더 큰 행운을 불러올 것입니다.",
-                "금전적인 이득보다는 인맥을 쌓는 것이 장기적으로 유리합니다.",
-                "뿌린 대로 거두는 날입니다. 성실함이 보상으로 돌아옵니다."
-            ];
-
-            const luckyColors = ["빨강", "파랑", "노랑", "초록", "보라", "금색", "은색", "흰색", "검정", "주황"];
-
-            const genIdx = Math.floor(seededRandom(seed) * genFortunes.length);
-            const loveIdx = Math.floor(seededRandom(seed + 1) * loveFortunes.length);
-            const moneyIdx = Math.floor(seededRandom(seed + 2) * moneyFortunes.length);
-            const colorIdx = Math.floor(seededRandom(seed + 3) * luckyColors.length);
-
-            const text = `
+                const text = `
                 <div style="text-align:left; margin: 0 auto; max-width:280px; line-height:1.8; font-size:14px;">
                     • <b>종합운</b> : ${genFortunes[genIdx]}<br>
                     • <b>애정운</b> : ${loveFortunes[loveIdx]}<br>
@@ -3626,394 +3636,394 @@
                 </div>
             `;
 
-            // 2. Number Generation
-            const selected = new Set();
-            let numSeed = seed + 100;
-            while (selected.size < 6) {
-                const n = Math.floor(seededRandom(numSeed) * 45) + 1;
-                selected.add(n);
-                numSeed++;
+                // 2. Number Generation
+                const selected = new Set();
+                let numSeed = seed + 100;
+                while (selected.size < 6) {
+                    const n = Math.floor(seededRandom(numSeed) * 45) + 1;
+                    selected.add(n);
+                    numSeed++;
+                }
+
+                return {
+                    text: text,
+                    numbers: Array.from(selected).sort((a, b) => a - b),
+                    historyCount: 0
+                };
             }
 
-            return {
-                text: text,
-                numbers: Array.from(selected).sort((a, b) => a - b),
-                historyCount: 0
-            };
-        }
-
-        function closeModal() {
-            // If the modal is open, going back will trigger popstate which closes it effectively
-            // But we need to check if we are actually in the modal state
-            if (document.getElementById('adModal').style.display === 'flex') {
-                history.back();
-            }
-        }
-
-        function _internalCloseModal() {
-            document.getElementById('adModal').style.display = 'none';
-        }
-
-        function showResult(customResult = null) {
-            document.getElementById('adContent').style.display = 'none';
-            document.getElementById('resultContent').style.display = 'block';
-
-            // Legal Disclaimer
-            const legalDiv = document.getElementById('legalDisclaimer');
-            if (!legalDiv) {
-                const legal = document.createElement('div');
-                legal.id = 'legalDisclaimer';
-                legal.style.cssText = "font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 15px; text-align: center; line-height: 1.4;";
-                legal.innerHTML = "※ 본 서비스는 동행복권의 당첨 데이터를 기반으로 통계적/임의적 분석을 제공하며, 당첨을 보장하지 않습니다.<br>과도한 복권 구매는 도박 중독을 유발할 수 있습니다.";
-                document.getElementById('resultContent').appendChild(legal);
+            function closeModal() {
+                // If the modal is open, going back will trigger popstate which closes it effectively
+                // But we need to check if we are actually in the modal state
+                if (document.getElementById('adModal').style.display === 'flex') {
+                    history.back();
+                }
             }
 
-            const ballContainer = document.getElementById('luckyBalls');
-            ballContainer.innerHTML = '';
+            function _internalCloseModal() {
+                document.getElementById('adModal').style.display = 'none';
+            }
 
-            // Reset container styles
-            ballContainer.style.flexDirection = 'column';
-            ballContainer.style.gap = '5px';
-            console.log("Layout Updated: Gap 5px");
+            function showResult(customResult = null) {
+                document.getElementById('adContent').style.display = 'none';
+                document.getElementById('resultContent').style.display = 'block';
 
-            if (customResult) {
-                // --- Dream / Horoscope Mode (Single Row) ---
-                if (customResult.type === 'dream') {
-                    const container = document.getElementById('resultInfoText');
-                    if (container) {
-                        container.innerHTML =
-                            `꿈 키워드 <strong style="color:#fae100;">'${customResult.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
-                    }
-                } else if (customResult.type === 'horoscope') {
-                    const container = document.getElementById('resultInfoText');
-                    if (container) {
-                        container.innerHTML =
-                            `<div class="horoscope-text-box">
+                // Legal Disclaimer
+                const legalDiv = document.getElementById('legalDisclaimer');
+                if (!legalDiv) {
+                    const legal = document.createElement('div');
+                    legal.id = 'legalDisclaimer';
+                    legal.style.cssText = "font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 15px; text-align: center; line-height: 1.4;";
+                    legal.innerHTML = "※ 본 서비스는 동행복권의 당첨 데이터를 기반으로 통계적/임의적 분석을 제공하며, 당첨을 보장하지 않습니다.<br>과도한 복권 구매는 도박 중독을 유발할 수 있습니다.";
+                    document.getElementById('resultContent').appendChild(legal);
+                }
+
+                const ballContainer = document.getElementById('luckyBalls');
+                ballContainer.innerHTML = '';
+
+                // Reset container styles
+                ballContainer.style.flexDirection = 'column';
+                ballContainer.style.gap = '5px';
+                console.log("Layout Updated: Gap 5px");
+
+                if (customResult) {
+                    // --- Dream / Horoscope Mode (Single Row) ---
+                    if (customResult.type === 'dream') {
+                        const container = document.getElementById('resultInfoText');
+                        if (container) {
+                            container.innerHTML =
+                                `꿈 키워드 <strong style="color:#fae100;">'${customResult.keyword}'</strong>(으)로<br>분석된 행운의 번호입니다.`;
+                        }
+                    } else if (customResult.type === 'horoscope') {
+                        const container = document.getElementById('resultInfoText');
+                        if (container) {
+                            container.innerHTML =
+                                `<div class="horoscope-text-box">
                                 <div style="font-size:24px; margin-bottom:5px;">${customResult.icon}</div>
                                 <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${customResult.zodiac}띠 오늘의 운세</div>
                                 ${customResult.text}
                             </div>
                             <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
+                        }
                     }
-                }
 
 
-                // Render with Copy/OMR buttons using createRow helper
-                const createRowForCustom = (numbers) => {
-                    const mainContainer = document.createElement('div');
-                    mainContainer.style.display = 'flex';
-                    mainContainer.style.flexDirection = 'column';
-                    mainContainer.style.alignItems = 'center';
-                    mainContainer.style.width = '100%';
+                    // Render with Copy/OMR buttons using createRow helper
+                    const createRowForCustom = (numbers) => {
+                        const mainContainer = document.createElement('div');
+                        mainContainer.style.display = 'flex';
+                        mainContainer.style.flexDirection = 'column';
+                        mainContainer.style.alignItems = 'center';
+                        mainContainer.style.width = '100%';
 
-                    const rowWrapper = document.createElement('div');
-                    rowWrapper.style.display = 'flex';
-                    rowWrapper.style.alignItems = 'center';
-                    rowWrapper.style.justifyContent = 'center';
-                    rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
-                    rowWrapper.style.width = '100%';
+                        const rowWrapper = document.createElement('div');
+                        rowWrapper.style.display = 'flex';
+                        rowWrapper.style.alignItems = 'center';
+                        rowWrapper.style.justifyContent = 'center';
+                        rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
+                        rowWrapper.style.width = '100%';
 
-                    // Balls
-                    const ballsRow = document.createElement('div');
-                    ballsRow.style.display = 'flex';
-                    ballsRow.style.justifyContent = 'center';
-                    ballsRow.style.gap = '5px';
-                    ballsRow.style.flex = 'none';
+                        // Balls
+                        const ballsRow = document.createElement('div');
+                        ballsRow.style.display = 'flex';
+                        ballsRow.style.justifyContent = 'center';
+                        ballsRow.style.gap = '5px';
+                        ballsRow.style.flex = 'none';
 
-                    numbers.forEach(n => {
-                        const ball = document.createElement('div');
-                        ball.className = 'ball ' + getBallColor(n);
-                        ball.innerText = n;
-                        ballsRow.appendChild(ball);
-                    });
-                    rowWrapper.appendChild(ballsRow);
+                        numbers.forEach(n => {
+                            const ball = document.createElement('div');
+                            ball.className = 'ball ' + getBallColor(n);
+                            ball.innerText = n;
+                            ballsRow.appendChild(ball);
+                        });
+                        rowWrapper.appendChild(ballsRow);
 
-                    // Buttons Column
-                    const buttonsCol = document.createElement('div');
-                    buttonsCol.style.display = 'flex';
-                    buttonsCol.style.flexDirection = 'column';
-                    buttonsCol.style.gap = '5px';
-                    buttonsCol.style.minWidth = '90px';
+                        // Buttons Column
+                        const buttonsCol = document.createElement('div');
+                        buttonsCol.style.display = 'flex';
+                        buttonsCol.style.flexDirection = 'column';
+                        buttonsCol.style.gap = '5px';
+                        buttonsCol.style.minWidth = '90px';
 
-                    // Copy Button
-                    const copyBtn = document.createElement('div');
-                    copyBtn.className = 'omr-action-btn';
-                    copyBtn.innerHTML = '📋 복사';
-                    copyBtn.style.justifyContent = 'center';
-                    copyBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        copyToClipboard(numbers);
-                    };
-                    buttonsCol.appendChild(copyBtn);
-
-                    // OMR Button
-                    const omrBtn = document.createElement('div');
-                    omrBtn.className = 'omr-action-btn';
-                    omrBtn.innerHTML = '📝 OMR 보기';
-                    omrBtn.style.justifyContent = 'center';
-                    omrBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        openOMR(numbers);
-                    };
-                    buttonsCol.appendChild(omrBtn);
-
-                    rowWrapper.appendChild(buttonsCol);
-                    mainContainer.appendChild(rowWrapper);
-                    return mainContainer;
-                };
-
-                ballContainer.appendChild(createRowForCustom(customResult.numbers));
-
-                // Store last recommended numbers for quick OMR access
-                lastRecommendedNumbers = customResult.numbers;
-                localStorage.setItem('lastLottoNumbers', JSON.stringify(lastRecommendedNumbers));
-
-            } else {
-                // --- Standard Analysis Mode (Auto + Manual) ---
-                // Generate two sets with specific modes
-                const resultAuto = generateLuckyNumbers(currentShopData.rounds, 'auto');
-                const resultManual = generateLuckyNumbers(currentShopData.rounds, 'manual');
-
-                // Update Info Text (Shared stats)
-                const container = document.getElementById('resultInfoText');
-                if (container) {
-                    container.innerHTML =
-                        `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${resultAuto.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
-                        `(<span id="paramRounds">${resultAuto.relatedRounds.join(', ') + (resultAuto.historyCount > 5 ? '...' : '')}</span> 등)`;
-                }
-
-                // Helper to create a unified row component
-                const createRow = (label, numbers, isManual = false) => {
-                    // Main Container (Vertical stack for Row + Optional Link)
-                    const mainContainer = document.createElement('div');
-                    mainContainer.style.display = 'flex';
-                    mainContainer.style.flexDirection = 'column';
-                    mainContainer.style.alignItems = 'center';
-                    mainContainer.style.width = '100%';
-                    mainContainer.style.marginBottom = '2px';
-
-                    // Row (Label + Balls + Buttons)
-                    const rowWrapper = document.createElement('div');
-                    rowWrapper.style.display = 'flex';
-                    rowWrapper.style.alignItems = 'center';
-                    rowWrapper.style.justifyContent = 'center';
-                    rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
-                    console.log("Horizontal Layout Updated: Gap 12px");
-                    rowWrapper.style.width = '100%';
-                    rowWrapper.className = 'result-row-wrapper'; // Add class for mobile layout
-
-                    // Label
-                    const labelDiv = document.createElement('div');
-                    labelDiv.className = 'result-label'; // Add class for mobile layout
-                    labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:16px;">[${label}]</span>`;
-                    // labelDiv.style.minWidth = '50px'; // Removed min-width to reduce gap
-                    rowWrapper.appendChild(labelDiv);
-
-                    // Balls
-                    const ballsRow = document.createElement('div');
-                    ballsRow.className = 'result-balls'; // Add class for mobile layout
-                    ballsRow.style.display = 'flex';
-                    ballsRow.style.justifyContent = 'center';
-                    ballsRow.style.gap = '5px';
-                    ballsRow.style.flex = 'none';
-
-                    numbers.forEach(n => {
-                        const ball = document.createElement('div');
-                        ball.className = 'ball ' + getBallColor(n);
-                        ball.innerText = n;
-                        ballsRow.appendChild(ball);
-                    });
-                    rowWrapper.appendChild(ballsRow);
-
-                    // Buttons Column (Copy / OMR stacked vertically)
-                    const buttonsCol = document.createElement('div');
-                    buttonsCol.style.display = 'flex';
-                    buttonsCol.style.flexDirection = 'column';
-                    buttonsCol.style.gap = '5px';
-                    buttonsCol.style.minWidth = '90px';
-
-                    // Copy Button
-                    const copyBtn = document.createElement('div');
-                    copyBtn.className = 'omr-action-btn';
-                    copyBtn.innerHTML = '📋 복사';
-                    copyBtn.style.justifyContent = 'center';
-                    copyBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        copyToClipboard(numbers);
-                    };
-                    buttonsCol.appendChild(copyBtn);
-
-                    // OMR Button
-                    const omrBtn = document.createElement('div');
-                    omrBtn.className = 'omr-action-btn';
-                    omrBtn.innerHTML = '📝 OMR 보기';
-                    omrBtn.style.justifyContent = 'center';
-                    omrBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        openOMR(numbers);
-                    };
-                    buttonsCol.appendChild(omrBtn);
-
-                    rowWrapper.appendChild(buttonsCol);
-                    mainContainer.appendChild(rowWrapper);
-
-                    // Link for Manual
-                    if (isManual) {
-                        const linkBtn = document.createElement('div');
-                        linkBtn.innerHTML = '📊 번호별 출현 횟수 참고하기 >';
-                        linkBtn.style.color = '#fae100';
-                        linkBtn.style.fontSize = '12px';
-                        linkBtn.style.marginTop = '5px';
-                        linkBtn.style.cursor = 'pointer';
-                        linkBtn.style.textDecoration = 'underline';
-                        linkBtn.style.opacity = '1';
-                        linkBtn.onclick = (e) => {
+                        // Copy Button
+                        const copyBtn = document.createElement('div');
+                        copyBtn.className = 'omr-action-btn';
+                        copyBtn.innerHTML = '📋 복사';
+                        copyBtn.style.justifyContent = 'center';
+                        copyBtn.onclick = (e) => {
                             e.stopPropagation();
-                            showStats();
+                            copyToClipboard(numbers);
                         };
-                        mainContainer.appendChild(linkBtn);
+                        buttonsCol.appendChild(copyBtn);
+
+                        // OMR Button
+                        const omrBtn = document.createElement('div');
+                        omrBtn.className = 'omr-action-btn';
+                        omrBtn.innerHTML = '📝 OMR 보기';
+                        omrBtn.style.justifyContent = 'center';
+                        omrBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            openOMR(numbers);
+                        };
+                        buttonsCol.appendChild(omrBtn);
+
+                        rowWrapper.appendChild(buttonsCol);
+                        mainContainer.appendChild(rowWrapper);
+                        return mainContainer;
+                    };
+
+                    ballContainer.appendChild(createRowForCustom(customResult.numbers));
+
+                    // Store last recommended numbers for quick OMR access
+                    lastRecommendedNumbers = customResult.numbers;
+                    localStorage.setItem('lastLottoNumbers', JSON.stringify(lastRecommendedNumbers));
+
+                } else {
+                    // --- Standard Analysis Mode (Auto + Manual) ---
+                    // Generate two sets with specific modes
+                    const resultAuto = generateLuckyNumbers(currentShopData.rounds, 'auto');
+                    const resultManual = generateLuckyNumbers(currentShopData.rounds, 'manual');
+
+                    // Update Info Text (Shared stats)
+                    const container = document.getElementById('resultInfoText');
+                    if (container) {
+                        container.innerHTML =
+                            `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${resultAuto.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
+                            `(<span id="paramRounds">${resultAuto.relatedRounds.join(', ') + (resultAuto.historyCount > 5 ? '...' : '')}</span> 등)`;
                     }
 
-                    return mainContainer;
-                };
+                    // Helper to create a unified row component
+                    const createRow = (label, numbers, isManual = false) => {
+                        // Main Container (Vertical stack for Row + Optional Link)
+                        const mainContainer = document.createElement('div');
+                        mainContainer.style.display = 'flex';
+                        mainContainer.style.flexDirection = 'column';
+                        mainContainer.style.alignItems = 'center';
+                        mainContainer.style.width = '100%';
+                        mainContainer.style.marginBottom = '2px';
 
-                ballContainer.appendChild(createRow('자동', resultAuto.numbers));
-                ballContainer.appendChild(createRow('수동', resultManual.numbers, true));
+                        // Row (Label + Balls + Buttons)
+                        const rowWrapper = document.createElement('div');
+                        rowWrapper.style.display = 'flex';
+                        rowWrapper.style.alignItems = 'center';
+                        rowWrapper.style.justifyContent = 'center';
+                        rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
+                        console.log("Horizontal Layout Updated: Gap 12px");
+                        rowWrapper.style.width = '100%';
+                        rowWrapper.className = 'result-row-wrapper'; // Add class for mobile layout
 
-                // Store last recommended numbers (Auto mode) for quick OMR access
-                lastRecommendedNumbers = resultAuto.numbers;
-                localStorage.setItem('lastLottoNumbers', JSON.stringify(lastRecommendedNumbers));
-            }
-        }
+                        // Label
+                        const labelDiv = document.createElement('div');
+                        labelDiv.className = 'result-label'; // Add class for mobile layout
+                        labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:16px;">[${label}]</span>`;
+                        // labelDiv.style.minWidth = '50px'; // Removed min-width to reduce gap
+                        rowWrapper.appendChild(labelDiv);
 
-        function getBallColor(n) {
-            if (n <= 10) return 'one';
-            if (n <= 20) return 'two';
-            if (n <= 30) return 'three';
-            if (n <= 40) return 'four';
-            return 'five';
-        }
+                        // Balls
+                        const ballsRow = document.createElement('div');
+                        ballsRow.className = 'result-balls'; // Add class for mobile layout
+                        ballsRow.style.display = 'flex';
+                        ballsRow.style.justifyContent = 'center';
+                        ballsRow.style.gap = '5px';
+                        ballsRow.style.flex = 'none';
 
-        function goToShop() {
-            if (!currentShopData) return;
-            openDirections(currentShopData.lat, currentShopData.lng, currentShopData.name);
-            closeModal();
-        }
+                        numbers.forEach(n => {
+                            const ball = document.createElement('div');
+                            ball.className = 'ball ' + getBallColor(n);
+                            ball.innerText = n;
+                            ballsRow.appendChild(ball);
+                        });
+                        rowWrapper.appendChild(ballsRow);
 
-        // --- Side Nav Controls ---
-        function toggleNav() {
-            const nav = document.getElementById('sideNav');
-            const overlay = document.getElementById('sideNavOverlay');
-            const btn = document.getElementById('menuBtn');
-            const isOpen = nav.classList.contains('open');
+                        // Buttons Column (Copy / OMR stacked vertically)
+                        const buttonsCol = document.createElement('div');
+                        buttonsCol.style.display = 'flex';
+                        buttonsCol.style.flexDirection = 'column';
+                        buttonsCol.style.gap = '5px';
+                        buttonsCol.style.minWidth = '90px';
 
-            if (isOpen) {
-                closeNav();
-            } else {
-                nav.classList.add('open');
-                overlay.style.display = 'block';
-                setTimeout(() => overlay.classList.add('show'), 10);
-                btn.classList.add('active');
-            }
-        }
+                        // Copy Button
+                        const copyBtn = document.createElement('div');
+                        copyBtn.className = 'omr-action-btn';
+                        copyBtn.innerHTML = '📋 복사';
+                        copyBtn.style.justifyContent = 'center';
+                        copyBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            copyToClipboard(numbers);
+                        };
+                        buttonsCol.appendChild(copyBtn);
 
-        function closeNav() {
-            const nav = document.getElementById('sideNav');
-            const overlay = document.getElementById('sideNavOverlay');
-            const btn = document.getElementById('menuBtn');
+                        // OMR Button
+                        const omrBtn = document.createElement('div');
+                        omrBtn.className = 'omr-action-btn';
+                        omrBtn.innerHTML = '📝 OMR 보기';
+                        omrBtn.style.justifyContent = 'center';
+                        omrBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            openOMR(numbers);
+                        };
+                        buttonsCol.appendChild(omrBtn);
 
-            nav.classList.remove('open');
-            overlay.classList.remove('show');
-            setTimeout(() => {
-                if (!nav.classList.contains('open')) {
-                    overlay.style.display = 'none';
+                        rowWrapper.appendChild(buttonsCol);
+                        mainContainer.appendChild(rowWrapper);
+
+                        // Link for Manual
+                        if (isManual) {
+                            const linkBtn = document.createElement('div');
+                            linkBtn.innerHTML = '📊 번호별 출현 횟수 참고하기 >';
+                            linkBtn.style.color = '#fae100';
+                            linkBtn.style.fontSize = '12px';
+                            linkBtn.style.marginTop = '5px';
+                            linkBtn.style.cursor = 'pointer';
+                            linkBtn.style.textDecoration = 'underline';
+                            linkBtn.style.opacity = '1';
+                            linkBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                showStats();
+                            };
+                            mainContainer.appendChild(linkBtn);
+                        }
+
+                        return mainContainer;
+                    };
+
+                    ballContainer.appendChild(createRow('자동', resultAuto.numbers));
+                    ballContainer.appendChild(createRow('수동', resultManual.numbers, true));
+
+                    // Store last recommended numbers (Auto mode) for quick OMR access
+                    lastRecommendedNumbers = resultAuto.numbers;
+                    localStorage.setItem('lastLottoNumbers', JSON.stringify(lastRecommendedNumbers));
                 }
-            }, 300);
-            btn.classList.remove('active');
-        }
+            }
 
-        let currentFreqPeriod = 0; // 0 for All, N for last N weeks
+            function getBallColor(n) {
+                if (n <= 10) return 'one';
+                if (n <= 20) return 'two';
+                if (n <= 30) return 'three';
+                if (n <= 40) return 'four';
+                return 'five';
+            }
 
-        function showStats() {
-            closeNav();
-            const modal = document.getElementById('statModal');
-            modal.style.display = 'flex';
-            currentFreqPeriod = 0; // Reset to All
-            updateFreqFilterUI();
-            renderFrequencyStats();
-        }
+            function goToShop() {
+                if (!currentShopData) return;
+                openDirections(currentShopData.lat, currentShopData.lng, currentShopData.name);
+                closeModal();
+            }
 
-        function closeStatModal() {
-            document.getElementById('statModal').style.display = 'none';
-        }
+            // --- Side Nav Controls ---
+            function toggleNav() {
+                const nav = document.getElementById('sideNav');
+                const overlay = document.getElementById('sideNavOverlay');
+                const btn = document.getElementById('menuBtn');
+                const isOpen = nav.classList.contains('open');
 
-        function setFreqPeriod(period) {
-            currentFreqPeriod = period;
-            updateFreqFilterUI();
-            renderFrequencyStats();
-        }
-
-        function updateFreqFilterUI() {
-            const items = document.querySelectorAll('.freq-filter-item');
-            items.forEach(item => {
-                const onclickStr = item.getAttribute('onclick');
-                const p = parseInt(onclickStr.match(/\d+/)[0]);
-                if (p === currentFreqPeriod) {
-                    item.classList.add('active');
+                if (isOpen) {
+                    closeNav();
                 } else {
-                    item.classList.remove('active');
+                    nav.classList.add('open');
+                    overlay.style.display = 'block';
+                    setTimeout(() => overlay.classList.add('show'), 10);
+                    btn.classList.add('active');
                 }
-            });
-        }
-
-        function renderFrequencyStats() {
-            const container = document.getElementById('freqListContainer');
-            const rangeText = document.getElementById('freqRangeText');
-            if (!window.lottoHistory) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:red;">데이터를 불러올 수 없습니다.</div>';
-                return;
             }
 
-            // Get sorted rounds
-            const rounds = Object.keys(window.lottoHistory).map(Number).sort((a, b) => b - a);
-            const totalRoundsAvailable = rounds.length;
-            const maxR = rounds[0];
+            function closeNav() {
+                const nav = document.getElementById('sideNav');
+                const overlay = document.getElementById('sideNavOverlay');
+                const btn = document.getElementById('menuBtn');
 
-            let targetRounds = rounds;
-            let minR = rounds[rounds.length - 1];
-
-            if (currentFreqPeriod > 0) {
-                targetRounds = rounds.slice(0, currentFreqPeriod);
-                minR = targetRounds[targetRounds.length - 1];
+                nav.classList.remove('open');
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    if (!nav.classList.contains('open')) {
+                        overlay.style.display = 'none';
+                    }
+                }, 300);
+                btn.classList.remove('active');
             }
 
-            rangeText.innerText = `${minR}회 ~ ${maxR}회`;
+            let currentFreqPeriod = 0; // 0 for All, N for last N weeks
 
-            // 1. Calculate frequencies for the selected range (1-45)
-            const counts = {};
-            for (let i = 1; i <= 45; i++) counts[i] = 0;
+            function showStats() {
+                closeNav();
+                const modal = document.getElementById('statModal');
+                modal.style.display = 'flex';
+                currentFreqPeriod = 0; // Reset to All
+                updateFreqFilterUI();
+                renderFrequencyStats();
+            }
 
-            targetRounds.forEach(r => {
-                const nums = window.lottoHistory[r.toString()];
-                nums.forEach(n => {
-                    if (counts[n] !== undefined) counts[n]++;
+            function closeStatModal() {
+                document.getElementById('statModal').style.display = 'none';
+            }
+
+            function setFreqPeriod(period) {
+                currentFreqPeriod = period;
+                updateFreqFilterUI();
+                renderFrequencyStats();
+            }
+
+            function updateFreqFilterUI() {
+                const items = document.querySelectorAll('.freq-filter-item');
+                items.forEach(item => {
+                    const onclickStr = item.getAttribute('onclick');
+                    const p = parseInt(onclickStr.match(/\d+/)[0]);
+                    if (p === currentFreqPeriod) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
                 });
-            });
+            }
 
-            // 2. Convert to array and sort by frequency (descending)
-            const sorted = Object.keys(counts).map(num => ({
-                num: parseInt(num),
-                count: counts[num]
-            })).sort((a, b) => b.count - a.count || a.num - b.num);
+            function renderFrequencyStats() {
+                const container = document.getElementById('freqListContainer');
+                const rangeText = document.getElementById('freqRangeText');
+                if (!window.lottoHistory) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px; color:red;">데이터를 불러올 수 없습니다.</div>';
+                    return;
+                }
 
-            const maxCount = sorted.length > 0 ? sorted[0].count : 0;
+                // Get sorted rounds
+                const rounds = Object.keys(window.lottoHistory).map(Number).sort((a, b) => b - a);
+                const totalRoundsAvailable = rounds.length;
+                const maxR = rounds[0];
 
-            // 3. Render
-            let html = '';
-            sorted.forEach((item, index) => {
-                const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-                const paddedNum = item.num < 10 ? '0' + item.num : item.num;
-                html += `
+                let targetRounds = rounds;
+                let minR = rounds[rounds.length - 1];
+
+                if (currentFreqPeriod > 0) {
+                    targetRounds = rounds.slice(0, currentFreqPeriod);
+                    minR = targetRounds[targetRounds.length - 1];
+                }
+
+                rangeText.innerText = `${minR}회 ~ ${maxR}회`;
+
+                // 1. Calculate frequencies for the selected range (1-45)
+                const counts = {};
+                for (let i = 1; i <= 45; i++) counts[i] = 0;
+
+                targetRounds.forEach(r => {
+                    const nums = window.lottoHistory[r.toString()];
+                    nums.forEach(n => {
+                        if (counts[n] !== undefined) counts[n]++;
+                    });
+                });
+
+                // 2. Convert to array and sort by frequency (descending)
+                const sorted = Object.keys(counts).map(num => ({
+                    num: parseInt(num),
+                    count: counts[num]
+                })).sort((a, b) => b.count - a.count || a.num - b.num);
+
+                const maxCount = sorted.length > 0 ? sorted[0].count : 0;
+
+                // 3. Render
+                let html = '';
+                sorted.forEach((item, index) => {
+                    const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+                    const paddedNum = item.num < 10 ? '0' + item.num : item.num;
+                    html += `
                     <div class="freq-row">
                         <div class="freq-ball">${paddedNum}</div>
                         <div class="freq-bar-container">
@@ -4022,439 +4032,452 @@
                         <div class="freq-count">${item.count}</div>
                     </div>
                 `;
-            });
+                });
 
-            container.innerHTML = html;
-        }
-
-        let html5QrCode = null;
-
-        function showQRScanner() {
-            closeNav();
-            const modal = document.getElementById('qrModal');
-            modal.style.display = 'flex';
-
-            // Reset Result
-            document.getElementById('qrResult').style.display = 'none';
-            document.getElementById('qr-reader').style.display = 'block';
-
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("qr-reader");
+                container.innerHTML = html;
             }
 
-            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            let html5QrCode = null;
 
-            // Start Camera (Prefer Environment)
-            html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-                .catch(err => {
-                    console.error("Error starting QR scanner", err);
-                    alert("카메라를 실행할 수 없습니다. 권한을 확인해주세요.\n" + err);
-                    // Return to hamburger menu on permission denial or error
-                    closeQRScanner();
-                });
-        }
+            function showQRScanner() {
+                closeNav();
+                const modal = document.getElementById('qrModal');
+                modal.style.display = 'flex';
 
-        function closeQRScanner() {
-            const modal = document.getElementById('qrModal');
-            modal.style.display = 'none';
+                // Reset Result
+                document.getElementById('qrResult').style.display = 'none';
+                document.getElementById('qr-reader').style.display = 'block';
 
-            if (html5QrCode) {
-                if (html5QrCode.isScanning) {
-                    html5QrCode.stop().then(() => {
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("qr-reader");
+                }
+
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+                // Start Camera (Prefer Environment)
+                html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                    .catch(err => {
+                        console.error("Error starting QR scanner", err);
+                        alert("카메라를 실행할 수 없습니다. 권한을 확인해주세요.\n" + err);
+                        // Return to hamburger menu on permission denial or error
+                        closeQRScanner();
+                    });
+            }
+
+            function closeQRScanner() {
+                const modal = document.getElementById('qrModal');
+                modal.style.display = 'none';
+
+                if (html5QrCode) {
+                    if (html5QrCode.isScanning) {
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+                            html5QrCode = null;
+                            // Return to hamburger menu
+                            toggleNav();
+                        }).catch(err => {
+                            console.log("Failed to stop qr code scanner", err);
+                            toggleNav();
+                        });
+                    } else {
                         html5QrCode.clear();
                         html5QrCode = null;
-                        // Return to hamburger menu
                         toggleNav();
-                    }).catch(err => {
-                        console.log("Failed to stop qr code scanner", err);
-                        toggleNav();
-                    });
+                    }
                 } else {
-                    html5QrCode.clear();
-                    html5QrCode = null;
                     toggleNav();
                 }
-            } else {
-                toggleNav();
             }
-        }
 
-        function restartQRScanner() {
-            // Simply call showQRScanner to reuse the initialization logic
-            // But we need to ensure previous instance is cleaned up if it exists in weird state?
-            // Usually onScanSuccess cleans it up.
-            showQRScanner();
-        }
+            function restartQRScanner() {
+                // Simply call showQRScanner to reuse the initialization logic
+                // But we need to ensure previous instance is cleaned up if it exists in weird state?
+                // Usually onScanSuccess cleans it up.
+                showQRScanner();
+            }
 
-        function onScanSuccess(decodedText, decodedResult) {
-            console.log(`Scan result: ${decodedText}`);
-            if (decodedText.includes('dhlottery.co.kr') && decodedText.includes('v=')) {
-                // Stop scanning
-                if (html5QrCode) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        html5QrCode = null; // Destroy instance to force fresh start next time
-                        document.getElementById('qr-reader').style.display = 'none';
-                        verifyLotteryQR(decodedText);
-                    }).catch(err => console.error(err));
+            function onScanSuccess(decodedText, decodedResult) {
+                console.log(`Scan result: ${decodedText}`);
+                if (decodedText.includes('dhlottery.co.kr') && decodedText.includes('v=')) {
+                    // Stop scanning
+                    if (html5QrCode) {
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+                            html5QrCode = null; // Destroy instance to force fresh start next time
+                            document.getElementById('qr-reader').style.display = 'none';
+                            verifyLotteryQR(decodedText);
+                        }).catch(err => console.error(err));
+                    }
+                } else {
+                    // Continuous scanning...
                 }
-            } else {
-                // Continuous scanning...
             }
-        }
 
-        function verifyLotteryQR(url) {
-            try {
-                const urlObj = new URL(url);
-                const v = urlObj.searchParams.get('v');
-                if (!v) throw new Error("QR 데이터 파싱 실패 (v param missing)");
+            function verifyLotteryQR(url) {
+                try {
+                    const urlObj = new URL(url);
+                    const v = urlObj.searchParams.get('v');
+                    if (!v) throw new Error("QR 데이터 파싱 실패 (v param missing)");
 
-                // Format: ROUND + 'm' + NUMBERS...
-                const parts = v.split('m');
-                const round = parseInt(parts[0]);
-                const rawNumbers = parts[1];
+                    // Format: ROUND + 'm' + NUMBERS...
+                    const parts = v.split('m');
+                    const round = parseInt(parts[0]);
+                    const rawNumbers = parts[1];
 
-                document.getElementById('qrRound').innerText = round;
+                    document.getElementById('qrRound').innerText = round;
 
-                // Get winning numbers
-                const winNums = window.lottoHistory ? window.lottoHistory[String(round)] : null;
-                const resultArea = document.getElementById('qrResult');
-                resultArea.style.display = 'block';
+                    // Get winning numbers
+                    const winNums = window.lottoHistory ? window.lottoHistory[String(round)] : null;
+                    const resultArea = document.getElementById('qrResult');
+                    resultArea.style.display = 'block';
 
-                const listContainer = document.getElementById('qrGameList');
-                listContainer.innerHTML = '';
+                    const listContainer = document.getElementById('qrGameList');
+                    listContainer.innerHTML = '';
 
-                if (!winNums) {
-                    listContainer.innerHTML = `<div style="padding:20px; text-align:center;">
+                    if (!winNums) {
+                        listContainer.innerHTML = `<div style="padding:20px; text-align:center;">
                         ${round}회차 추첨 결과가 아직 없습니다.<br>
                         (토요일 오후 8시 35분 이후 확인 가능)
                     </div>`;
-                    return;
-                }
-
-                // winNums: [n1, n2, n3, n4, n5, n6, bonus]
-                const mainNums = winNums.slice(0, 6);
-                const bonusNum = winNums[6];
-
-                // Parse games
-                const games = [];
-                // rawNumbers string contains concatenated games.
-                // It 'usually' splits by 'n' or other delimiters in older formats?
-                // But the snippet saw `v.split('m')` logic.
-                // Let's rely on fixed width 12 chars per game logic if possible, 
-                // but safeguard against delimiters.
-                // Removing non-digit characters is safer.
-                const cleanNums = rawNumbers.replace(/[^0-9]/g, '');
-
-                for (let i = 0; i < cleanNums.length; i += 12) {
-                    const gameStr = cleanNums.substring(i, i + 12);
-                    if (gameStr.length < 12) break;
-
-                    const nums = [];
-                    for (let j = 0; j < 12; j += 2) {
-                        nums.push(parseInt(gameStr.substring(j, j + 2)));
+                        return;
                     }
-                    games.push(nums);
-                }
 
-                const gameLabels = ['A', 'B', 'C', 'D', 'E'];
+                    // winNums: [n1, n2, n3, n4, n5, n6, bonus]
+                    const mainNums = winNums.slice(0, 6);
+                    const bonusNum = winNums[6];
 
-                games.forEach((myNums, idx) => {
-                    let matchCount = 0;
-                    let bonusMatch = false;
+                    // Parse games
+                    const games = [];
+                    // rawNumbers string contains concatenated games.
+                    // It 'usually' splits by 'n' or other delimiters in older formats?
+                    // But the snippet saw `v.split('m')` logic.
+                    // Let's rely on fixed width 12 chars per game logic if possible, 
+                    // but safeguard against delimiters.
+                    // Removing non-digit characters is safer.
+                    const cleanNums = rawNumbers.replace(/[^0-9]/g, '');
 
-                    myNums.forEach(n => {
-                        if (mainNums.includes(n)) matchCount++;
-                        if (n === bonusNum) bonusMatch = true;
-                    });
+                    for (let i = 0; i < cleanNums.length; i += 12) {
+                        const gameStr = cleanNums.substring(i, i + 12);
+                        if (gameStr.length < 12) break;
 
-                    let rank = "낙첨";
-                    let rankClass = "prize-none";
-
-                    if (matchCount === 6) { rank = "1등 🥇"; rankClass = "prize-win"; }
-                    else if (matchCount === 5 && bonusMatch) { rank = "2등 🥈"; rankClass = "prize-win"; }
-                    else if (matchCount === 5) { rank = "3등 🥉"; rankClass = "prize-win"; }
-                    else if (matchCount === 4) { rank = "4등 💵"; rankClass = "prize-win"; }
-                    else if (matchCount === 3) { rank = "5등 💰"; rankClass = "prize-win"; }
-
-                    // Render
-                    const row = document.createElement('div');
-                    row.className = 'qr-game-row';
-
-                    const ballsHtml = myNums.map(n => {
-                        let style = "display:inline-block; width:20px; text-align:center;";
-                        let color = "#333";
-                        let weight = "normal";
-
-                        if (mainNums.includes(n)) {
-                            color = "#d32f2f"; weight = "bold";
-                        } else if (n === bonusNum && matchCount === 5) {
-                            color = "#1976d2"; weight = "bold"; // Bonus highlight
+                        const nums = [];
+                        for (let j = 0; j < 12; j += 2) {
+                            nums.push(parseInt(gameStr.substring(j, j + 2)));
                         }
+                        games.push(nums);
+                    }
 
-                        return `<span style="${style} color:${color}; font-weight:${weight};">${n}</span>`;
-                    }).join('');
+                    const gameLabels = ['A', 'B', 'C', 'D', 'E'];
 
-                    row.innerHTML = `
+                    games.forEach((myNums, idx) => {
+                        let matchCount = 0;
+                        let bonusMatch = false;
+
+                        myNums.forEach(n => {
+                            if (mainNums.includes(n)) matchCount++;
+                            if (n === bonusNum) bonusMatch = true;
+                        });
+
+                        let rank = "낙첨";
+                        let rankClass = "prize-none";
+
+                        if (matchCount === 6) { rank = "1등 🥇"; rankClass = "prize-win"; }
+                        else if (matchCount === 5 && bonusMatch) { rank = "2등 🥈"; rankClass = "prize-win"; }
+                        else if (matchCount === 5) { rank = "3등 🥉"; rankClass = "prize-win"; }
+                        else if (matchCount === 4) { rank = "4등 💵"; rankClass = "prize-win"; }
+                        else if (matchCount === 3) { rank = "5등 💰"; rankClass = "prize-win"; }
+
+                        // Render
+                        const row = document.createElement('div');
+                        row.className = 'qr-game-row';
+
+                        const ballsHtml = myNums.map(n => {
+                            let style = "display:inline-block; width:20px; text-align:center;";
+                            let color = "#333";
+                            let weight = "normal";
+
+                            if (mainNums.includes(n)) {
+                                color = "#d32f2f"; weight = "bold";
+                            } else if (n === bonusNum && matchCount === 5) {
+                                color = "#1976d2"; weight = "bold"; // Bonus highlight
+                            }
+
+                            return `<span style="${style} color:${color}; font-weight:${weight};">${n}</span>`;
+                        }).join('');
+
+                        row.innerHTML = `
                         <div style="font-weight:bold; color:#666; width:20px;">${gameLabels[idx] || '?'}</div>
                         <div style="flex:1; display:flex; justify-content:center; gap:2px; font-size:13px;">
                             ${ballsHtml}
                         </div>
                         <div class="qr-prize-badge ${rankClass}">${rank}</div>
                     `;
-                    listContainer.appendChild(row);
-                });
-
-            } catch (e) {
-                console.error(e);
-                alert("QR 코드를 분석할 수 없습니다. " + e.message);
-                restartQRScanner();
-            }
-        }
-
-        // Close modal when clicking outside (click + touchstart for mobile)
-        const handleBackdropClick = (event) => {
-            const adModal = document.getElementById('adModal');
-            const statModal = document.getElementById('statModal');
-            const qrModal = document.getElementById('qrModal');
-            if (event.target === adModal) {
-                closeModal();
-            }
-            if (event.target === statModal) {
-                closeStatModal();
-            }
-            if (event.target === qrModal) {
-                closeQRScanner();
-            }
-        };
-
-        window.addEventListener('click', handleBackdropClick);
-        window.addEventListener('touchstart', handleBackdropClick, { passive: true });
-
-        // Handle Back Button
-        window.addEventListener('popstate', function (event) {
-            // When history changes (Back pressed), we close the modal UI
-            // Check if modal is currently visible
-            const modal = document.getElementById('adModal');
-            if (modal && modal.style.display === 'flex') {
-                _internalCloseModal();
-            }
-        });
-
-
-
-        function focusShop(lat, lng) {
-            console.log('Focusing shop:', lat, lng);
-            // Find marker by coordinates (approximate match to handle float precision)
-            const target = markers.find(m => {
-                const p = m.getPosition();
-                return Math.abs(p.getLat() - lat) < 0.0001 && Math.abs(p.getLng() - lng) < 0.0001;
-            });
-
-            if (target) {
-                // Zoom in to resolve clusters and ensure marker is visible
-                if (map.getLevel() > 5) {
-                    map.setLevel(3);
-                }
-                const mapCenter = new kakao.maps.LatLng(lat, lng);
-                map.panTo(mapCenter);
-
-                // Trigger click to open InfoWindow (Wait a bit for pan to finish for better UI)
-                setTimeout(() => {
-                    kakao.maps.event.trigger(target, 'click');
-                }, 300);
-            } else {
-                console.warn('Marker not found for:', lat, lng);
-                showToast("현재 조건(회차 필터 등)에 맞는 판매점 마커를 찾을 수 없습니다.", "info");
-            }
-        }
-
-        function findNearestShop(lat, lng, label = "내 위치", shouldPan = true) {
-            // Find nearest among ACTIVE markers (filtered ones on the map)
-            if (!markers || markers.length === 0) {
-                // If it's a map drag, don't show toast if no markers. 
-                // Only show if it's a specific request or shouldn't pan.
-                if (shouldPan) showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
-                return;
-            }
-
-            // Sort all markers by distance
-            const sortedByDist = markers.map(m => {
-                const p = m.getPosition();
-                return {
-                    marker: m,
-                    distance: getDistance(lat, lng, p.getLat(), p.getLng())
-                };
-            }).sort((a, b) => a.distance - b.distance);
-
-            // Take top 3 (top 2 on mobile to prevent overlap)
-            const isMobile = window.innerWidth <= 768;
-            const topCount = isMobile ? 2 : 3;
-            const topShops = sortedByDist.slice(0, topCount);
-            if (topShops.length > 0) {
-                let msg = `📍 <strong style="white-space: nowrap;">${label} 주변 1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
-                topShops.forEach((item, index) => {
-                    const shop = item.marker.shopData;
-                    const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
-                    // Add clickable span
-                    msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
-                });
-
-                if (shouldPan) {
-                    // Adaptive Zoom: Fit my location and top nearest shops
-                    const bounds = new kakao.maps.LatLngBounds();
-                    bounds.extend(new kakao.maps.LatLng(lat, lng));
-
-                    topShops.forEach(item => {
-                        if (item.distance < 10) { // Only include within 10km for bounds
-                            bounds.extend(item.marker.getPosition());
-                        }
+                        listContainer.appendChild(row);
                     });
 
-                    const bottomPad = isMobile ? 180 : 40;
-                    map.setBounds(bounds, 40, 40, bottomPad, 40);
+                } catch (e) {
+                    console.error(e);
+                    alert("QR 코드를 분석할 수 없습니다. " + e.message);
+                    restartQRScanner();
                 }
-
-                showToast(msg, "success", true, 'nearby-shops-toast'); // Use ID to prevent duplicates
-            }
-        }
-
-        function showToast(message, type = "info", persistent = false, id = null) {
-            const container = document.getElementById('toast-container');
-
-            // Check for existing toast with same ID
-            let toast = id ? document.getElementById(id) : null;
-
-            if (toast && toast.parentNode === container) {
-                // Update existing toast content
-                const content = toast.querySelector('.toast-content');
-                if (content) content.innerHTML = message;
-                toast.className = `toast toast-${type} show`; // Ensure it's visible and has correct type
-                return;
             }
 
-            // Create new toast if not found
-            toast = document.createElement('div');
-            if (id) toast.id = id;
-            toast.className = `toast toast-${type}`;
-
-            // Contents
-            const content = document.createElement('div');
-            content.className = 'toast-content'; // Add class for update logic
-            content.innerHTML = message;
-            toast.appendChild(content);
-
-            // Close Button
-            const closeBtn = document.createElement('span');
-            closeBtn.className = 'toast-close';
-            closeBtn.innerHTML = '&times;';
-            closeBtn.onclick = () => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (toast.parentNode === container) container.removeChild(toast);
-                }, 300);
+            // Close modal when clicking outside (click + touchstart for mobile)
+            const handleBackdropClick = (event) => {
+                const adModal = document.getElementById('adModal');
+                const statModal = document.getElementById('statModal');
+                const qrModal = document.getElementById('qrModal');
+                if (event.target === adModal) {
+                    closeModal();
+                }
+                if (event.target === statModal) {
+                    closeStatModal();
+                }
+                if (event.target === qrModal) {
+                    closeQRScanner();
+                }
             };
-            toast.appendChild(closeBtn);
 
-            container.appendChild(toast);
+            window.addEventListener('click', handleBackdropClick);
+            window.addEventListener('touchstart', handleBackdropClick, { passive: true });
 
-            // Force reflow
-            toast.offsetHeight;
+            // Handle Back Button
+            window.addEventListener('popstate', function (event) {
+                // When history changes (Back pressed), we close the modal UI
+                // Check if modal is currently visible
+                const modal = document.getElementById('adModal');
+                if (modal && modal.style.display === 'flex') {
+                    _internalCloseModal();
+                }
+            });
 
-            toast.classList.add('show');
 
-            // Auto-hide only if NOT persistent
-            if (!persistent) {
-                setTimeout(() => {
-                    if (toast.classList.contains('show')) {
-                        toast.classList.remove('show');
-                        setTimeout(() => {
-                            if (toast.parentNode === container) container.removeChild(toast);
-                        }, 300);
+
+            function focusShop(lat, lng) {
+                console.log('Focusing shop:', lat, lng);
+                // Find marker by coordinates (approximate match to handle float precision)
+                const target = markers.find(m => {
+                    const p = m.getPosition();
+                    return Math.abs(p.getLat() - lat) < 0.0001 && Math.abs(p.getLng() - lng) < 0.0001;
+                });
+
+                if (target) {
+                    // Zoom in to resolve clusters and ensure marker is visible
+                    if (map.getLevel() > 5) {
+                        map.setLevel(3);
                     }
-                }, 5000);
+                    const mapCenter = new kakao.maps.LatLng(lat, lng);
+                    map.panTo(mapCenter);
+
+                    // Trigger click to open InfoWindow (Wait a bit for pan to finish for better UI)
+                    setTimeout(() => {
+                        kakao.maps.event.trigger(target, 'click');
+                    }, 300);
+                } else {
+                    console.warn('Marker not found for:', lat, lng);
+                    showToast("현재 조건(회차 필터 등)에 맞는 판매점 마커를 찾을 수 없습니다.", "info");
+                }
             }
-        }
 
-        // Helper to forcefully clear toasts
-        function closeAllToasts() {
-            const container = document.getElementById('toast-container');
-            if (container) container.innerHTML = '';
-        }
-
-        function copyToClipboard(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast("📋 주소가 클립보드에 복사되었습니다.", "success");
-            } catch (err) {
-                showToast("복사 실패", "error");
-            }
-            document.body.removeChild(textarea);
-        }
-
-        function openDirections(lat, lng, name) {
-            const url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
-            window.open(url, '_blank');
-        }
-
-        function shareToKakao() {
-            try {
-                console.log('[Kakao Share] Function called');
-
-                // Check if Kakao SDK is loaded
-                if (typeof window.Kakao === 'undefined') {
-                    console.error('[Kakao Share] Kakao SDK not loaded');
+            function findNearestShop(lat, lng, label = "내 위치", shouldPan = true) {
+                // Find nearest among ACTIVE markers (filtered ones on the map)
+                if (!markers || markers.length === 0) {
+                    // If it's a map drag, don't show toast if no markers. 
+                    // Only show if it's a specific request or shouldn't pan.
+                    if (shouldPan) showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
                     return;
                 }
 
-                console.log('[Kakao Share] Kakao SDK loaded successfully');
+                // Sort all markers by distance
+                const sortedByDist = markers.map(m => {
+                    const p = m.getPosition();
+                    return {
+                        marker: m,
+                        distance: getDistance(lat, lng, p.getLat(), p.getLng())
+                    };
+                }).sort((a, b) => a.distance - b.distance);
 
-                // Initialize Kakao SDK if not already initialized
-                if (!window.Kakao.isInitialized()) {
-                    console.log('[Kakao Share] Initializing Kakao SDK...');
-                    window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d');
-                    console.log('[Kakao Share] Kakao SDK initialized');
-                } else {
-                    console.log('[Kakao Share] Kakao SDK already initialized');
+                // Take top 3 (top 2 on mobile to prevent overlap)
+                const isMobile = window.innerWidth <= 768;
+                const topCount = isMobile ? 2 : 3;
+                const topShops = sortedByDist.slice(0, topCount);
+                if (topShops.length > 0) {
+                    // Check if the nearest shop is within a reasonable range (e.g., 20km)
+                    const nearestDist = topShops[0].distance;
+                    if (nearestDist > 20) {
+                        if (shouldPan) {
+                            showToast(`현재 조건(회차)으로는<br>주변 20km 내에 1등 당첨점이 없습니다.<br><span style="font-size:12px; color:#ccc;">(가장 가까운 곳: ${topShops[0].marker.shopData.n} ${nearestDist.toFixed(1)}km)</span>`, "info", true, 'nearby-shops-toast');
+
+                            // Pan to user location but don't zoom out to the distant shop
+                            const center = new kakao.maps.LatLng(lat, lng);
+                            map.panTo(center);
+                        }
+                        return;
+                    }
+
+                    let msg = `📍 <strong style="white-space: nowrap;">${label} 주변 1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
+                    topShops.forEach((item, index) => {
+                        const shop = item.marker.shopData;
+                        const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
+                        // Add clickable span
+                        msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
+                    });
+
+                    if (shouldPan) {
+                        // Adaptive Zoom: Fit my location and top nearest shops
+                        const bounds = new kakao.maps.LatLngBounds();
+                        bounds.extend(new kakao.maps.LatLng(lat, lng));
+
+                        topShops.forEach(item => {
+                            if (item.distance < 10) { // Only include within 10km for bounds
+                                bounds.extend(item.marker.getPosition());
+                            }
+                        });
+
+                        const bottomPad = isMobile ? 180 : 40;
+                        map.setBounds(bounds, 40, 40, bottomPad, 40);
+                    }
+
+                    showToast(msg, "success", true, 'nearby-shops-toast'); // Use ID to prevent duplicates
+                }
+            }
+
+            function showToast(message, type = "info", persistent = false, id = null) {
+                const container = document.getElementById('toast-container');
+
+                // Check for existing toast with same ID
+                let toast = id ? document.getElementById(id) : null;
+
+                if (toast && toast.parentNode === container) {
+                    // Update existing toast content
+                    const content = toast.querySelector('.toast-content');
+                    if (content) content.innerHTML = message;
+                    toast.className = `toast toast-${type} show`; // Ensure it's visible and has correct type
+                    return;
                 }
 
-                // Prepare share data - NO IMAGE to ensure k-inov.co.kr link works
-                const shareData = {
-                    objectType: 'feed',
-                    content: {
-                        title: '🎰 KINOV 로또 명당 지도',
-                        description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.\n\n지금 바로 KINOV Mall을 방문하세요!',
-                        link: {
-                            mobileWebUrl: 'https://www.k-inov.co.kr',
-                            webUrl: 'https://www.k-inov.co.kr'
+                // Create new toast if not found
+                toast = document.createElement('div');
+                if (id) toast.id = id;
+                toast.className = `toast toast-${type}`;
+
+                // Contents
+                const content = document.createElement('div');
+                content.className = 'toast-content'; // Add class for update logic
+                content.innerHTML = message;
+                toast.appendChild(content);
+
+                // Close Button
+                const closeBtn = document.createElement('span');
+                closeBtn.className = 'toast-close';
+                closeBtn.innerHTML = '&times;';
+                closeBtn.onclick = () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode === container) container.removeChild(toast);
+                    }, 300);
+                };
+                toast.appendChild(closeBtn);
+
+                container.appendChild(toast);
+
+                // Force reflow
+                toast.offsetHeight;
+
+                toast.classList.add('show');
+
+                // Auto-hide only if NOT persistent
+                if (!persistent) {
+                    setTimeout(() => {
+                        if (toast.classList.contains('show')) {
+                            toast.classList.remove('show');
+                            setTimeout(() => {
+                                if (toast.parentNode === container) container.removeChild(toast);
+                            }, 300);
                         }
-                    },
-                    buttons: [
-                        {
-                            title: 'KINOV Mall 방문하기',
+                    }, 5000);
+                }
+            }
+
+            // Helper to forcefully clear toasts
+            function closeAllToasts() {
+                const container = document.getElementById('toast-container');
+                if (container) container.innerHTML = '';
+            }
+
+            function copyToClipboard(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast("📋 주소가 클립보드에 복사되었습니다.", "success");
+                } catch (err) {
+                    showToast("복사 실패", "error");
+                }
+                document.body.removeChild(textarea);
+            }
+
+            function openDirections(lat, lng, name) {
+                const url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+                window.open(url, '_blank');
+            }
+
+            function shareToKakao() {
+                try {
+                    console.log('[Kakao Share] Function called');
+
+                    // Check if Kakao SDK is loaded
+                    if (typeof window.Kakao === 'undefined') {
+                        console.error('[Kakao Share] Kakao SDK not loaded');
+                        return;
+                    }
+
+                    console.log('[Kakao Share] Kakao SDK loaded successfully');
+
+                    // Initialize Kakao SDK if not already initialized
+                    if (!window.Kakao.isInitialized()) {
+                        console.log('[Kakao Share] Initializing Kakao SDK...');
+                        window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d');
+                        console.log('[Kakao Share] Kakao SDK initialized');
+                    } else {
+                        console.log('[Kakao Share] Kakao SDK already initialized');
+                    }
+
+                    // Prepare share data - NO IMAGE to ensure k-inov.co.kr link works
+                    const shareData = {
+                        objectType: 'feed',
+                        content: {
+                            title: '🎰 KINOV 로또 명당 지도',
+                            description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.\n\n지금 바로 KINOV Mall을 방문하세요!',
                             link: {
                                 mobileWebUrl: 'https://www.k-inov.co.kr',
                                 webUrl: 'https://www.k-inov.co.kr'
                             }
-                        }
-                    ]
-                };
+                        },
+                        buttons: [
+                            {
+                                title: 'KINOV Mall 방문하기',
+                                link: {
+                                    mobileWebUrl: 'https://www.k-inov.co.kr',
+                                    webUrl: 'https://www.k-inov.co.kr'
+                                }
+                            }
+                        ]
+                    };
 
-                console.log('[Kakao Share] Sending share data:', shareData);
+                    console.log('[Kakao Share] Sending share data:', shareData);
 
-                // Send KakaoTalk share message
-                window.Kakao.Share.sendDefault(shareData);
+                    // Send KakaoTalk share message
+                    window.Kakao.Share.sendDefault(shareData);
 
-                console.log('[Kakao Share] Share dialog opened successfully');
+                    console.log('[Kakao Share] Share dialog opened successfully');
 
-            } catch (error) {
-                console.error('[Kakao Share] Error:', error);
+                } catch (error) {
+                    console.error('[Kakao Share] Error:', error);
+                }
             }
-        }
     </script>
     <!-- OMR Modal (Re-inserted) -->
     <div id="omrModal" class="omr-modal-overlay" onclick="closeOMR()">
@@ -4475,220 +4498,220 @@
     </div>
 
     <script>
-        function openOMR(numbers) {
-            const grid = document.getElementById('omrGrid');
-            grid.innerHTML = '';
+            function openOMR(numbers) {
+                const grid = document.getElementById('omrGrid');
+                grid.innerHTML = '';
 
-            // Generate 1-45 grid
-            for (let i = 1; i <= 45; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'omr-number';
-                cell.innerText = i;
-                if (numbers.includes(i)) {
-                    cell.className += ' marked';
+                // Generate 1-45 grid
+                for (let i = 1; i <= 45; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'omr-number';
+                    cell.innerText = i;
+                    if (numbers.includes(i)) {
+                        cell.className += ' marked';
+                    }
+                    grid.appendChild(cell);
                 }
-                grid.appendChild(cell);
+
+                const modal = document.getElementById('omrModal');
+                modal.style.display = 'flex';
+                setTimeout(() => modal.className += ' show', 10);
+
+                // Update global last viewed numbers (Standard logic: "Last checked" means last opened/viewed)
+                lastRecommendedNumbers = numbers;
+                localStorage.setItem('lastLottoNumbers', JSON.stringify(numbers));
             }
 
-            const modal = document.getElementById('omrModal');
-            modal.style.display = 'flex';
-            setTimeout(() => modal.className += ' show', 10);
-
-            // Update global last viewed numbers (Standard logic: "Last checked" means last opened/viewed)
-            lastRecommendedNumbers = numbers;
-            localStorage.setItem('lastLottoNumbers', JSON.stringify(numbers));
-        }
-
-        function closeOMR() {
-            const modal = document.getElementById('omrModal');
-            modal.className = 'omr-modal-overlay';
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-
-        // Quick OMR View from Hamburger Menu
-        function openLastOMR() {
-            if (lastRecommendedNumbers && lastRecommendedNumbers.length === 6) {
-                closeNav();
-                openOMR(lastRecommendedNumbers);
-            } else {
-                // Show alert box in hamburger menu
-                const alertBox = document.getElementById('omrAlertBox');
-                alertBox.style.display = 'block';
-
-                // Auto-hide after 4 seconds
-                setTimeout(() => {
-                    alertBox.style.display = 'none';
-                }, 4000);
-            }
-        }
-
-        // Updated Clipboard function (Global)
-        // Note: Replaces/Overwrites the old one if names collide, or just exists as a better version
-        window.copyToClipboard = function (numbers) {
-            let text = "";
-            if (Array.isArray(numbers)) {
-                text = numbers.join(', ');
-            } else {
-                text = numbers;
+            function closeOMR() {
+                const modal = document.getElementById('omrModal');
+                modal.className = 'omr-modal-overlay';
+                setTimeout(() => modal.style.display = 'none', 300);
             }
 
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast(`📋 번호가 복사되었습니다: ${text}`);
-                }).catch(err => {
-                    showToast('복사 실패: ' + err);
-                });
-            } else {
-                // Fallback
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast("📋 번호가 복사되었습니다 (구형 브라우저)", "success");
-                } catch (err) {
-                    showToast("복사 실패", "error");
-                }
-                document.body.removeChild(textarea);
-            }
-        };
+            // Quick OMR View from Hamburger Menu
+            function openLastOMR() {
+                if (lastRecommendedNumbers && lastRecommendedNumbers.length === 6) {
+                    closeNav();
+                    openOMR(lastRecommendedNumbers);
+                } else {
+                    // Show alert box in hamburger menu
+                    const alertBox = document.getElementById('omrAlertBox');
+                    alertBox.style.display = 'block';
 
-        // ============ Roadview Functions ============
-
-        function openRoadview(lat, lng, shopName, address, actionType, actionData) {
-            const modal = document.getElementById('roadviewModal');
-            const roadviewContainer = document.getElementById('roadview');
-            const shopNameEl = document.getElementById('roadviewShopName');
-            const copyBtn = document.getElementById('roadviewCopyBtn');
-            const naviBtn = document.getElementById('roadviewNaviBtn');
-
-            shopNameEl.textContent = shopName + ' 로드뷰';
-
-            if (!roadview) {
-                roadview = new kakao.maps.Roadview(roadviewContainer);
-            }
-            if (!roadviewClient) {
-                roadviewClient = new kakao.maps.RoadviewClient();
-            }
-
-            // Find preset first to check if we have a hardcoded Pano ID
-            const currentShopName = (shopName || "").trim();
-            const currentAddress = (address || "").trim();
-            const preset = ROADVIEW_PRESETS.find(p =>
-                currentShopName.includes(p.name) && currentAddress.includes(p.addr)
-            );
-
-            if (preset && preset.isClosed) {
-                alert('현재 폐업점으로 로드뷰 제공이 불가능합니다');
-                return;
-            }
-
-            if (preset && preset.customLink) {
-                alert(preset.customMessage);
-                window.open(preset.customLink, '_blank');
-                return;
-            }
-
-            if (preset && preset.customMessage) {
-                alert(preset.customMessage);
-            }
-
-            const roadviewEl = document.getElementById('roadview');
-            const imgContainer = document.getElementById('roadviewImageContainer');
-            const staticImg = document.getElementById('roadviewStaticImage');
-            const helpText = document.getElementById('roadviewHelpText');
-
-            if (preset && preset.imageUrl) {
-                // Display Static Image
-                roadviewEl.style.display = 'none';
-                imgContainer.style.display = 'block';
-                staticImg.src = preset.imageUrl;
-                helpText.style.display = 'none';
-                modal.style.display = 'block';
-
-                // Action buttons setup for Image mode
-                copyBtn.style.display = 'none';
-                naviBtn.style.display = 'none';
-                if (actionType === 'copy') {
-                    copyBtn.style.display = 'inline-block';
-                    copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
-                } else if (actionType === 'navi') {
-                    naviBtn.style.display = 'inline-block';
-                    naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
-                }
-                document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
-                return; // End here for image mode
-            }
-
-            // Normal Roadview Mode
-            roadviewEl.style.display = 'block';
-            imgContainer.style.display = 'none';
-            helpText.style.display = 'block';
-
-            const displayRoadview = (finalPanoId, finalPos) => {
-                roadview.setPanoId(finalPanoId, finalPos);
-                modal.style.display = 'block';
-
-                if (preset) {
+                    // Auto-hide after 4 seconds
                     setTimeout(() => {
-                        roadview.setViewpoint(new kakao.maps.Viewpoint(preset.pov.pan, preset.pov.tilt, preset.pov.zoom));
-                    }, 1200);
+                        alertBox.style.display = 'none';
+                    }, 4000);
+                }
+            }
+
+            // Updated Clipboard function (Global)
+            // Note: Replaces/Overwrites the old one if names collide, or just exists as a better version
+            window.copyToClipboard = function (numbers) {
+                let text = "";
+                if (Array.isArray(numbers)) {
+                    text = numbers.join(', ');
+                } else {
+                    text = numbers;
                 }
 
-                // Action buttons setup
-                copyBtn.style.display = 'none';
-                naviBtn.style.display = 'none';
-                if (actionType === 'copy') {
-                    copyBtn.style.display = 'inline-block';
-                    copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
-                } else if (actionType === 'navi') {
-                    naviBtn.style.display = 'inline-block';
-                    naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast(`📋 번호가 복사되었습니다: ${text}`);
+                    }).catch(err => {
+                        showToast('복사 실패: ' + err);
+                    });
+                } else {
+                    // Fallback
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast("📋 번호가 복사되었습니다 (구형 브라우저)", "success");
+                    } catch (err) {
+                        showToast("복사 실패", "error");
+                    }
+                    document.body.removeChild(textarea);
                 }
-                document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
             };
 
-            if (preset && preset.panoId) {
-                // If we have a verified Pano ID, use it directly (bypass search)
-                const verifiedPos = new kakao.maps.LatLng(lat, lng);
-                displayRoadview(preset.panoId, verifiedPos);
-            } else {
-                // Precise Identification using Places Service
-                const ps = new kakao.maps.services.Places();
-                ps.keywordSearch(`${address} ${shopName}`, function (data, status) {
-                    let targetPos = new kakao.maps.LatLng(lat, lng);
-                    if (status === kakao.maps.services.Status.OK) {
-                        const target = data.find(p => p.category_name.includes('복권') || p.place_name.includes(shopName)) || data[0];
-                        targetPos = new kakao.maps.LatLng(target.y, target.x);
+            // ============ Roadview Functions ============
+
+            function openRoadview(lat, lng, shopName, address, actionType, actionData) {
+                const modal = document.getElementById('roadviewModal');
+                const roadviewContainer = document.getElementById('roadview');
+                const shopNameEl = document.getElementById('roadviewShopName');
+                const copyBtn = document.getElementById('roadviewCopyBtn');
+                const naviBtn = document.getElementById('roadviewNaviBtn');
+
+                shopNameEl.textContent = shopName + ' 로드뷰';
+
+                if (!roadview) {
+                    roadview = new kakao.maps.Roadview(roadviewContainer);
+                }
+                if (!roadviewClient) {
+                    roadviewClient = new kakao.maps.RoadviewClient();
+                }
+
+                // Find preset first to check if we have a hardcoded Pano ID
+                const currentShopName = (shopName || "").trim();
+                const currentAddress = (address || "").trim();
+                const preset = ROADVIEW_PRESETS.find(p =>
+                    currentShopName.includes(p.name) && currentAddress.includes(p.addr)
+                );
+
+                if (preset && preset.isClosed) {
+                    alert('현재 폐업점으로 로드뷰 제공이 불가능합니다');
+                    return;
+                }
+
+                if (preset && preset.customLink) {
+                    alert(preset.customMessage);
+                    window.open(preset.customLink, '_blank');
+                    return;
+                }
+
+                if (preset && preset.customMessage) {
+                    alert(preset.customMessage);
+                }
+
+                const roadviewEl = document.getElementById('roadview');
+                const imgContainer = document.getElementById('roadviewImageContainer');
+                const staticImg = document.getElementById('roadviewStaticImage');
+                const helpText = document.getElementById('roadviewHelpText');
+
+                if (preset && preset.imageUrl) {
+                    // Display Static Image
+                    roadviewEl.style.display = 'none';
+                    imgContainer.style.display = 'block';
+                    staticImg.src = preset.imageUrl;
+                    helpText.style.display = 'none';
+                    modal.style.display = 'block';
+
+                    // Action buttons setup for Image mode
+                    copyBtn.style.display = 'none';
+                    naviBtn.style.display = 'none';
+                    if (actionType === 'copy') {
+                        copyBtn.style.display = 'inline-block';
+                        copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
+                    } else if (actionType === 'navi') {
+                        naviBtn.style.display = 'inline-block';
+                        naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
                     }
-                    roadviewClient.getNearestPanoId(targetPos, 50, function (panoId) {
-                        if (panoId === null) { alert('해당 점포는 로드뷰 정보가 없습니다.'); return; }
-                        displayRoadview(panoId, targetPos);
+                    document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
+                    return; // End here for image mode
+                }
+
+                // Normal Roadview Mode
+                roadviewEl.style.display = 'block';
+                imgContainer.style.display = 'none';
+                helpText.style.display = 'block';
+
+                const displayRoadview = (finalPanoId, finalPos) => {
+                    roadview.setPanoId(finalPanoId, finalPos);
+                    modal.style.display = 'block';
+
+                    if (preset) {
+                        setTimeout(() => {
+                            roadview.setViewpoint(new kakao.maps.Viewpoint(preset.pov.pan, preset.pov.tilt, preset.pov.zoom));
+                        }, 1200);
+                    }
+
+                    // Action buttons setup
+                    copyBtn.style.display = 'none';
+                    naviBtn.style.display = 'none';
+                    if (actionType === 'copy') {
+                        copyBtn.style.display = 'inline-block';
+                        copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
+                    } else if (actionType === 'navi') {
+                        naviBtn.style.display = 'inline-block';
+                        naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
+                    }
+                    document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
+                };
+
+                if (preset && preset.panoId) {
+                    // If we have a verified Pano ID, use it directly (bypass search)
+                    const verifiedPos = new kakao.maps.LatLng(lat, lng);
+                    displayRoadview(preset.panoId, verifiedPos);
+                } else {
+                    // Precise Identification using Places Service
+                    const ps = new kakao.maps.services.Places();
+                    ps.keywordSearch(`${address} ${shopName}`, function (data, status) {
+                        let targetPos = new kakao.maps.LatLng(lat, lng);
+                        if (status === kakao.maps.services.Status.OK) {
+                            const target = data.find(p => p.category_name.includes('복권') || p.place_name.includes(shopName)) || data[0];
+                            targetPos = new kakao.maps.LatLng(target.y, target.x);
+                        }
+                        roadviewClient.getNearestPanoId(targetPos, 50, function (panoId) {
+                            if (panoId === null) { alert('해당 점포는 로드뷰 정보가 없습니다.'); return; }
+                            displayRoadview(panoId, targetPos);
+                        });
                     });
-                });
+                }
             }
-        }
 
-        function closeRoadview() {
-            document.getElementById('roadviewModal').style.display = 'none';
-        }
-
-        function openRoadviewWithCopy(lat, lng, shopName, address) {
-            openRoadview(lat, lng, shopName, address, 'copy', address);
-        }
-
-        function openRoadviewWithNavi(lat, lng, shopName, address) {
-            if (shopName.includes('인터넷 복권판매사이트')) {
-                window.open('https://www.dhlottery.co.kr/userGuide', '_blank');
-                return;
+            function closeRoadview() {
+                document.getElementById('roadviewModal').style.display = 'none';
             }
-            openRoadview(lat, lng, shopName, address, 'navi', { lat, lng, name: shopName });
-        }
 
-        function openKakaoMap(lat, lng, shopName, address) {
-            window.open(`https://map.kakao.com/?q=${encodeURIComponent(address + ' 복권')}`, '_blank');
-        }
+            function openRoadviewWithCopy(lat, lng, shopName, address) {
+                openRoadview(lat, lng, shopName, address, 'copy', address);
+            }
+
+            function openRoadviewWithNavi(lat, lng, shopName, address) {
+                if (shopName.includes('인터넷 복권판매사이트')) {
+                    window.open('https://www.dhlottery.co.kr/userGuide', '_blank');
+                    return;
+                }
+                openRoadview(lat, lng, shopName, address, 'navi', { lat, lng, name: shopName });
+            }
+
+            function openKakaoMap(lat, lng, shopName, address) {
+                window.open(`https://map.kakao.com/?q=${encodeURIComponent(address + ' 복권')}`, '_blank');
+            }
     </script>
 </body>
 
