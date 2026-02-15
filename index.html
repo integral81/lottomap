@@ -1134,20 +1134,7 @@
             overflow: hidden;
         }
 
-        .latest-round-glow::after {
-            content: 'NEW';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            background: #d32f2f;
-            color: white;
-            font-size: 8px;
-            padding: 2px 5px;
-            font-weight: 900;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-        }
+        /* NEW badge moved to inline element in JavaScript for better mobile layout */
 
         .latest-round-glow .mini-ball {
             transform: scale(1.1);
@@ -3264,6 +3251,14 @@
                 roundNum.className = 'recent-round-num';
                 roundNum.innerText = targetRound + '회';
                 row.appendChild(roundNum);
+
+                // Add NEW badge inline for round 1211 (between round number and balls)
+                if (targetRound === 1211) {
+                    const newBadge = document.createElement('span');
+                    newBadge.style.cssText = 'background:#d32f2f; color:white; font-size:8px; padding:2px 5px; font-weight:900; border-radius:3px; margin:0 4px; box-shadow:0 1px 3px rgba(0,0,0,0.2);';
+                    newBadge.innerText = 'NEW';
+                    row.appendChild(newBadge);
+                }
 
                 // Balls Container
                 const ballsDiv = document.createElement('div');
