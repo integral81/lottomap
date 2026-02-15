@@ -203,16 +203,25 @@ def main():
     try:
         res = requests.get("https://www.dhlottery.co.kr/common.do?method=main", headers=HEADERS, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
-        # Find the latest round number in the main page
+        # Standard ID for round number
         latest_text = soup.find('strong', id='lottoDrwNo')
         if latest_text:
             current_round = int(latest_text.get_text())
         else:
-            # Fallback if parsing fails - try 1210 if last was 1209
-            current_round = last_round + 1
-    except:
+            # Fallback for "Simplified Page" mode
+            print("Round ID not found on main page. Attempting fallback to results page...")
+            res_result = requests.get("https://www.dhlottery.co.kr/lt645/result", headers=HEADERS, timeout=10)
+            # Find number followed by '회'
+            match = re.search(r'(\d+)회', res_result.text)
+            if match:
+                current_round = int(match.group(1))
+                print(f"Fallback found current round: {current_round}")
+            else:
+                current_round = last_round + 1
+    except Exception as e:
+        print(f"Failed to detect latest round: {e}")
         current_round = last_round + 1
-        
+    
     print(f"Target latest round: {current_round}")
     
     if last_round >= current_round:
