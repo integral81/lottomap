@@ -1,0 +1,226 @@
+
+import json
+
+# 1. Get current data from lotto_data.json
+try:
+    with open('lotto_data.json', 'r', encoding='utf-8') as f:
+        lotto_data = json.load(f)
+        
+    shop_stats = {} 
+    for item in lotto_data:
+        addr = item.get('a', '').strip()
+        name = item.get('n', '').strip()
+        if not addr: continue
+        
+        if addr not in shop_stats:
+            shop_stats[addr] = {
+                "name": name, 
+                "wins": 0, 
+                "has_pov": False,
+                "lat": item.get('lat'),
+                "lng": item.get('lng'),
+                "has_coords": item.get('lat') is not None
+            }
+        shop_stats[addr]["wins"] += 1
+        if 'pov' in item:
+            shop_stats[addr]["has_pov"] = True
+
+    # Filter: Exactly 4 wins and no POV
+    missing_pov_shops = []
+    for addr, info in shop_stats.items():
+        if info['wins'] == 4 and not info['has_pov']:
+            missing_pov_shops.append({
+                "name": info['name'],
+                "address": addr,
+                "wins": info['wins'],
+                "lat": info['lat'],
+                "lng": info['lng'],
+                "has_coords": info['has_coords']
+            })
+            
+    missing_pov_shops.sort(key=lambda x: x['name'])
+    js_shops = json.dumps(missing_pov_shops, ensure_ascii=False, indent=4)
+
+    # 2. Build the FULL HTML content
+    full_html = f"""<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotto POV Admin - 수기 등록 도구</title>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
+    <style>
+        :root {{ --primary: #d32f2f; --sidebar-width: 350px; --header-height: 60px; }}
+        * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+        body {{ font-family: 'Pretendard', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: #f0f2f5; }}
+        header {{ height: var(--header-height); background: #333; color: white; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }}
+        header h1 {{ font-size: 18px; }}
+        main {{ flex: 1; display: flex; overflow: hidden; }}
+        #sidebar {{ width: var(--sidebar-width); background: white; border-right: 1px solid #ddd; overflow-y: auto; padding: 10px; }}
+        .shop-item {{ padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; margin-bottom: 5px; }}
+        .shop-item:hover {{ background: #f5f5f5; }}
+        .shop-item.active {{ background: #e3f2fd; border-color: #2196f3; }}
+        .shop-name {{ font-weight: bold; font-size: 15px; margin-bottom: 4px; }}
+        .shop-addr {{ font-size: 12px; color: #666; display: flex; align-items: center; justify-content: space-between; }}
+        .addr-copy-btn {{ border: 1px solid #2196f3; background: #e3f2fd; cursor: pointer; font-size: 10px; padding: 3px 8px; border-radius: 3px; color: #1976d2; }}
+        .win-count {{ display: inline-block; background: var(--primary); color: white; font-size: 11px; padding: 2px 6px; border-radius: 10px; margin-top: 4px; }}
+        #content {{ flex: 1; display: flex; flex-direction: column; }}
+        #viewer-container {{ flex: 1; display: flex; gap: 10px; padding: 10px; min-height: 0; }}
+        #map, #roadview {{ flex: 1; border: 1px solid #ddd; border-radius: 8px; }}
+        #roadview {{ flex: 2; }}
+        #control-panel {{ height: 350px; background: white; border-top: 1px solid #ddd; padding: 15px; display: flex; gap: 20px; }}
+        .control-group {{ flex: 1; display: flex; flex-direction: column; gap: 10px; }}
+        .control-group h3 {{ font-size: 14px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 5px; }}
+        #stack-area {{ flex: 1; background: #222; color: #ccc; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px; overflow-y: auto; white-space: pre-wrap; }}
+        .btn-update {{ padding: 10px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🎰 POV 관리 (Simple Mode)</h1>
+    </header>
+    <main>
+        <div id="sidebar">
+            <div style="padding: 10px; font-size: 13px; font-weight: bold; color: #333; border-bottom: 2px solid #333; margin-bottom: 10px;">
+                대상 리스트 (<span id="missing-count">0</span>)
+            </div>
+            <div id="shop-list"></div>
+        </div>
+        <div id="content">
+            <div id="viewer-container">
+                <div id="map"></div>
+                <div id="roadview"></div>
+            </div>
+            <div id="control-panel">
+                <div class="control-group">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <h3 style="color:#d32f2f;">1. 현재 코드 (한 줄)</h3>
+                        <span style="font-size:11px; color:#999;">화면을 움직이면 자동 갱신됩니다</span>
+                    </div>
+                    <div id="current-code-area" style="background:#222; color:#00ff00; padding:12px; border-radius:6px; font-family:monospace; font-size:12px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">
+                        <span id="current-code-text">// 상점을 선택해주세요</span>
+                    </div>
+                    
+                    <button class="btn-update" onclick="markAsRegistered()" style="font-size:16px; padding:15px; margin: 10px 0; background:#1976d2;">
+                        ⬇️ 아래 리스트로 추가 (누적)
+                    </button>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h3 style="color:#333;">2. 누적 리스트 (<span id="stack-count">0</span>개)</h3>
+                        <div style="display:flex; gap:8px;">
+                            <button onclick="copyStack()" style="background:#4caf50; color:white; border:none; padding:8px 16px; border-radius:4px; font-weight:bold; cursor:pointer;">📋 결과 전체 복사</button>
+                            <button onclick="clearStack()" style="background:#999; color:white; border:none; padding:8px 16px; border-radius:4px; cursor:pointer;">🧹 비우기</button>
+                        </div>
+                    </div>
+                    <div id="stack-area" style="flex:1; background:#1e1e1e; border:2px solid #333;"><pre id="stack-output" style="margin:0; padding:5px; color:#eee;"></pre></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        let map, rv, rvClient, marker;
+        let currentShop = null;
+        let accumulatedCodes = JSON.parse(localStorage.getItem('pov_accumulated_codes') || '[]');
+        let allMissingShops = {js_shops};
+        let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {{
+            try {{
+                const mapContainer = document.getElementById('map');
+                map = new kakao.maps.Map(mapContainer, {{ center: new kakao.maps.LatLng(37.4815, 127.0145), level: 3 }});
+                rv = new kakao.maps.Roadview(document.getElementById('roadview'));
+                rvClient = new kakao.maps.RoadviewClient();
+                marker = new kakao.maps.Marker({{ position: map.getCenter(), map: map, draggable: true }});
+
+                kakao.maps.event.addListener(rv, 'init', updatePOVUI);
+                kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
+                kakao.maps.event.addListener(marker, 'dragend', () => loadRoadview(marker.getPosition().getLat(), marker.getPosition().getLng()));
+                
+                renderShopList();
+                updateCodeOutput();
+            }} catch (e) {{ console.error(e); }}
+        }}
+
+        function renderShopList() {{
+            const filteredList = allMissingShops.filter(s => !registeredKeys.includes(`${{s.name}}|${{s.address}}`));
+            document.getElementById('missing-count').innerText = filteredList.length;
+            const container = document.getElementById('shop-list');
+            container.innerHTML = '';
+            filteredList.forEach(shop => {{
+                const div = document.createElement('div');
+                div.className = 'shop-item' + (currentShop?.name === shop.name ? ' active' : '');
+                div.onclick = () => selectShop(shop, div);
+                div.innerHTML = `<div class="shop-name">${{shop.name}}</div><div class="shop-addr"><span>${{shop.address}}</span><button class="addr-copy-btn" onclick="event.stopPropagation(); copyToClipboard('${{shop.address}}')">복사</button></div><div class="win-count">${{shop.wins}}회 당첨</div>`;
+                container.appendChild(div);
+            }});
+        }}
+
+        function selectShop(shop, el) {{
+            document.querySelectorAll('.shop-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            currentShop = shop;
+            const pos = new kakao.maps.LatLng(shop.lat, shop.lng);
+            map.setCenter(pos);
+            marker.setPosition(pos);
+            loadRoadview(shop.lat, shop.lng);
+        }}
+
+        function loadRoadview(lat, lng) {{
+            const pos = new kakao.maps.LatLng(lat, lng);
+            rvClient.getNearestPanoId(pos, 100, (id) => {{ if(id) rv.setPanoId(id, pos); else alert('로드뷰 불가'); }});
+        }}
+
+        function updatePOVUI() {{ updateCodeOutput(); }}
+
+        function updateCodeOutput() {{
+            if (currentShop && rv.getPanoId()) {{
+                const vp = rv.getViewpoint();
+                const code = `{{ name: "${{currentShop.name}}", addr: "${{currentShop.address}}", panoid: ${{rv.getPanoId()}}, pov: {{ pan: ${{vp.pan.toFixed(2)}}, tilt: ${{vp.tilt.toFixed(2)}}, zoom: ${{Math.floor(vp.zoom)}} }} }},`;
+                document.getElementById('current-code-text').textContent = code;
+            }}
+            document.getElementById('stack-output').textContent = accumulatedCodes.join('\\n');
+            document.getElementById('stack-count').innerText = accumulatedCodes.length;
+            const sa = document.getElementById('stack-area'); sa.scrollTop = sa.scrollHeight;
+        }}
+
+        function markAsRegistered() {{
+            if (!currentShop || !rv.getPanoId()) return;
+            const code = document.getElementById('current-code-text').textContent;
+            if (!accumulatedCodes.includes(code)) accumulatedCodes.push(code);
+            localStorage.setItem('pov_accumulated_codes', JSON.stringify(accumulatedCodes));
+            const key = `${{currentShop.name}}|${{currentShop.address}}`;
+            if (!registeredKeys.includes(key)) registeredKeys.push(key);
+            localStorage.setItem('pov_registered_shops', JSON.stringify(registeredKeys));
+            showToast('추가되었습니다');
+            renderShopList();
+            updateCodeOutput();
+        }}
+
+        function copyStack() {{
+            navigator.clipboard.writeText(accumulatedCodes.join('\\n')).then(() => showToast('복사 완료'));
+        }}
+
+        function clearStack() {{ if(confirm('비우시겠습니까?')) {{ accumulatedCodes = []; localStorage.setItem('pov_accumulated_codes', '[]'); updateCodeOutput(); }} }}
+        function resetRegistered() {{ if(confirm('초기화하시겠습니까?')) {{ localStorage.removeItem('pov_registered_shops'); registeredKeys = []; renderShopList(); }} }}
+        function copyToClipboard(t) {{ navigator.clipboard.writeText(t).then(() => showToast('복사됨')); }}
+        function showToast(m) {{
+            const t = document.createElement('div'); t.innerText = m;
+            t.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:white; padding:8px 16px; border-radius:20px; font-size:13px; z-index:9999;';
+            document.body.appendChild(t); setTimeout(() => t.remove(), 1500);
+        }}
+        function exportRegistered() {{
+            const w = window.open('', '_blank');
+            w.document.write('<textarea style="width:100%;height:100%;">' + localStorage.getItem('pov_registered_shops') + '</textarea>');
+        }}
+    </script>
+</body>
+</html>"""
+
+    with open('admin_pov.html', 'w', encoding='utf-8') as f:
+        f.write(full_html)
+    print("FULL RESTORATION SUCCESS")
+
+except Exception as e:
+    print(f"Error: {e}")

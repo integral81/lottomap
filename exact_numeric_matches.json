@@ -1,0 +1,1146 @@
+[
+    {
+        "name": "\ub85c\ub610\uba85\ub2f9 \uc77c\uc0b0\uc810",
+        "address": "\uacbd\uae30 \uace0\uc591\uc2dc \uc77c\uc0b0\uc11c\uad6c \uc77c\uc0b0\ub3d9 655-268",
+        "wins": 1,
+        "lat": 37.6829547102806,
+        "lng": 126.770150106654,
+        "pov": false
+    },
+    {
+        "name": "\uc6a9\uafc8\ub3fc\uc9c0\uafc8",
+        "address": "\uc11c\uc6b8 \ub9c8\ud3ec\uad6c \uacf5\ub355\ub3d9 255-23",
+        "wins": 2,
+        "lat": 37.54477179904291,
+        "lng": 126.95232120735648,
+        "pov": false
+    },
+    {
+        "name": "\ud589\uc6b4\ubcf5\uad8c\ubc29",
+        "address": "\uacbd\uae30 \uc758\uc815\ubd80\uc2dc \ucda9\uc758\ub85c 55",
+        "wins": 5,
+        "lat": 37.0668863,
+        "lng": 127.0614119,
+        "pov": false
+    },
+    {
+        "name": "\ub178\ub2e4\uc9c0\uad6c\ubbf8\ud669\uc0c1",
+        "address": "\uacbd\ubd81 \uad6c\ubbf8\uc2dc \uc218\ucd9c\ub300\ub85c 555",
+        "wins": 1,
+        "lat": 36.1108944928709,
+        "lng": 128.425724189764,
+        "pov": false
+    },
+    {
+        "name": "\ub3c8\ubcbc\ub77d\ub9de\ub294\uacf3",
+        "address": "\ubd80\uc0b0 \ud574\uc6b4\ub300\uad6c \uc591\uc6b4\ub85c 55 \ub450\uc0b0\uc704\ube0c\uc13c\ud2f0\uc6c0\uc0c1\uac00102\ud638",
+        "wins": 2,
+        "lat": 35.1681697165142,
+        "lng": 129.176218799492,
+        "pov": false
+    },
+    {
+        "name": "\uadf8\ub9b0\ub9c8\ud2b8",
+        "address": "\uacbd\uae30 \uc131\ub0a8\uc2dc \ubd84\ub2f9\uad6c \ub300\uc655\ud310\uad50\ub85c 255 107\ud638",
+        "wins": 3,
+        "lat": 37.3664737203881,
+        "lng": 127.101093585321,
+        "pov": false
+    },
+    {
+        "name": "\ub0a8\ubb38\uc2dc\uc7a5",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \ud314\ub2ec\uad6c \uc218\uc6d0\ucc9c\ub85c255\ubc88\uae38 6 89\ud638(\uc601\ub3d9 \uc601\ub3d9\uc2dc\uc7a5)",
+        "wins": 1,
+        "lat": 37.276815687652,
+        "lng": 127.018660256526,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\uc774\ub9cc\uc11d",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \uc601\ud1b5\uad6c \ub355\uc601\ub300\ub85c1555\ubc88\uae38 13 106\ud638(\uc601\ud1b5\ub3d9 \uc138\uc77c\ube4c\ub529)",
+        "wins": 1,
+        "lat": 37.246768985838,
+        "lng": 127.060811491707,
+        "pov": false
+    },
+    {
+        "name": "\ub300\uad11\ubcf5\uad8c\ubc29",
+        "address": "\uc804\ub0a8 \ud654\uc21c\uad70 \uce60\ucda9\ub85c 55 \ub300\uad11\uadf8\ub9b0\uc0c1\uac00\ub3d9 1\uce35109\ud638",
+        "wins": 3,
+        "lat": 35.0554316829248,
+        "lng": 126.977740365431,
+        "pov": false
+    },
+    {
+        "name": "\uc138\uc9c4\uc804\uc790\ud1b5\uc2e0",
+        "address": "\ub300\uad6c \uc11c\uad6c \uc11c\ub300\uad6c\ub85c 156",
+        "wins": 6,
+        "lat": 35.8718986373835,
+        "lng": 128.555199068014,
+        "pov": false
+    },
+    {
+        "name": "TO TO",
+        "address": "\uac15\uc6d0 \uac15\ub989\uc2dc \uc8fc\ubb38\ub85c 55",
+        "wins": 1,
+        "lat": 37.8888394953763,
+        "lng": 128.825610679739,
+        "pov": false
+    },
+    {
+        "name": "\uacf5\uc6d0\uc288\ud37c",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \uc7a5\uc548\uad6c \ud314\ub2ec\ub85c 255 1\uce35(\uc601\ud654\ub3d9)",
+        "wins": 2,
+        "lat": 37.2888295580437,
+        "lng": 127.012935153781,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\uc870\ub9ac\ubcf5\uad8c\ubc29",
+        "address": "\uc804\ubd81 \uc7a5\uc218\uad70 \uc7a5\uacc4\ucc9c\ubcc0\uae38 55-4",
+        "wins": 1,
+        "lat": 35.7310741390472,
+        "lng": 127.583548482256,
+        "pov": false
+    },
+    {
+        "name": "\ud589\uc6b4 \ubcf5\uad8c",
+        "address": "\uac15\uc6d0 \ub3d9\ud574\uc2dc \uc784\ud56d\ub85c 55 \uc0c1\uac00\ub3d9 202-5 \uac00\ub098\ud638(\ubd80\uace1\ub3d9\uc0bc\uc8152\ucc28\uc544\ud30c\ud2b8)",
+        "wins": 1,
+        "lat": 37.4934207705586,
+        "lng": 126.491489796733,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\ubcf5\uad8c",
+        "address": "\uacbd\uae30 \ud3c9\ud0dd\uc2dc \uc6d0\ud3c9\ub85c 55",
+        "wins": 1,
+        "lat": 36.9905172748973,
+        "lng": 127.083562813074,
+        "pov": false
+    },
+    {
+        "name": "\uac00\ub85c\ud310\ub9e4\uc810",
+        "address": "\uc11c\uc6b8 \uad00\uc545\uad6c \uacfc\ucc9c\ub300\ub85c 955",
+        "wins": 1,
+        "lat": 37.4759416445717,
+        "lng": 126.981163275417,
+        "pov": false
+    },
+    {
+        "name": "\uc9c0\uc5d0\uc2a4(GS25)\ub274\uc591\uc0b0\ud61c\uc778\uc810",
+        "address": "\uacbd\ub0a8 \uc591\uc0b0\uc2dc \uc6c5\uc0c1\ub300\ub85c 955 GS\ud3b8\uc758\uc810",
+        "wins": 2,
+        "lat": 35.3848616457542,
+        "lng": 129.15504959311,
+        "pov": false
+    },
+    {
+        "name": "\ub300\ubc15\ub85c\ub610\ud310\ub9e4\uc810",
+        "address": "\uacbd\uae30 \uc548\uc0b0\uc2dc \ub2e8\uc6d0\uad6c \uc11d\uc218\ub85c 55 102\ud638",
+        "wins": 1,
+        "lat": 37.3414695949661,
+        "lng": 126.807562832089,
+        "pov": false
+    },
+    {
+        "name": "\uc2e0\ud765\uc5d1\uc2a4\ud3ec\uc1fc\ud551",
+        "address": "\uc778\ucc9c \uc11c\uad6c \uac00\uc11d\ub85c156\ubc88\uae38 20",
+        "wins": 1,
+        "lat": 37.4970752346313,
+        "lng": 126.677101007393,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uba85\ub2f9\uae08\uc655\uc810",
+        "address": "\ucda9\ubd81 \uc74c\uc131\uad70 \ud0d1\uace8\uae38 55 \uc138\ube10\uc77c\ub808\ube10 \uae08\uc655\uc810",
+        "wins": 1,
+        "lat": 36.9909767213693,
+        "lng": 127.586378932803,
+        "pov": false
+    },
+    {
+        "name": "\uc815\uac00\ub124 \uac00\ub78c\uae30\uc815\ub5a1",
+        "address": "\uc778\ucc9c \ub0a8\ub3d9\uad6c \uc5d0\ucf54\uc911\uc559\ub85c156\ubc88\uae38 5-27",
+        "wins": 1,
+        "lat": 37.3921534074415,
+        "lng": 126.726898777517,
+        "pov": false
+    },
+    {
+        "name": "\ud6a8\ub2f9\ubcf5\uad8c\ud310\ub9e4\uc810",
+        "address": "\uc81c\uc8fc \uc81c\uc8fc\uc2dc \ub178\ud615\ub85c 355",
+        "wins": 1,
+        "lat": 33.4825997153179,
+        "lng": 126.474238594807,
+        "pov": false
+    },
+    {
+        "name": "\uac15\uc6d0\uc288\ud37c",
+        "address": "\uc11c\uc6b8 \uc11c\ub300\ubb38\uad6c \ubaa8\ub798\ub0b4\ub85c 355",
+        "wins": 2,
+        "lat": 37.5816365749183,
+        "lng": 126.935559395746,
+        "pov": false
+    },
+    {
+        "name": "\uac00\uc871\ubcf5\uad8c\ubc29",
+        "address": "\uacbd\ub0a8 \ucc3d\uc6d0\uc2dc \uc9c4\ud574\uad6c \uc6a9\uc6d0\ub3d9\ub85c 255",
+        "wins": 1,
+        "lat": 35.0957382828663,
+        "lng": 128.819698565629,
+        "pov": false
+    },
+    {
+        "name": "\uc528\uc720\uac70\uc81c\uc0ac\ub4f1\uc0c8\uc544\uce68\uc810",
+        "address": "\uacbd\ub0a8 \uac70\uc81c\uc2dc \uac70\uc81c\ub300\ub85c 5501 \uc8fc2\ub3d9 103\ud638104\ud638",
+        "wins": 1,
+        "lat": 34.9102079467843,
+        "lng": 128.54348691515,
+        "pov": false
+    },
+    {
+        "name": "\ucf54\uc0ac\ub9c8\ud2b8\ud55c\uc591\uc810",
+        "address": "\uacbd\uae30 \uace0\uc591\uc2dc \ub355\uc591\uad6c \ub9c8\uc0c1\ub85c 156",
+        "wins": 1,
+        "lat": 37.6584532907179,
+        "lng": 126.839567253705,
+        "pov": false
+    },
+    {
+        "name": "\uc6d4\ub4dc24\uc2dc",
+        "address": "\uc11c\uc6b8 \uc740\ud3c9\uad6c \ud1b5\uc77c\ub85c 855-15",
+        "wins": 1,
+        "lat": 37.619245156065,
+        "lng": 126.919784349949,
+        "pov": false
+    },
+    {
+        "name": "\ubabd\uc720\ud638\uac00(\u5922\u6709\u597d\u5bb6)",
+        "address": "\uc11c\uc6b8 \uac15\ub3d9\uad6c \uc62c\ub9bc\ud53d\ub85c 552 1\uce355\ud638",
+        "wins": 1,
+        "lat": 37.5308341998326,
+        "lng": 127.12101233589,
+        "pov": false
+    },
+    {
+        "name": "\uac15\uc11c\uc2a4\ud3ec\uce20",
+        "address": "\uc11c\uc6b8 \uac15\uc11c\uad6c \uacf0\ub2ec\ub798\ub85c 156-1",
+        "wins": 1,
+        "lat": 37.5306737702911,
+        "lng": 126.85032507277,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\ub4dc\ub9bc \ubcf5\uad8c\ubc29",
+        "address": "\ubd80\uc0b0 \ubd81\uad6c \uae30\ucc30\ub85c 155 (\ub355\ucc9c\ub3d9)",
+        "wins": 1,
+        "lat": 35.2145332655908,
+        "lng": 129.02157097824,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\uc870\ub9ac\ubcf5\uad8c\ubc29",
+        "address": "\uc804\ubd81 \uc7a5\uc218\uad70 \uc7a5\uacc4\uba74 \uc7a5\uacc4\ucc9c\ubcc0\uae38 55-4",
+        "wins": 1,
+        "lat": 35.7310741390472,
+        "lng": 127.583548482256,
+        "pov": false
+    },
+    {
+        "name": "\uc5ed\uc804\ub85c\ub610",
+        "address": "\ucda9\ub0a8 \uc544\uc0b0\uc2dc \uc911\uc559\ub85c 55 1\uce35 104\ud638",
+        "wins": 1,
+        "lat": 36.7799236497029,
+        "lng": 127.003356650911,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uba85\ub2f9\uae08\uc655\uc810",
+        "address": "\ucda9\ubd81 \uc74c\uc131\uad70 \uae08\uc655\uc74d \ud0d1\uace8\uae38 55 \uc138\ube10\uc77c\ub808\ube10 \uae08\uc655\uc810",
+        "wins": 2,
+        "lat": 36.9909767213693,
+        "lng": 127.586378932803,
+        "pov": false
+    },
+    {
+        "name": "\uc81c\uc77c\ubcf5\uad8c",
+        "address": "\ubd80\uc0b0 \uc11c\uad6c \ucda9\ubb34\ub300\ub85c255\ubc88\uae38 9 \ucda9\ubb34\uc1fc\ud5511\uce35",
+        "wins": 1,
+        "lat": 35.0930541909753,
+        "lng": 129.023262189766,
+        "pov": false
+    },
+    {
+        "name": "\uc9c4 \ubcf5\uad8c\ubc29",
+        "address": "\uacbd\uae30 \ud3ec\ucc9c\uc2dc \uc1a1\uc6b0\ub85c 55-5 101\ud638 \uc131\uc870\ube4c\ub529",
+        "wins": 1,
+        "lat": 37.8289229973383,
+        "lng": 127.14272230708,
+        "pov": false
+    },
+    {
+        "name": "\uc0ac\ub791\ubcf5\uad8c\ubc29",
+        "address": "\uacbd\uae30 \uc2dc\ud765\uc2dc \uc7a5\ud604\ub2a5\uace1\ub85c 155 \uc9c0\ud5581\uce35 B1055\ud638",
+        "wins": 1,
+        "lat": 37.3710521503438,
+        "lng": 126.807314112056,
+        "pov": false
+    },
+    {
+        "name": "\uc138\ube10\uc77c\ub808\ube10 \uc778\ucc9c\ud6a8\uc131\uc810",
+        "address": "\uc778\ucc9c \uacc4\uc591\uad6c \uc548\ub0a8\ub85c 551",
+        "wins": 1,
+        "lat": 37.5322526022721,
+        "lng": 126.710413673337,
+        "pov": false
+    },
+    {
+        "name": "\ub3d9\uc591\ub9c8\ud2b8\uc77c\uace1\uc810",
+        "address": "\uad11\uc8fc \ubd81\uad6c \uc77c\uace1\ub9c8\uc744\ub85c 55 \ud604\ub300\uc544\ud30c\ud2b8 2\ucc28\uc0c1\uac00 102-2\ud638",
+        "wins": 1,
+        "lat": 35.2049298738031,
+        "lng": 126.895688893483,
+        "pov": false
+    },
+    {
+        "name": "\uba85\uc9c0\ubcf5\uad8c\ubc29",
+        "address": "\uc11c\uc6b8 \uc1a1\ud30c\uad6c \uac70\ub9c8\ub85c 55 101\ud638",
+        "wins": 1,
+        "lat": 37.4978508169634,
+        "lng": 127.146253556315,
+        "pov": false
+    },
+    {
+        "name": "\uc9c0\uc5d0\uc2a4(GS25)\ub274\uc591\uc0b0\ud61c\uc778\uc810",
+        "address": "\uacbd\ub0a8 \uc591\uc0b0\uc2dc \uc6c5\uc0c1\ub300\ub85c 955",
+        "wins": 1,
+        "lat": 35.3848616457542,
+        "lng": 129.15504959311,
+        "pov": false
+    },
+    {
+        "name": "\ub178\ub2e4\uc9c0",
+        "address": "\uc11c\uc6b8 \ub3d9\ub300\ubb38\uad6c \ud55c\ucc9c\ub85c 55",
+        "wins": 1,
+        "lat": 37.5669101962131,
+        "lng": 127.061880899304,
+        "pov": false
+    },
+    {
+        "name": "\uc11c\ubd80\uc5ed\uc9c0\uc810",
+        "address": "\uacbd\uae30 \ud3c9\ud0dd\uc2dc \uc6d0\ud3c9\ub85c 55",
+        "wins": 1,
+        "lat": 36.9905172748973,
+        "lng": 127.083562813074,
+        "pov": false
+    },
+    {
+        "name": "\ub0a8\ubb38\uc2dc\uc7a5",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \ud314\ub2ec\uad6c \uc218\uc6d0\ucc9c\ub85c255\ubc88\uae38 6 \uc601\ub3d9\uc2dc\uc7a5 \uc601\ub3d9\uc2dc\uc7a5 101\ud638",
+        "wins": 1,
+        "lat": 37.276815687652,
+        "lng": 127.018660256526,
+        "pov": false
+    },
+    {
+        "name": "\uc11c\uba74\ub85c\ub610",
+        "address": "\ubd80\uc0b0 \ubd80\uc0b0\uc9c4\uad6c \uc911\uc559\ub300\ub85c680\ubc88\uac00\uae38 55-5",
+        "wins": 1,
+        "lat": 35.1558757052873,
+        "lng": 129.060591602386,
+        "pov": false
+    },
+    {
+        "name": "\uc11c\uc6d0\ud0d1\ud6fc\ubbf8\ub9ac",
+        "address": "\ubd80\uc0b0 \ub3d9\uad6c \uc218\uc815\uacf5\uc6d0\ub85c 55 4\ub3d9 1\uce35 101\ud638",
+        "wins": 2,
+        "lat": 35.1312113007104,
+        "lng": 129.039123082264,
+        "pov": false
+    },
+    {
+        "name": "GS25(\uc591\uc0b0\ud61c\uc778\uc810)",
+        "address": "\uacbd\ub0a8 \uc591\uc0b0\uc2dc \uc6c5\uc0c1\ub300\ub85c 955",
+        "wins": 2,
+        "lat": 35.3848616457542,
+        "lng": 129.15504959311,
+        "pov": false
+    },
+    {
+        "name": "\uae08\uc13124\uc2dc\ud3b8\uc758\uc810",
+        "address": "\uacbd\uae30 \uc591\uc8fc\uc2dc \ud654\ud569\ub85c 1355",
+        "wins": 1,
+        "lat": 37.8440519509279,
+        "lng": 127.062384415307,
+        "pov": false
+    },
+    {
+        "name": "\ub300\uad11\ubcf5\uad8c\ubc29",
+        "address": "\uc804\ub0a8 \ud654\uc21c\uad70 \uce60\ucda9\ub85c 55 \ub300\uad11\ub85c\uc81c\ube44\uc559 \ub300\uad11\uadf8\ub9b0\uc0c1\uac00\ub3d9 1\uce35109\ud638",
+        "wins": 1,
+        "lat": 35.0554316829248,
+        "lng": 126.977740365431,
+        "pov": false
+    },
+    {
+        "name": "GS25(\ubc18\ud3ec\uc911\uc559\uc810)",
+        "address": "\uc11c\uc6b8 \uc11c\ucd08\uad6c \uc0ac\ud3c9\ub300\ub85c55\uae38 37",
+        "wins": 1,
+        "lat": 37.5056738874165,
+        "lng": 127.022042835067,
+        "pov": false
+    },
+    {
+        "name": "\ucc3d\ubbf8\uc288\ud37c",
+        "address": "\uacbd\uae30 \ud654\uc131\uc2dc \ub0a8\uc591\uc131\uc9c0\ub85c 155",
+        "wins": 1,
+        "lat": 37.2100828014064,
+        "lng": 126.81965257523,
+        "pov": false
+    },
+    {
+        "name": "\ud568\uc548 \ubcf5\uad8c\ubc29",
+        "address": "\uacbd\ub0a8 \ud568\uc548\uad70 \ud568\uc548\ub300\ub85c 552",
+        "wins": 1,
+        "lat": 35.2758624122767,
+        "lng": 128.405741859682,
+        "pov": false
+    },
+    {
+        "name": "\ud55c\uad6d\uc885\ud569\ube4c\ub529(\ubcf5\uad8c)",
+        "address": "\uc778\ucc9c \ub0a8\ub3d9\uad6c \uac04\uc11d1\ub3d9 558-1",
+        "wins": 1,
+        "lat": 37.4612293997322,
+        "lng": 126.698217897698,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\uad8c365",
+        "address": "\uc11c\uc6b8 \uad11\uc9c4\uad6c \uc790\uc591\ub3d9 553-12",
+        "wins": 1,
+        "lat": 37.5372097427958,
+        "lng": 127.065796762782,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uc0bc\uc131\ubcf5\uad8c\ubc29",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \uc601\ud1b5\uad6c \uc6d0\ucc9c\ub3d9 550-1 \uc6d0\ucc9c\ud6fc\ubbf8\ub9ac\ud0c0\uc6b4105\ud638",
+        "wins": 1,
+        "lat": 37.266742664154,
+        "lng": 127.058151782029,
+        "pov": false
+    },
+    {
+        "name": "\uc6a9\uafc8\ub3fc\uc9c0\uafc8\ubcf5\uad8c\uc804\ubb38\uc810",
+        "address": "\uac15\uc6d0 \ub3d9\ud574\uc2dc \ucc9c\uace1\ub3d9 855 \uc774\uc8fc\ubbfc\uc0c1\uac001\uce3515\ud638",
+        "wins": 1,
+        "lat": 37.5216936392165,
+        "lng": 129.115030975254,
+        "pov": false
+    },
+    {
+        "name": "\uad6d\ubbfc\uc288\ud37c",
+        "address": "\uc11c\uc6b8 \ub3c4\ubd09\uad6c \ucc3d5\ub3d9 731-55",
+        "wins": 1,
+        "lat": 37.6570196601926,
+        "lng": 127.040124682046,
+        "pov": false
+    },
+    {
+        "name": "CU\ub85c\ub610(\uac15\uad6c\ud130\ubbf8\ub110\uc810)",
+        "address": "\uacbd\ubd81 \uc601\ub355\uad70 \uac15\uad6c\uba74 \uc624\ud3ec\ub9ac 557-5 1\uce35 CU\ud3b8\uc758\uc810\ub0b4",
+        "wins": 2,
+        "lat": 36.358711385625,
+        "lng": 129.37932117663,
+        "pov": false
+    },
+    {
+        "name": "\uc5ec\uc218\ub3d9\uc11c\uc0c1\uc0ac",
+        "address": "\uc804\ub0a8 \uc5ec\uc218\uc2dc \uad6d\ub3d9 655 \uc774\ub9c8\ud2b8\uc5d0\ube0c\ub9ac\ub370\uc774 \ub0b4",
+        "wins": 1,
+        "lat": 34.7341702234601,
+        "lng": 127.719220361438,
+        "pov": false
+    },
+    {
+        "name": "\uc6a9\ubbf8\uc0ac\uc9c4\uad00(\ub85c\ub610)",
+        "address": "\uc804\ub0a8 \uc21c\ucc9c\uc2dc \uc870\uace1\ub3d9 156-11 \uc6a9\ubbf8\uc0ac\uc9c4\uad00",
+        "wins": 1,
+        "lat": 34.9459662550576,
+        "lng": 127.500894362423,
+        "pov": false
+    },
+    {
+        "name": "\ud589\ubcf5\ucda9\uc804\uc18c",
+        "address": "\uacbd\uae30 \ud3c9\ud0dd\uc2dc \uc9c0\uc0b0\ub3d9 755-1",
+        "wins": 6,
+        "lat": 37.0818175011542,
+        "lng": 127.056399163472,
+        "pov": false
+    },
+    {
+        "name": "\ub178\ub2e4\uc9c0\ubcf5\uad8c",
+        "address": "\uac15\uc6d0 \uc0bc\ucc99\uc2dc \ub0a8\uc591\ub3d9 55-62 \uc778\ud654\uc0c1\uac00A-106\ud638",
+        "wins": 1,
+        "lat": 37.4415052061859,
+        "lng": 129.167584420053,
+        "pov": false
+    },
+    {
+        "name": "\ubc14\uc774\ub354\uc6e8\uc774\ub179\ubc88\uc911\uc559\uc810",
+        "address": "\uc11c\uc6b8 \uc740\ud3c9\uad6c \ub179\ubc88\ub3d9 155-20",
+        "wins": 6,
+        "lat": 37.6024919912933,
+        "lng": 126.925852092556,
+        "pov": false
+    },
+    {
+        "name": "\ud61c\uc778\uc0c1\uc0ac",
+        "address": "\ubd80\uc0b0 \uc0ac\ud558\uad6c \uad34\uc815\ub3d9 955-2",
+        "wins": 1,
+        "lat": 35.0982112661845,
+        "lng": 128.994145173851,
+        "pov": false
+    },
+    {
+        "name": "\uc601\ud6c8\uc288\ud37c\ub9c8\ucf13",
+        "address": "\uc11c\uc6b8 \ub3c4\ubd09\uad6c \ucc3d3\ub3d9 557-5",
+        "wins": 2,
+        "lat": 37.6378077105877,
+        "lng": 127.037689540883,
+        "pov": false
+    },
+    {
+        "name": "\ud48d\uc804\uc288\ud37c",
+        "address": "\uacbd\uae30 \ubd80\ucc9c\uc2dc \uc6d0\ubbf8\uad6c \uc6d0\ubbf8\ub3d9 55-1",
+        "wins": 3,
+        "lat": 37.4970774601291,
+        "lng": 126.791144735331,
+        "pov": false
+    },
+    {
+        "name": "\ub300\ubc15\ucc9c\ud558",
+        "address": "\uc778\ucc9c \uc5f0\uc218\uad6c \uc5f0\uc218\ub3d9(\uc5f0\uc2181\ub3d9) 556-10 103\ud638(\uc5f0\uc218\ub3d9)",
+        "wins": 1,
+        "lat": 37.4220455162348,
+        "lng": 126.675410757733,
+        "pov": false
+    },
+    {
+        "name": "\uc911\uc559\ubcf5\uad8c\ubc29",
+        "address": "\ucda9\ubd81 \uccad\uc8fc\uc2dc \uccad\uc6d0\uad6c \uc728\ub7c9\ub3d9 2155",
+        "wins": 1,
+        "lat": 36.6657108517352,
+        "lng": 127.500387078363,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uba85\ub2f9",
+        "address": "\uc778\ucc9c \ub0a8\uad6c \ubb38\ud559\ub3d9 355-12 \ud3b8\uc758\uc810\ub0b4",
+        "wins": 3,
+        "lat": 37.4385362225521,
+        "lng": 126.681073106998,
+        "pov": false
+    },
+    {
+        "name": "\uc0ac\ucc9c\ud070\ub9c8\ud2b8",
+        "address": "\uacbd\ub0a8 \uc0ac\ucc9c\uc2dc \uc0ac\ucc9c\uc74d \ud3c9\ud654\ub9ac 156-13",
+        "wins": 1,
+        "lat": 35.0830527239765,
+        "lng": 128.087019539284,
+        "pov": false
+    },
+    {
+        "name": "\uc655\ub300\ubc15\ubcf5\uad8c\uc804\ubb38\uc810",
+        "address": "\uac15\uc6d0 \ub3d9\ud574\uc2dc \ucc9c\uace1\ub3d9 855 \uc774\uc8fc\ubbfc\uc0c1\uac001\uce3518\ud638",
+        "wins": 2,
+        "lat": 37.5216936392165,
+        "lng": 129.115030975254,
+        "pov": false
+    },
+    {
+        "name": "GS25(\uccad\uc8fc\uc8fc\uc740\uc810)",
+        "address": "\ucda9\ubd81 \uccad\uc8fc\uc2dc \uc11c\uc6d0\uad6c \ubd84\ud3c9\ub3d9 1255",
+        "wins": 1,
+        "lat": 36.6098705834808,
+        "lng": 127.491338253234,
+        "pov": false
+    },
+    {
+        "name": "\ubcf4\ub78c\ubcf5\uad8c\ubc29",
+        "address": "\uc6b8\uc0b0 \ub0a8\uad6c \uc0bc\uc0b0\ub3d9 1567-6 \uc6b0\ub9ac\ub4e4\ub9c8\ud2b8 \ub0b4",
+        "wins": 3,
+        "lat": 35.541767738442,
+        "lng": 129.341640064008,
+        "pov": false
+    },
+    {
+        "name": "\ucda9\uc8fc\ubcf5\uad8c\uba85\ub2f9",
+        "address": "\ucda9\ubd81 \ucda9\uc8fc\uc2dc \ud638\uc554\ub3d9 553",
+        "wins": 2,
+        "lat": 36.9610889272975,
+        "lng": 127.929130419222,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\ubcf5\uad8c",
+        "address": "\uacbd\uae30 \ud3c9\ud0dd\uc2dc \ud3c9\ud0dd\ub3d9 55-8 \ubcf4\uad11\ub2f9\uae08\uc740\ubc29",
+        "wins": 1,
+        "lat": 36.9924127373336,
+        "lng": 127.085914344403,
+        "pov": false
+    },
+    {
+        "name": "\uc608\uc2a4\ub85c\ub610",
+        "address": "\ubd80\uc0b0 \uc0ac\ud558\uad6c \ub2e4\ub300\ub3d9 1551-33 \uc608\uc2a4\ub9c8\ud2b8",
+        "wins": 1,
+        "lat": 35.0500077252497,
+        "lng": 128.969918450197,
+        "pov": false
+    },
+    {
+        "name": "\uc778\ub354\ub77c\uc778 \ub85c\ub610",
+        "address": "\uc778\ucc9c \ubd80\ud3c9\uad6c \uc2ed\uc815\ub3d9 577-6",
+        "wins": 1,
+        "lat": 37.4773513046613,
+        "lng": 126.709834722586,
+        "pov": false
+    },
+    {
+        "name": "\uac00\ud310\uc810",
+        "address": "\uacbd\uae30 \uc131\ub0a8\uc2dc \uc218\uc815\uad6c \uc2e0\ud765\ub3d9(\uc2e0\ud7651\ub3d9) 5505",
+        "wins": 1,
+        "lat": 37.4433432694641,
+        "lng": 127.140733138511,
+        "pov": false
+    },
+    {
+        "name": "\uc655\ub300\ubc15\ubcf5\uad8c",
+        "address": "\uac15\uc6d0 \uc18d\ucd08\uc2dc \ub3d9\uba85\ub3d9 559-4",
+        "wins": 1,
+        "lat": 38.2113530349789,
+        "lng": 128.589364354613,
+        "pov": false
+    },
+    {
+        "name": "\uc815\uc6d0\ubcf5\uad8c\ubc29",
+        "address": "\uc11c\uc6b8 \ub3c4\ubd09\uad6c \ucc3d\ub3d9 655-20",
+        "wins": 2,
+        "lat": 37.6473298656067,
+        "lng": 127.034404206663,
+        "pov": false
+    },
+    {
+        "name": "\ud589\uc6b4\ub9c8\ud2b8",
+        "address": "\uacbd\ub0a8 \ud1b5\uc601\uc2dc \uad11\ub3c4\uba74 \uc8fd\ub9bc\ub9ac 1567-6",
+        "wins": 1,
+        "lat": 34.885536589465,
+        "lng": 128.416424805779,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\ud589\uc6b4\ub9c8\ud2b8",
+        "address": "\uacbd\ub0a8 \uae40\ud574\uc2dc \uc7a5\uc720\uba74 \ubb34\uacc4\ub9ac 155-12",
+        "wins": 1,
+        "lat": 35.2037855242535,
+        "lng": 128.810030137494,
+        "pov": false
+    },
+    {
+        "name": "\ub9e4\ud45c\uc18c",
+        "address": "\uacbd\uae30 \ubd80\ucc9c\uc2dc \uc6d0\ubbf8\uad6c \ub3c4\ub2f9\ub3d9 255-2 \ub3c4\ub85c\ubd80\uc9c0",
+        "wins": 1,
+        "lat": 37.5086605166023,
+        "lng": 126.785076979752,
+        "pov": false
+    },
+    {
+        "name": "\ud589\uc6b4\ubcf5\uad8c",
+        "address": "\uc11c\uc6b8 \uad00\uc545\uad6c \ubd09\ucc9c\ub3d9(\uccad\ub8e1\ub3d9) 1568-8",
+        "wins": 2,
+        "lat": 37.4790296264705,
+        "lng": 126.9511233273,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\uad8c\uc804\ubb38\uc810",
+        "address": "\uc11c\uc6b8 \uac15\ubd81\uad6c \ubbf8\uc544\ub3d9 460-55",
+        "wins": 1,
+        "lat": 37.6155594763148,
+        "lng": 127.028681830907,
+        "pov": false
+    },
+    {
+        "name": "\uc7a5\uc548\ud648\ud0c0\uc6b4",
+        "address": "\uc11c\uc6b8 \ub3d9\ub300\ubb38\uad6c \uc7a5\uc548\ub3d9 355-1",
+        "wins": 1,
+        "lat": 37.5679634325729,
+        "lng": 127.073841666082,
+        "pov": false
+    },
+    {
+        "name": "\uc5d1\uc2a4\ud2b8\ub77c(\uc6b0\uc8fc\uc810)",
+        "address": "\ubd80\uc0b0 \uc0ac\uc0c1\uad6c \ubaa8\ub77c\ub3d9(\ubaa8\ub77c\uc81c3\ub3d9) 552 \uac00\uc0c1\uac00106\ud638",
+        "wins": 1,
+        "lat": 35.1834812566756,
+        "lng": 128.995309476101,
+        "pov": false
+    },
+    {
+        "name": "\ubd80\uc790\ub098\ub77c\uc11d\ucd0c\uc810",
+        "address": "\uc11c\uc6b8 \uc1a1\ud30c\uad6c \uc11d\ucd0c\ub3d9 255-1 1\uce352\ud638",
+        "wins": 1,
+        "lat": 37.5001725465317,
+        "lng": 127.104868345007,
+        "pov": false
+    },
+    {
+        "name": "\ubd04\ub3d9\ub85c\ub610",
+        "address": "\ub300\uad6c \uc218\uc131\uad6c \ubc94\ubb3c\ub3d9 455-3",
+        "wins": 1,
+        "lat": 35.8173087132198,
+        "lng": 128.64481064465,
+        "pov": false
+    },
+    {
+        "name": "\uc131\uc548\ud3b8\uc758\uc810",
+        "address": "\uacbd\uae30 \uc548\uc0b0\uc2dc \uc0c1\ub85d\uad6c \uc0ac\ub3d9(\uc0ac1\ub3d9) 1551-1",
+        "wins": 1,
+        "lat": 37.3036780114704,
+        "lng": 126.844212593338,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uc0bc\uac01\uc810",
+        "address": "\uad11\uc8fc \ubd81\uad6c \uc0bc\uac01\ub3d9 755-16",
+        "wins": 1,
+        "lat": 35.1938921047952,
+        "lng": 126.90086681038,
+        "pov": false
+    },
+    {
+        "name": "\ud589\ubcf5\ub098\ub214\ubcf5\uad8c\ubc29",
+        "address": "\uc11c\uc6b8 \uac15\uc11c\uad6c \uac00\uc591\ub3d9 155-8",
+        "wins": 1,
+        "lat": 37.5688688153189,
+        "lng": 126.841116899759,
+        "pov": false
+    },
+    {
+        "name": "\ucc9c\uae08\ubcf5\uad8c\ubc29",
+        "address": "\ucda9\ubd81 \uccad\uc8fc\uc2dc \uc0c1\ub2f9\uad6c \uc601\uc6b4\ub3d9 55-1",
+        "wins": 2,
+        "lat": 36.620751721846,
+        "lng": 127.507975926984,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\ud589\uc6b4\ub9c8\ud2b8",
+        "address": "\uacbd\ub0a8 \uae40\ud574\uc2dc \uc7a5\uc720\uba74 \ubb34\uacc4\ub9ac155-12",
+        "wins": 1,
+        "lat": 35.2037855242535,
+        "lng": 128.810030137494,
+        "pov": false
+    },
+    {
+        "name": "\uc624\ub80c\uc9c025",
+        "address": "\uacbd\uae30 \uace0\uc591\uc2dc \uc77c\uc0b0\uc11c\uad6c \uc77c\uc0b0\ub3d9 555-1 \uc591\uc6b0\uc5d0\uc774\uc2a4\uc2a4\ud0c0\ub514\uc6c0109",
+        "wins": 2,
+        "lat": 37.6852674251996,
+        "lng": 126.777144140141,
+        "pov": false
+    },
+    {
+        "name": "\uc655\ub300\ubc15\ubcf5\uad8c",
+        "address": "\uc778\ucc9c \ubd80\ud3c9\uad6c \uc2ed\uc815\ub3d9 577-6",
+        "wins": 4,
+        "lat": 37.4773513046613,
+        "lng": 126.709834722586,
+        "pov": false
+    },
+    {
+        "name": "\ub7ed\ud0a4\ub9c8\ucf13",
+        "address": "\uc11c\uc6b8 \uac15\ub3d9\uad6c \ub454\ucd0c\ub3d9 55",
+        "wins": 1,
+        "lat": 37.5331535051867,
+        "lng": 127.144243413419,
+        "pov": false
+    },
+    {
+        "name": "\ud589\uc6b4\ub9c8\ud2b8",
+        "address": "\uc778\ucc9c \ubd80\ud3c9\uad6c \uc2ed\uc815\ub3d9 355-18",
+        "wins": 2,
+        "lat": 37.4718127442267,
+        "lng": 126.69537948159,
+        "pov": false
+    },
+    {
+        "name": "\uc5d1\uc2a4\ud2b8\ub77c(\uc6b0\uc8fc\uc810)",
+        "address": "\ubd80\uc0b0 \uc0ac\uc0c1\uad6c \ubaa8\ub77c\ub3d9 551 \uc8fc\uacf5\uc0c1\uac00 \uac00-106",
+        "wins": 1,
+        "lat": 37.2511026769671,
+        "lng": 127.035478887754,
+        "pov": false
+    },
+    {
+        "name": "\ub2ec\ub791\uc288\ud37c",
+        "address": "\uc11c\uc6b8 \uac15\ub0a8\uad6c \ub300\uce58\ub3d9 955-1",
+        "wins": 1,
+        "lat": 37.5052892763932,
+        "lng": 127.05953581761,
+        "pov": false
+    },
+    {
+        "name": "\ud55c\uc9c4\ub86f\ub610\ub300\ubc15\ud310\ub9e4\uc810",
+        "address": "\uc804\ubd81 \uace0\ucc3d\uad70 \uc2e0\ub9bc\uba74 \ubcbd\uc1a1\ub9ac557-10\uace0\ucc3d\uace0\uc778\ub3cc\ud734\uac8c\uc18c(\ud558) \uc758\ub958\ub9e4\uc7a5",
+        "wins": 1,
+        "lat": 35.4681690515673,
+        "lng": 126.673906334726,
+        "pov": false
+    },
+    {
+        "name": "\ud558\ub298\ucc44\ubcf5\uad8c\ubc29",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \uc601\ud1b5\uad6c \ub9e4\ud0c4\ub3d9 1156-1",
+        "wins": 1,
+        "lat": 37.2591972137611,
+        "lng": 127.040757030079,
+        "pov": false
+    },
+    {
+        "name": "\uc138\ube10\uc77c\ub808\ube10\ubd80\uc0b0\uc628\ucc9c\uc7a5\uc5ed\uc810",
+        "address": "\ubd80\uc0b0 \ub3d9\ub798\uad6c \uc628\ucc9c\ub3d9 156-1 \uc628\ucc9c\uc7a5\uc5ed\uc9c0\ud558\ucca0 \ub0b4",
+        "wins": 1,
+        "lat": 37.5499641263349,
+        "lng": 126.864156572483,
+        "pov": false
+    },
+    {
+        "name": "\uc77c\ub4f1\ub85c\ub610\ubc29",
+        "address": "\uc804\ubd81 \uc804\uc8fc\uc2dc \uc644\uc0b0\uad6c \ud3c9\ud654\ub3d91\uac00 558-1",
+        "wins": 1,
+        "lat": 35.7966160436933,
+        "lng": 127.134816374687,
+        "pov": false
+    },
+    {
+        "name": "\ub300\uad6c\uc5f0\uc1c4\uc810",
+        "address": "\ubd80\uc0b0 \ubd80\uc0b0\uc9c4\uad6c \ubd80\uc804\ub3d9 55-2",
+        "wins": 1,
+        "lat": 35.1623704106437,
+        "lng": 129.062357833279,
+        "pov": false
+    },
+    {
+        "name": "\ud0c0\uc784\ub9c8\ud2b8",
+        "address": "\ub300\uc804 \uc11c\uad6c \ub3c4\uc548\ub3d9 855\ud504\ub77c\uc784\ube4c\ub529103\ud638",
+        "wins": 1,
+        "lat": 36.3318206191222,
+        "lng": 127.340570578708,
+        "pov": false
+    },
+    {
+        "name": "\ud589\ubcf5\ucda9\uc804\uc18c",
+        "address": "\uacbd\uae30 \ud3c9\ud0dd\uc2dc \uc9c0\uc0b0\ub3d9 755",
+        "wins": 2,
+        "lat": 37.5197069880884,
+        "lng": 126.843669212531,
+        "pov": false
+    },
+    {
+        "name": "\ud0d1\ud3ec\uc778\ud2b8\ubd80\ud3c9\uc810",
+        "address": "\uc778\ucc9c \ubd80\ud3c9\uad6c \ubd80\ud3c9\ub3d9 557-11\uce35",
+        "wins": 2,
+        "lat": 37.5197525142919,
+        "lng": 126.906701370918,
+        "pov": false
+    },
+    {
+        "name": "\uc138\ube10\uc77c\ub808\ube10\ubd80\uc0b0\uc628\ucc9c\uc7a5\uc5ed\uc810",
+        "address": "\ubd80\uc0b0 \ub3d9\ub798\uad6c \uc628\ucc9c\ub3d9 156-1",
+        "wins": 2,
+        "lat": 37.2933977973944,
+        "lng": 126.861748003405,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uc0bc\uc131\ubcf5\uad8c\ubc29",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \uc601\ud1b5\uad6c \uc6d0\ucc9c\ub3d9 550-1 \uc6d0\ucc9c\ud6fc\ubbf8\ub9ac\ud0c0\uc6b41\uce35(105-2\ud638)",
+        "wins": 1,
+        "lat": 37.266742664154,
+        "lng": 127.058151782029,
+        "pov": false
+    },
+    {
+        "name": "\uc81c\uc77c\ubcf5\uad8c",
+        "address": "\uc81c\uc8fc \uc81c\uc8fc\uc2dc \uc0bc\ub3c41\ub3d9 558-7",
+        "wins": 1,
+        "lat": 33.5000709444261,
+        "lng": 126.523626846524,
+        "pov": false
+    },
+    {
+        "name": "\ud589\uc6b4\ubcf5\uad8c\ubc29",
+        "address": "\uc81c\uc8fc \uc81c\uc8fc\uc2dc \uc678\ub3c41\ub3d9 550-10",
+        "wins": 1,
+        "lat": 33.4876705540673,
+        "lng": 126.43214996133,
+        "pov": false
+    },
+    {
+        "name": "\ubc14\uc774\ub354\uc6e8\uc774\uc0bc\ucc99\uc0bc\uc6d0\uc810",
+        "address": "\uac15\uc6d0 \uc0bc\ucc99\uc2dc \ub0a8\uc591\ub3d9 955/5",
+        "wins": 1,
+        "lat": 37.8755598668348,
+        "lng": 126.793503506765,
+        "pov": false
+    },
+    {
+        "name": "\ubcf4\uad11\ubb38\uad6c\uc0ac",
+        "address": "\uacbd\uae30 \ud30c\uc8fc\uc2dc \ubb38\uc0b0\uc74d \ubb38\uc0b04\ub9ac 17-55",
+        "wins": 1,
+        "lat": 37.8755598668348,
+        "lng": 126.793503506765,
+        "pov": false
+    },
+    {
+        "name": "\uc2e0\uc77c\ub9c8\ud2b8",
+        "address": "\uc804\ubd81 \uad70\uc0b0\uc2dc \ub098\uc6b4\ub3d9 156-2\uc2e0\uc77c@\uc81c\uc0c1\uac00\ub3d9\uc81c1\uce35114",
+        "wins": 2,
+        "lat": 35.9583227272102,
+        "lng": 126.698069872866,
+        "pov": false
+    },
+    {
+        "name": "\ubc84\uc2a4\uac00\ub450\ud310\ub9e4\uc810",
+        "address": "\uacbd\uae30 \uc218\uc6d0\uc2dc \uc601\ud1b5\uad6c \uc601\ud1b5\ub3d9 955-1",
+        "wins": 1,
+        "lat": 37.26243359705,
+        "lng": 127.079691261172,
+        "pov": false
+    },
+    {
+        "name": "\uc655\ub300\ubc15\ubcf5\uad8c\ubc29",
+        "address": "\ub300\uad6c \ubd81\uad6c \ud0dc\uc804\ub3d9 155-36",
+        "wins": 1,
+        "lat": 35.9228670635416,
+        "lng": 128.544594110392,
+        "pov": false
+    },
+    {
+        "name": "\ud6fc\ubbf8\ub9ac\ub9c8\ud2b8(\uc790\uc591\ud0dc\uc131\uc810)",
+        "address": "\uc11c\uc6b8 \uad11\uc9c4\uad6c \uc790\uc591\ub3d9 553-489101 102\ud638 792",
+        "wins": 1,
+        "lat": 37.5905199841175,
+        "lng": 127.060211782651,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\uba85\ub2f9",
+        "address": "\uc778\ucc9c \ub0a8\uad6c \ubb38\ud559\ub3d9 355-12",
+        "wins": 1,
+        "lat": 37.4385362225521,
+        "lng": 126.681073106998,
+        "pov": false
+    },
+    {
+        "name": "\ud589\ubcf5\ubcf5\uad8c\ubc29",
+        "address": "\uc6b8\uc0b0 \ub0a8\uad6c \uc625\ub3d9 156-4",
+        "wins": 1,
+        "lat": 35.5338647389465,
+        "lng": 129.296037026675,
+        "pov": false
+    },
+    {
+        "name": "\uc601\ud6c8\uc288\ud37c\ub9c8\ucf13",
+        "address": "\uc11c\uc6b8 \ub3c4\ubd09\uad6c \ucc3d3\ub3d9 557-5\ud638",
+        "wins": 3,
+        "lat": 37.5380583266842,
+        "lng": 127.2048098925,
+        "pov": false
+    },
+    {
+        "name": "\uc544\ub984\ub2e4\uc6b4\uc288\ud37c",
+        "address": "\uacbd\uae30 \uc2dc\ud765\uc2dc \uac70\ubaa8\ub3d9 1566-11",
+        "wins": 1,
+        "lat": 36.1226809411846,
+        "lng": 128.364022137249,
+        "pov": false
+    },
+    {
+        "name": "\uc528\uc2a4\ud398\uc774\uc2a4(\uc0c1\uc778\uc810)",
+        "address": "\ub300\uad6c \ub2ec\uc11c\uad6c \uc0c1\uc778\ub3d9 1552-4",
+        "wins": 1,
+        "lat": 35.8129274922301,
+        "lng": 128.546099213093,
+        "pov": false
+    },
+    {
+        "name": "\ud61c\uc778\uc0c1\uc0ac",
+        "address": "\ubd80\uc0b0 \uc0ac\ud558\uad6c \uad34\uc815\ub3d9 955-22\ud3ec\uc2dc\uc98c\ud3b8\uc758\uc810\ub0b4",
+        "wins": 1,
+        "lat": 35.0980290194748,
+        "lng": 128.994124944637,
+        "pov": false
+    },
+    {
+        "name": "\uc6a9\uafc8\ub3fc\uc9c0\uafc8\ubcf5\uad8c\uc804\ubb38\uc810",
+        "address": "\uac15\uc6d0 \ub3d9\ud574\uc2dc \ucc9c\uace1\ub3d9 855\uc774\uc8fc\ubbfc\uc0c1\uac0015\ud638",
+        "wins": 1,
+        "lat": 37.5216936392165,
+        "lng": 129.115030975254,
+        "pov": false
+    },
+    {
+        "name": "\ud6fc\ubc00\ub9ac\ubcf5\uad8c",
+        "address": "\ubd80\uc0b0 \uae08\uc815\uad6c \ubd80\uace1\ub3d9 225-55",
+        "wins": 2,
+        "lat": 35.2376966228675,
+        "lng": 129.090135645966,
+        "pov": false
+    },
+    {
+        "name": "\uac15\ub0a825\uc2dc\ud3b8\uc758\uc810",
+        "address": "\uacbd\ub0a8 \uac70\uc81c\uc2dc \uc625\ud3ec\ub3d9 550-17",
+        "wins": 1,
+        "lat": 34.8891155978505,
+        "lng": 128.691938441756,
+        "pov": false
+    },
+    {
+        "name": "\ubcf5\uad8c\ucc9c\ud558",
+        "address": "\uc11c\uc6b8 \uac15\ubd81\uad6c \ubbf8\uc544\ub3d9 55-52",
+        "wins": 1,
+        "lat": 37.612550795998,
+        "lng": 127.031876981148,
+        "pov": false
+    },
+    {
+        "name": "\uc77c\ub4f1\ub85c\ub610\ubc29",
+        "address": "\uc804\ubd81 \uc804\uc8fc\uc2dc \uc644\uc0b0\uad6c \ud3c9\ud654\ub3d9 1\uac00558-1",
+        "wins": 1,
+        "lat": 35.7966160436933,
+        "lng": 127.134816374687,
+        "pov": false
+    },
+    {
+        "name": "\ucfe8\ub9c8\ud2b8\uc601\ub0a8\ub124\uc624\ube4c\uc810",
+        "address": "\ub300\uad6c \ub2ec\uc11c\uad6c \uc7a5\uae30\ub3d9 551\uc601\ub0a8\ub124\uc624\ube4c\ube44\uc2a4\ud0c0\uc0c1\uac00201\ub3d9101\ud638",
+        "wins": 1,
+        "lat": 35.8423129512747,
+        "lng": 128.533086379908,
+        "pov": false
+    },
+    {
+        "name": "LG\ub2e4\ub300\uc131\uc6d0\uc810",
+        "address": "\ubd80\uc0b0 \uc0ac\ud558\uad6c \ub2e4\ub300\ub3d9 1551-25",
+        "wins": 1,
+        "lat": 35.0498243541153,
+        "lng": 128.969872731151,
+        "pov": false
+    },
+    {
+        "name": "\uc655\ub300\ubc15\ubcf5\uad8c",
+        "address": "\uac15\uc6d0 \uc18d\ucd08\uc2dc \ub3d9\uba85\ub3d9 559-5",
+        "wins": 1,
+        "lat": 38.2114920528074,
+        "lng": 128.589535667321,
+        "pov": false
+    },
+    {
+        "name": "\uadf8\ub9b0\uc288\ud37c",
+        "address": "\uc11c\uc6b8 \uac15\ub3d9\uad6c \uae381\ub3d9 355-1",
+        "wins": 1,
+        "lat": 37.5400814905526,
+        "lng": 127.144228810399,
+        "pov": false
+    },
+    {
+        "name": "\ud55c\uad6d\uc885\ud569\ube4c\ub529(\ubcf5\uad8c)",
+        "address": "\uc778\ucc9c \ub0a8\ub3d9\uad6c \uac04\uc11d\ub3d9 558-1/2 1\uce35",
+        "wins": 1,
+        "lat": 37.4612293997322,
+        "lng": 126.698217897698,
+        "pov": false
+    },
+    {
+        "name": "\ub124\uc78e\ud06c\ub85c\ubc14",
+        "address": "\uacbd\uae30 \uc548\uc591\uc2dc \ub3d9\uc548\uad6c \ud638\uacc41\ub3d9 555-9 \uad6d\uc81c\uc720\ud1b5\ub2e8\uc9c0\uc9c0\uc6d0\ub3d9\uc0c1\uac00 \uc9c0\ud558 1\uce35 171\ud638",
+        "wins": 1,
+        "lat": 37.3716055943484,
+        "lng": 126.952112312216,
+        "pov": false
+    },
+    {
+        "name": "\ud55c\uad6d\uc885\ud569\ube4c\ub529(\ubcf5\uad8c)",
+        "address": "\uc778\ucc9c \ub0a8\ub3d9\uad6c \uac04\uc11d1\ub3d9 558-1/2 1\uce35",
+        "wins": 1,
+        "lat": 37.4612293997322,
+        "lng": 126.698217897698,
+        "pov": false
+    },
+    {
+        "name": "\ub300\ud638\uc0c1\uc0ac",
+        "address": "\uacbd\uae30 \uc131\ub0a8\uc2dc \ubd84\ub2f9\uad6c \uc57c\ud0d1\ub3d9 355-1\uc138\ud6542001\ube4c\ub529107",
+        "wins": 2,
+        "lat": 37.4111733398211,
+        "lng": 127.126829627289,
+        "pov": false
+    },
+    {
+        "name": "\ubcf4\ub78c\ubcf5\uad8c\ubc29",
+        "address": "\uc6b8\uc0b0 \ub0a8\uad6c \uc0bc\uc0b0\ub3d9 1567-6",
+        "wins": 1,
+        "lat": 35.541767738442,
+        "lng": 129.341640064008,
+        "pov": false
+    },
+    {
+        "name": "\uc8fc\ud0dd\ubcf5\uad8c\uc0ac\ub791\ubc29",
+        "address": "\uc11c\uc6b8 \uad6c\ub85c\uad6c \uad6c\ub85c\ub3d9 1258 \uc911\uc559\uc720\ud1b5\uc9c0\ud558 B55-02\ud638",
+        "wins": 1,
+        "lat": 37.5009041397426,
+        "lng": 126.874585855825,
+        "pov": false
+    },
+    {
+        "name": "\uac00\ub85c\ud310\ub9e4\uc810",
+        "address": "\uc11c\uc6b8 \uc591\ucc9c\uad6c \uc2e0\uc6d46\ub3d9 550-5",
+        "wins": 1,
+        "lat": 37.5180050813814,
+        "lng": 126.842243646961,
+        "pov": false
+    },
+    {
+        "name": "\ub85c\ub610\ubcf5\uad8c\ud310\ub9e4\uc18c",
+        "address": "\uc11c\uc6b8 \uad6c\ub85c\uad6c \uad6c\ub85c\ub3d9 685-155 \uad6c\uc77c\ud504\ub77c\uc790 GS25",
+        "wins": 1,
+        "lat": 37.4956825784619,
+        "lng": 126.874113080471,
+        "pov": false
+    },
+    {
+        "name": "\uc624\ub80c\uc9c025",
+        "address": "\uacbd\uae30 \uace0\uc591\uc2dc \uc77c\uc0b0\uc11c\uad6c \uc77c\uc0b0\ub3d9 \uc77c\uc0b0\ub3d9 555-1 \uc591\uc6b0\uc5d0\uc774\uc2a4\uc2a4\ud0c0\ub514\uc6c0109",
+        "wins": 1,
+        "lat": 37.6852674251996,
+        "lng": 126.777144140141,
+        "pov": false
+    },
+    {
+        "name": "\ud48d\uc804\uc218\ud37c",
+        "address": "\uacbd\uae30 \ubd80\ucc9c\uc2dc \uc6d0\ubbf8\uad6c \uc6d0\ubbf8\ub3d9 \uc6d0\ubbf8\ub3d9 55-1",
+        "wins": 1,
+        "lat": 37.4970774601291,
+        "lng": 126.791144735331,
+        "pov": false
+    },
+    {
+        "name": "\ud55c\ubbf8\ubcf5\uad8c\ubc29",
+        "address": "\uc11c\uc6b8 \uac15\ub3d9\uad6c \uc131\ub0b41\ub3d9 550",
+        "wins": 1,
+        "lat": 37.5291478926467,
+        "lng": 127.123788171465,
+        "pov": false
+    }
+]
