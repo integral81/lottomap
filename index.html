@@ -366,8 +366,10 @@
 
         /* AI Modal Fixed Header Structure */
         .ai-modal-content {
-            width: 90%;
-            max-width: 350px;
+            width: 88%;
+            /* Slightly reduced from 90% */
+            max-width: 340px;
+            /* Slightly reduced from 350px */
             height: 80vh;
             /* Fallback */
             height: 80dvh;
@@ -390,10 +392,29 @@
             z-index: 10;
         }
 
+        /* New: Horizontal Tags */
+        .ai-tags {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: nowrap;
+            margin-top: 5px;
+        }
+
+        .ai-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: white;
+            white-space: nowrap;
+        }
+
         .ai-modal-body {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 0 20px 80px 20px;
+            padding: 0 15px 80px 15px;
             /* Bottom padding for scrolling */
             width: 100%;
             display: flex;
@@ -422,16 +443,18 @@
         .kakao-share-btn {
             background: #fae100;
             color: #3c1e1e;
-            padding: 12px 15px;
+            padding: 12px 10px;
             text-align: center;
             font-weight: bold;
             cursor: pointer;
-            font-size: 14px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            font-size: 13px;
+            border-radius: 25px;
+            /* Fully rounded */
+            margin: 0 auto 20px auto;
+            /* Centered with margin */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 320px;
+            width: 96%;
+            /* Fit within modal with slight padding */
             animation: pulse-soft 2s infinite;
         }
 
@@ -2595,6 +2618,8 @@
 
         // Premium Roadview POV Presets (User Verified 260210)
         const ROADVIEW_PRESETS = [
+            // User Request: Sejin Electronics (Daegu)
+            { name: "세진전자통신", addr: "대구 서구 서대구로", panoid: 1201585664, pov: { pan: 93.03, tilt: 5.09, zoom: -3 } },
             { name: "교통카드판매대", addr: "서울 강동구 고덕동 210-1", isClosed: true, customMessage: "현재 폐점되었습니다 (구서울승합종점앞 가판대)." },
             { name: "부일카서비스", addr: "부산 동구 범일동", panoId: 1202519412, pov: { pan: 236.39, tilt: 6.54, zoom: -3 } },
             { name: "일등복권편의점", addr: "대구 달서구 본리동", panoId: 1201526676, pov: { pan: 349.47, tilt: 12.34, zoom: -1 } },
