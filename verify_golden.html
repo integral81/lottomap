@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>Golden Auto-Find</title>
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=84b62e85ed3ec32fca558717eda26006&libraries=services,roadview"></script>
+<style>html,body{height:100%;margin:0}</style>
+</head><body><div id="roadview" style="width:100%;height:100%"></div>
+<script>
+var rv = new kakao.maps.Roadview(document.getElementById('roadview'));
+var client = new kakao.maps.RoadviewClient();
+var pos = new kakao.maps.LatLng(35.1553489475, 129.0386441775);
+client.getNearestPanoId(pos, 50, function(panoId) {
+    if(panoId) rv.setPanoId(panoId, pos);
+    else alert('Roadview not found near ' + 35.1553489475 + ',' + 129.0386441775);
+});
+</script></body></html>

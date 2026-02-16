@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Verify Gapanjeom (Fixed)</title>
+    <script type="text/javascript"
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
+    <style>
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #roadview {
+            width: 100%;
+            height: 100%;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 999;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="info">
+        <h3>가판점 (신도림)</h3>
+        <p>좌표: 37.50877, 126.89108 (새말로 117-21)</p>
+        <p id="status">로드뷰 검색 중...</p>
+    </div>
+    <div id="roadview"></div>
+    <script>
+        var rvContainer = document.getElementById('roadview');
+        var rv = new kakao.maps.Roadview(rvContainer);
+        var client = new kakao.maps.RoadviewClient();
+
+        // Exact coords for Sindorim Gapanjeom
+        var pos = new kakao.maps.LatLng(37.5087701449787, 126.891080501385);
+
+        client.getNearestPanoId(pos, 50, function (panoId) {
+            if (panoId) {
+                rv.setPanoId(panoId, pos);
+                document.getElementById('status').innerText = "PanoID: " + panoId;
+            } else {
+                document.getElementById('status').innerText = "❌ 반경 50m 내 로드뷰 없음";
+                alert('이 위치 주변(50m)에 로드뷰가 없습니다.');
+            }
+        });
+    </script>
+</body>
+
+</html>

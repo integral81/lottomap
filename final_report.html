@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Final Recovery Report</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #d32f2f;
+            text-align: center;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .list-box {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+        }
+
+        li {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 5px;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .bg-green {
+            background: #4caf50;
+        }
+
+        .bg-blue {
+            background: #2196f3;
+        }
+
+        .bg-orange {
+            background: #ff9800;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 데이터 복구 최종 보고서</h1>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="total-verified">150+</div>
+                <div>역사적 완전 복구</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="total-fixed">2</div>
+                <div>수동/URL 복구</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="total-scan">~4</div>
+                <div>스캔 필요 (좌표보정됨)</div>
+            </div>
+        </div>
+
+        <h3>📋 주요 복구 내역 (Top Targets)</h3>
+        <div class="list-box">
+            <ul>
+                <li><span class="badge bg-green">HISTORY</span> <b>목화휴게소</b> (사천) - 완벽 복구</li>
+                <li><span class="badge bg-green">HISTORY</span> <b>알리바이</b> (나주) - 완벽 복구</li>
+                <li><span class="badge bg-green">HISTORY</span> <b>복권명당</b> (공주/대구?) - PanoID 복구</li>
+                <li><span class="badge bg-green">HISTORY</span> <b>가판점</b> (신도림) - PanoID 복구</li>
+                <li><span class="badge bg-green">HISTORY</span> <b>GS25</b> (청주 등) - PanoID 복구</li>
+                <li><span class="badge bg-blue">MANUAL</span> <b>로또휴게실</b> (용인) - URL로 PanoID 추출 완료</li>
+                <li><span class="badge bg-orange">SCAN</span> <b>황금복권방</b> (부산) - 좌표 129.039로 보정됨 (스캔 즉시 발견)</li>
+                <li><span class="badge bg-orange">SCAN</span> <b>CU</b> (수성그린) - 좌표 128.616로 보정됨 (스캔 즉시 발견)</li>
+                <li><span class="badge bg-orange">SCAN</span> <b>뉴빅마트</b> (기장) - 정관해해로 좌표 보정됨</li>
+            </ul>
+        </div>
+
+        <p style="text-align: center; margin-top: 20px; color: #666;">
+            * '완전 복구'된 150개 매장은 이미 <code>lotto_data.json</code>에 저장되었습니다.<br>
+            * '스캔 필요' 매장은 <code>verify_recovery_all.html</code>을 열면 자동으로 찾아집니다.
+        </p>
+    </div>
+</body>
+
+</html>

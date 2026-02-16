@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Verification: Lotto Rest Area</title>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
+    <style>
+        body, html { width: 100%; height: 100%; margin: 0; }
+        #roadview { width: 100%; height: 100%; }
+        #info {
+            position: absolute; top: 10px; left: 10px; z-index: 999;
+            background: white; padding: 10px; border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>로또휴게실 (User Verified URL)</h3>
+        <p>Addr: 경기 용인시 기흥구 용구대로 1885</p>
+        <p>PanoID: 1199447820</p>
+        <p>POV: Pan 282.0, Tilt 1.2</p>
+    </div>
+    <div id="roadview"></div>
+    <script>
+        var rvContainer = document.getElementById('roadview');
+        var roadview = new kakao.maps.Roadview(rvContainer);
+        var panoId = 1199447820;
+        var pov = { pan: 282.0, tilt: 1.2, zoom: 0 };
+        
+        roadview.setPanoId(panoId, new kakao.maps.LatLng(37.256, 127.104)); // Dummy coord
+        
+        kakao.maps.event.addListener(roadview, 'init', function() {
+            roadview.setViewpoint(pov);
+        });
+    </script>
+</body>
+</html>

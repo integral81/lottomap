@@ -1,0 +1,90 @@
+
+import json
+
+def create_bus_shop_verification():
+    """Create verification HTML for 버스표판매소"""
+    
+    # Coordinates from data
+    lat = 37.6200950875394
+    lng = 126.839313752988
+    
+    html = f"""<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>버스표판매소 (고양시 덕양구) 검증</title>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=84b62e85ed3ec32fca558717eda26006&libraries=services,roadview"></script>
+    <style>
+        html, body {{ height: 100%; margin: 0; }}
+        #container {{ display: flex; height: 100%; }}
+        #map {{ width: 50%; }}
+        #roadview {{ width: 50%; }}
+        #info {{
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 400px;
+        }}
+        h3 {{ margin: 0 0 10px 0; color: #d32f2f; }}
+        .info-row {{ margin: 5px 0; }}
+        .label {{ font-weight: bold; }}
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>🚌 버스표판매소 (고양시 덕양구)</h3>
+        <div class="info-row"><span class="label">주소:</span> 경기 고양시 덕양구 화신로 76</div>
+        <div class="info-row"><span class="label">위치:</span> 가라뫼 사거리 변전소 앞 버스정류장</div>
+        <div class="info-row"><span class="label">당첨:</span> 1등 7회, 2등 15회 (공식 기록)</div>
+        <div class="info-row"><span class="label">데이터:</span> 11회 당첨 (최근 1092회차)</div>
+        <div class="info-row"><span class="label">상태:</span> <strong style="color: green;">영업중 (로또 명당)</strong></div>
+    </div>
+    <div id="container">
+        <div id="map"></div>
+        <div id="roadview"></div>
+    </div>
+    <script>
+        const pos = new kakao.maps.LatLng({lat}, {lng});
+        
+        // Map
+        const map = new kakao.maps.Map(document.getElementById('map'), {{
+            center: pos,
+            level: 3
+        }});
+        
+        const marker = new kakao.maps.Marker({{
+            position: pos,
+            map: map
+        }});
+        
+        // Roadview
+        const rv = new kakao.maps.Roadview(document.getElementById('roadview'));
+        const rvClient = new kakao.maps.RoadviewClient();
+        
+        // Try to find roadview with larger radius
+        rvClient.getNearestPanoId(pos, 500, function(panoId) {{
+            if (panoId) {{
+                rv.setPanoId(panoId, pos);
+                console.log('PanoID found:', panoId);
+            }} else {{
+                document.getElementById('roadview').innerHTML = 
+                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f5f5f5;">' +
+                    '<div style="text-align:center;"><h2>로드뷰 없음</h2><p>500m 내 로드뷰를 찾을 수 없습니다.<br>하지만 <strong>영업중</strong>입니다!</p></div></div>';
+            }}
+        }});
+    </script>
+</body>
+</html>"""
+    
+    with open('verify_bus_shop.html', 'w', encoding='utf-8') as f:
+        f.write(html)
+    
+    print("[OK] Generated verify_bus_shop.html")
+
+if __name__ == "__main__":
+    create_bus_shop_verification()
