@@ -88,7 +88,7 @@ def main():
 
     # 4. Exclude Registered
     presets = load_index_presets()
-    registered_names = set(p['name'] for p in presets)
+    registered_names = [p['name'] for p in presets]
     registered_addrs = [normalize(p['addr']) for p in presets]
     
     final_list = []
@@ -99,10 +99,30 @@ def main():
 
     for t in targets:
         t_name = t['name']
+        t_name_norm = normalize(t_name)
         t_addr_norm = normalize(t['address'])
         
-        # 1. Exact Name Match (Safe for unique famous shops like 부일카서비스)
-        if t_name in registered_names:
+        # 1. Name Match (Normalized Exact OR Partial)
+        # Catches "행복한사람들 (흥부네)" vs "행복한사람들(흥부네)" (Space difference)
+        is_name_match = False
+        
+        for r_name in registered_names:
+            r_name_norm = normalize(r_name)
+            
+            # Skip very short names for partial safety (but exact match is okay)
+            if len(t_name_norm) <= 2 or len(r_name_norm) <= 2:
+                if t_name_norm == r_name_norm:
+                    is_name_match = True
+                    break
+                continue
+            
+            # Check contains relationship on normalized strings
+            if t_name_norm in r_name_norm or r_name_norm in t_name_norm:
+                is_name_match = True
+                # print(f"Excluded by Name: {t_name} matches {r_name}")
+                break
+                
+        if is_name_match:
             count_excluded_name += 1
             continue
             
