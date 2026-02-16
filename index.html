@@ -364,10 +364,13 @@
             .ai-modal-content {
                 width: 95%;
                 padding: 25px 20px;
-                max-height: 85vh;
-                /* Increased from 60vh to fit all options */
+                /* iPhone 15 Fix: Use dvh for dynamic bars, fallback to vh */
+                max-height: 80vh;
+                max-height: 80dvh;
                 overflow-y: auto;
-                /* Enable scrolling if still needed */
+                overscroll-behavior: contain;
+                padding-bottom: 80px;
+                /* Extra padding for bottom overlap */
             }
         }
 
