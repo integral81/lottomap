@@ -1051,6 +1051,41 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
         }
 
+        /* Roadview Message Overlay */
+        #roadview-message-overlay {
+            position: absolute;
+            top: 60px;
+            /* Below title/close button */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 20;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
         .ball.one {
             background: #fbc400;
         }
@@ -1858,6 +1893,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            position: relative;
         }
 
         .roadview-header {
@@ -2386,12 +2422,15 @@
     </div>
 
     <!-- Roadview Modal -->
-    <div id="roadviewModal" class="modal">
+    <!-- Roadview Modal -->
+    <div id="roadview-modal" class="modal">
         <div class="roadview-modal-content">
             <div class="roadview-header">
                 <span class="roadview-title" id="roadviewShopName">매장 로드뷰</span>
                 <span class="roadview-close-btn" onclick="closeRoadview()">✕</span>
             </div>
+            <!-- Roadview Message Overlay -->
+            <div id="roadview-message-overlay"></div>
             <div id="roadview" style="width:100%; height:450px; background:#f5f5f5;"></div>
             <div id="roadviewImageContainer"
                 style="display:none; width:100%; height:450px; background:#000; overflow:hidden; position:relative;">
@@ -4755,48 +4794,23 @@
 
         // ============ Roadview Functions ============
 
-        function openRoadview(lat, lng, shopName, address, actionType, actionData) {
-            const modal = document.getElementById('roadviewModal');
-            const roadviewContainer = document.getElementById('roadview');
-            const shopNameEl = document.getElementById('roadviewShopName');
-            const copyBtn = document.getElementById('roadviewCopyBtn');
-            const naviBtn = document.getElementById('roadviewNaviBtn');
-
-            shopNameEl.textContent = shopName + ' 로드뷰';
-
-            if (!roadview) {
-                roadview = new kakao.maps.Roadview(roadviewContainer);
-            }
-            if (!roadviewClient) {
-                roadviewClient = new kakao.maps.RoadviewClient();
-            }
-
-            // Find preset first to check if we have a hardcoded Pano ID
-            const currentShopName = (shopName || "").trim();
-            const currentAddress = (address || "").trim();
-            const preset = ROADVIEW_PRESETS.find(p =>
-                currentShopName.includes(p.name) && currentAddress.includes(p.addr)
-            );
-
-            if (preset && preset.isClosed) {
-                alert('현재 폐업점으로 로드뷰 제공이 불가능합니다');
-                return;
-            }
-
-            if (preset && preset.customLink) {
-                alert(preset.customMessage);
-                window.open(preset.customLink, '_blank');
-                return;
-            }
-
-            if (preset && preset.customMessage) {
-                alert(preset.customMessage);
-            }
-
+        function openRoadview(shop) {
+            const roadviewContainer = document.getElementById('roadview-modal');
             const roadviewEl = document.getElementById('roadview');
-            const imgContainer = document.getElementById('roadviewImageContainer');
             const staticImg = document.getElementById('roadviewStaticImage');
-            const helpText = document.getElementById('roadviewHelpText');
+            if (shop.customMessage) {
+                messageEl.textContent = shop.customMessage;
+                messageEl.style.display = 'block';
+            } else {
+                messageEl.style.display = 'none';
+            }
+
+            // Roadview Button Visibility - ALWAYS SHOW
+            const roadviewBtn = document.getElementById('btn-roadview');
+            roadviewBtn.style.display = 'flex';
+            roadviewBtn.onclick = () => openRoadview(shop);
+
+            // Map Panning
 
             if (preset && preset.imageUrl) {
                 // Display Static Image
@@ -4818,6 +4832,19 @@
                 }
                 document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
                 return; // End here for image mode
+            }
+
+            // Custom Message Sync
+            const msgOverlay = document.getElementById('roadview-message-overlay');
+            const shopMsgEl = document.getElementById('shop-message');
+
+            if (msgOverlay) {
+                if (shopMsgEl && shopMsgEl.textContent && shopMsgEl.style.display !== 'none') {
+                    msgOverlay.textContent = shopMsgEl.textContent;
+                    msgOverlay.style.display = 'block';
+                } else {
+                    msgOverlay.style.display = 'none';
+                }
             }
 
             // Normal Roadview Mode
