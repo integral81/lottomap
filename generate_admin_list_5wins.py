@@ -88,22 +88,40 @@ def main():
 
     # 4. Exclude Registered
     presets = load_index_presets()
-    registered_keys = set()
-    for p in presets:
-        # We'll treat registered if normalized address matches
-        registered_keys.add(normalize(p['addr']))
-        # Also maybe name+addr?
+    registered_names = set(p['name'] for p in presets)
+    registered_addrs = [normalize(p['addr']) for p in presets]
     
     final_list = []
+    print(f"Filtering against {len(presets)} registered shops...")
+    
+    count_excluded_name = 0
+    count_excluded_addr = 0
+
     for t in targets:
-        t_key = normalize(t['address'])
-        if t_key in registered_keys:
+        t_name = t['name']
+        t_addr_norm = normalize(t['address'])
+        
+        # 1. Exact Name Match (Safe for unique famous shops like 부일카서비스)
+        if t_name in registered_names:
+            count_excluded_name += 1
             continue
             
-        # Double check fuzzy matching or substring?
-        # For now, strict normalized address match.
+        # 2. Address Match (Loose)
+        # Check if t_addr_norm is inside any registered_addr OR vice versa
+        is_registered = False
+        for r_addr in registered_addrs:
+            if len(r_addr) < 5: continue # Skip too short addresses to avoid false positives
+            if t_addr_norm in r_addr or r_addr in t_addr_norm:
+                is_registered = True
+                break
         
+        if is_registered:
+            count_excluded_addr += 1
+            continue
+            
         final_list.append(t)
+
+    print(f"Excluded {count_excluded_name} by Name, {count_excluded_addr} by Address.")
 
     # Sort by wins desc
     final_list.sort(key=lambda x: x['wins'], reverse=True)
