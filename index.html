@@ -1142,6 +1142,50 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        /* Mobile Responsive Design (Small Phones) */
+        @media (max-width: 640px) {
+            .container {
+                flex-direction: column !important;
+            }
+
+            .list-panel {
+                width: 100% !important;
+                max-height: 50vh !important;
+                order: 2 !important;
+                padding: 15px !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+
+            #map {
+                order: 1 !important;
+                height: 60vh !important;
+                min-height: 400px !important;
+            }
+
+            h1 {
+                font-size: 18px !important;
+                margin: 0 0 15px 0 !important;
+            }
+
+            .recent-round-num {
+                width: 38px !important;
+                font-size: 12px !important;
+            }
+
+            .mini-ball {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 10px !important;
+                margin-right: 1px !important;
+            }
+
+            .latest-round-glow .mini-ball {
+                transform: none !important;
+                margin: 0 1px !important;
+            }
+        }
+
         /* Mobile Responsive Design */
         @media (max-width: 768px) {
             #app {
@@ -1154,812 +1198,798 @@
                 max-height: 50vh !important;
                 order: 2 !important;
                 padding: 15px !important;
-                overflow-y: auto !important;
-                -webkit-overflow-scrolling: touch !important;
+
+                .section {
+                    margin-bottom: 15px !important;
+                    padding-bottom: 15px !important;
+                }
+
+                .section-title {
+                    font-size: 13px !important;
+                }
+
+                .btn-apply {
+                    font-size: 14px !important;
+                    padding: 12px !important;
+                }
+
+                .stats-card {
+                    font-size: 12px !important;
+                    padding: 12px !important;
+                }
+
+                .modal-content {
+                    width: 95% !important;
+                    max-width: 95% !important;
+                    margin: 0 auto !important;
+                }
+
+                #adContent,
+                #resultContent {
+                    padding: 15px !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                    /* Ensure padding doesn't add to width */
+                }
+
+                .modal-close {
+                    right: 10px !important;
+                    top: 10px !important;
+                }
+
+                /* Lucky Number Result Mobile Layout */
+                .result-row-wrapper {
+                    flex-wrap: wrap !important;
+                    justify-content: flex-start !important;
+                    gap: 5px !important;
+                    padding: 5px 0;
+                }
+
+                .result-label {
+                    width: 100% !important;
+                    text-align: left !important;
+                    margin-bottom: 5px !important;
+                    padding-left: 5px;
+                }
+
+                .result-balls {
+                    justify-content: flex-start !important;
+                    /* Align balls to left */
+                }
             }
 
-            #map {
-                order: 1 !important;
-                height: 50vh !important;
-                min-height: 300px !important;
+            /* Selection Menu Styles (Global) */
+            .selection-menu {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+                margin-top: 10px;
             }
 
-            h1 {
-                font-size: 18px !important;
-                margin: 0 0 15px 0 !important;
+            /* AI System Card Style */
+            .ai-system-card {
+                background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
+                border-radius: 20px;
+                padding: 18px 20px;
+                margin-bottom: 20px;
+                color: white;
+                text-align: left;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             }
 
-            .section {
-                margin-bottom: 15px !important;
-                padding-bottom: 15px !important;
-            }
-
-            .section-title {
-                font-size: 13px !important;
-            }
-
-            .btn-apply {
-                font-size: 14px !important;
-                padding: 12px !important;
-            }
-
-            .stats-card {
-                font-size: 12px !important;
-                padding: 12px !important;
-            }
-
-            .modal-content {
-                width: 95% !important;
-                max-width: 95% !important;
-                margin: 0 auto !important;
-            }
-
-            #adContent,
-            #resultContent {
-                padding: 15px !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-                /* Ensure padding doesn't add to width */
-            }
-
-            .modal-close {
-                right: 10px !important;
-                top: 10px !important;
-            }
-
-            /* Lucky Number Result Mobile Layout */
-            .result-row-wrapper {
-                flex-wrap: wrap !important;
-                justify-content: flex-start !important;
-                gap: 5px !important;
-                padding: 5px 0;
-            }
-
-            .result-label {
-                width: 100% !important;
-                text-align: left !important;
-                margin-bottom: 5px !important;
-                padding-left: 5px;
-            }
-
-            .result-balls {
-                justify-content: flex-start !important;
-                /* Align balls to left */
-            }
-        }
-
-        /* Selection Menu Styles (Global) */
-        .selection-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        /* AI System Card Style */
-        .ai-system-card {
-            background: linear-gradient(135deg, #6366f1 0%, #d946ef 100%);
-            border-radius: 20px;
-            padding: 18px 20px;
-            margin-bottom: 20px;
-            color: white;
-            text-align: left;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .ai-system-card .ai-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .ai-system-card .ai-desc {
-            font-size: 13px;
-            line-height: 1.5;
-            opacity: 0.9;
-            margin-bottom: 15px;
-            word-break: keep-all;
-        }
-
-        .ai-system-card .ai-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .ai-system-card .ai-tag {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .selection-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
-
-        .selection-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            background: white;
-        }
-
-        .selection-icon {
-            font-size: 24px;
-            background: #f0f4f8;
-            min-width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .selection-info {
-            flex: 1;
-        }
-
-        .selection-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 2px;
-            display: block;
-        }
-
-        .selection-desc {
-            font-size: 12px;
-            color: #666;
-            display: block;
-        }
-
-        /* Loading Animation */
-        .loader-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: white;
-            text-align: center;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fae100;
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Dream Mode Styles */
-        .dream-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .dream-tag {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .dream-tag:hover {
-            background: white;
-            color: #667eea;
-            font-weight: bold;
-        }
-
-        .dream-input-box {
-            display: flex;
-            gap: 5px;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .dream-input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            text-align: center;
-            outline: none;
-            min-width: 0;
-            /* Allow input to shrink if needed */
-        }
-
-        .btn-dream-submit {
-            background: #fae100;
-            color: #333;
-            border: none;
-            padding: 0 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-            /* Prevent text wrapping */
-            flex-shrink: 0;
-            /* Don't let the button shrink below its text content */
-        }
-
-        /* Input Container for Dream/Zodiac */
-        .input-container {
-            display: none;
-            width: 100%;
-            text-align: center;
-        }
-
-        .btn-sm {
-            background-color: #555;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn-sm:hover {
-            background-color: #333;
-        }
-
-        /* Recent Rounds Dropdown Styles */
-        .recent-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-toggle {
-            background-color: #1976d2;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .dropdown-toggle:hover {
-            background-color: #1565c0;
-        }
-
-        .dropdown-toggle::after {
-            content: '▼';
-            font-size: 10px;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            min-width: 120px;
-            margin-top: 4px;
-            overflow: hidden;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-            animation: dropdownFadeIn 0.2s ease;
-        }
-
-        @keyframes dropdownFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .dropdown-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 13px;
-            color: #333;
-            transition: background 0.2s;
-        }
-
-        .dropdown-item:hover {
-            background-color: #f0f0f0;
-        }
-
-        /* Zodiac Mode Styles */
-        .zodiac-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            width: 100%;
-            max-width: 320px;
-            margin: 0 auto;
-        }
-
-        .zodiac-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 10px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            aspect-ratio: 1;
-            /* Square shape */
-        }
-
-        .zodiac-item:hover {
-            transform: scale(1.05);
-            background: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .zodiac-icon {
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-
-        .zodiac-name {
-            font-size: 12px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .horoscope-text-box {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            color: white;
-            font-size: 14px;
-            line-height: 1.5;
-            border-left: 4px solid #fae100;
-        }
-
-        /* QR Scanner Modal Styles */
-        #qrModal {
-            z-index: 10000;
-        }
-
-        .qr-modal-content {
-            background: #fff;
-            max-width: 600px;
-            width: 95%;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 90vh;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        #qr-reader {
-            width: 100%;
-            border: none !important;
-        }
-
-        #qr-reader__dashboard {
-            padding: 20px !important;
-        }
-
-        #qr-reader__status_span {
-            font-size: 14px !important;
-            font-weight: bold !important;
-        }
-
-        .qr-result-container {
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #eee;
-            overflow-y: auto;
-        }
-
-        .qr-game-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .qr-prize-badge {
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .prize-none {
-            background: #999;
-        }
-
-        .prize-win {
-            background: #ff5252;
-        }
-
-        /* Frequency Dashboard Styles */
-        .freq-modal-content {
-            background: #fff;
-            max-width: 500px;
-            width: 90%;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            max-height: 85vh;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        @media (max-width: 640px) {
-            .freq-modal-content {
-                width: 95%;
-                max-height: 90vh;
-                border-radius: 15px;
-            }
-
-            .freq-body {
-                padding: 15px 10px;
-            }
-
-            .freq-row {
+            .ai-system-card .ai-title {
+                display: flex;
+                align-items: center;
                 gap: 8px;
+                font-size: 18px;
+                font-weight: 800;
+                margin-bottom: 12px;
             }
 
-            .freq-ball {
-                width: 28px;
-                height: 28px;
-                font-size: 0.8rem;
+            .ai-system-card .ai-desc {
+                font-size: 13px;
+                line-height: 1.5;
+                opacity: 0.9;
+                margin-bottom: 15px;
+                word-break: keep-all;
             }
 
-            .freq-bar-container {
-                height: 10px;
-            }
-        }
-
-        .freq-header {
-            background: #80cbc4;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .freq-header .back-btn {
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .freq-body {
-            padding: 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .freq-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 15px;
-        }
-
-        .freq-ball {
-            width: 32px;
-            height: 32px;
-            border: 2px solid #ccc;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-
-        .freq-bar-container {
-            flex: 1;
-            height: 12px;
-            background: #e0e0e0;
-            border-radius: 6px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .freq-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #444, #777);
-            border-radius: 6px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .freq-disclaimer {
-            font-size: 11px;
-            color: #ff5252;
-            margin-top: 5px;
-            font-weight: 500;
-        }
-
-        .freq-count {
-            width: 35px;
-            text-align: right;
-            font-size: 0.95rem;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .freq-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-
-        .freq-filter-row {
-            display: flex;
-            gap: 15px;
-            font-size: 0.95rem;
-            color: #1976d2;
-            font-weight: 500;
-            justify-content: center;
-        }
-
-        .freq-filter-item {
-            cursor: pointer;
-            padding: 2px 5px;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .freq-filter-item.active {
-            font-weight: 800;
-            border-bottom: 2px solid #1976d2;
-        }
-
-        .freq-range-display {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #1976d2;
-            margin-top: 5px;
-        }
-
-        /* PC: 제목 줄바꿈 숨김 */
-        .freq-title-br {
-            display: none;
-        }
-
-        /* Mobile Responsive Styles */
-        @media (max-width: 768px) {
-            .stats-card {
-                padding: 15px 15px 15px 15px;
-                /* 오른쪽 패딩을 15px로 증가하여 숫자가 왼쪽으로 이동 */
+            .ai-system-card .ai-tags {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
             }
 
-            .stat-item {
-                padding-right: 15px;
-                /* 오른쪽 여백 증가로 숫자가 화면 왼쪽으로 이동 */
+            .ai-system-card .ai-tag {
+                background: rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+                padding: 5px 12px;
+                border-radius: 15px;
+                font-size: 11px;
+                font-weight: 600;
             }
 
-            /* 모바일에서만 제목 줄바꿈 표시 */
-            .freq-title-br {
+            .selection-card {
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 12px;
+                padding: 15px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                text-align: left;
+            }
+
+            .selection-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+                background: white;
+            }
+
+            .selection-icon {
+                font-size: 24px;
+                background: #f0f4f8;
+                min-width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .selection-info {
+                flex: 1;
+            }
+
+            .selection-title {
+                font-size: 16px;
+                font-weight: bold;
+                color: #333;
+                margin-bottom: 2px;
                 display: block;
             }
 
-            /* 모바일에서만 제목 줄 간격 축소 */
-            .freq-header>div:nth-child(2) {
-                line-height: 1.1;
+            .selection-desc {
+                font-size: 12px;
+                color: #666;
+                display: block;
             }
 
-            /* 모바일에서만 필터 버튼 간격 확대 (0.3cm) */
-            .freq-filter-row {
-                gap: 26px;
+            /* Loading Animation */
+            .loader-container {
+                display: none;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                color: white;
+                text-align: center;
             }
-        }
 
-        /* Roadview Modal Styles */
-        .roadview-modal-content {
-            background: white;
-            margin: 2% auto;
-            padding: 0;
-            width: 90%;
-            max-width: 900px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+            .spinner {
+                width: 40px;
+                height: 40px;
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: #fae100;
+                animation: spin 1s ease-in-out infinite;
+                margin-bottom: 20px;
+            }
 
-        .roadview-header {
-            background: linear-gradient(135deg, #80cbc4 0%, #26a69a 100%);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
 
-        .roadview-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
+            /* Dream Mode Styles */
+            .dream-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
 
-        .roadview-close-btn {
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            color: white;
-            line-height: 1;
-            transition: transform 0.2s;
-        }
+            .dream-tag {
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            }
 
-        .roadview-close-btn:hover {
-            transform: scale(1.2);
-        }
+            .dream-tag:hover {
+                background: white;
+                color: #667eea;
+                font-weight: bold;
+            }
 
-        .roadview-help {
-            background: #fff3cd;
-            color: #856404;
-            padding: 8px 15px;
-            text-align: center;
-            font-size: 13px;
-            border-top: 1px solid #ffeaa7;
-        }
+            .dream-input-box {
+                display: flex;
+                gap: 5px;
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
 
-        .roadview-notice {
-            background: #fff8e1;
-            color: #f57c00;
-            padding: 10px 15px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            border-top: 1px solid #ffecb3;
-        }
+            .dream-input {
+                flex: 1;
+                padding: 10px;
+                border-radius: 8px;
+                border: none;
+                text-align: center;
+                outline: none;
+                min-width: 0;
+                /* Allow input to shrink if needed */
+            }
 
-        .roadview-actions {
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            background: #f8f9fa;
-        }
+            .btn-dream-submit {
+                background: #fae100;
+                color: #333;
+                border: none;
+                padding: 0 15px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                white-space: nowrap;
+                /* Prevent text wrapping */
+                flex-shrink: 0;
+                /* Don't let the button shrink below its text content */
+            }
 
-        .btn-roadview {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+            /* Input Container for Dream/Zodiac */
+            .input-container {
+                display: none;
+                width: 100%;
+                text-align: center;
+            }
 
-        .btn-roadview.btn-copy {
-            background: #4CAF50;
-            color: white;
-        }
+            .btn-sm {
+                background-color: #555;
+                color: white;
+                border: none;
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+                white-space: nowrap;
+            }
 
-        .btn-roadview.btn-copy:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
+            .btn-sm:hover {
+                background-color: #333;
+            }
 
-        .btn-roadview.btn-navi {
-            background: #2196F3;
-            color: white;
-        }
+            /* Recent Rounds Dropdown Styles */
+            .recent-dropdown {
+                position: relative;
+                display: inline-block;
+            }
 
-        .btn-roadview.btn-navi:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-        }
+            .dropdown-toggle {
+                background-color: #1976d2;
+                color: white;
+                border: none;
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
 
-        .btn-roadview.btn-close {
-            background: #9E9E9E;
-            color: white;
-        }
+            .dropdown-toggle:hover {
+                background-color: #1565c0;
+            }
 
-        .btn-roadview.btn-close:hover {
-            background: #757575;
-        }
+            .dropdown-toggle::after {
+                content: '▼';
+                font-size: 10px;
+            }
 
-        .btn-roadview.btn-kakaomap {
-            background: #FF9800;
-            color: white;
-        }
+            .dropdown-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                min-width: 120px;
+                margin-top: 4px;
+                overflow: hidden;
+            }
 
-        .btn-roadview.btn-kakaomap:hover {
-            background: #F57C00;
-            transform: translateY(-2px);
-        }
+            .dropdown-menu.show {
+                display: block;
+                animation: dropdownFadeIn 0.2s ease;
+            }
 
-        .btn-roadview.btn-naver {
-            background: #03c75a;
-            color: white;
-        }
+            @keyframes dropdownFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
 
-        .btn-roadview.btn-naver:hover {
-            background: #02b350;
-            transform: translateY(-2px);
-        }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
 
-        @media (max-width: 768px) {
-            .roadview-modal-content {
+            .dropdown-item {
+                padding: 8px 12px;
+                cursor: pointer;
+                font-size: 13px;
+                color: #333;
+                transition: background 0.2s;
+            }
+
+            .dropdown-item:hover {
+                background-color: #f0f0f0;
+            }
+
+            /* Zodiac Mode Styles */
+            .zodiac-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                width: 100%;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+
+            .zodiac-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 12px;
+                padding: 10px;
+                cursor: pointer;
+                transition: transform 0.2s, background 0.2s;
+                aspect-ratio: 1;
+                /* Square shape */
+            }
+
+            .zodiac-item:hover {
+                transform: scale(1.05);
+                background: rgba(255, 255, 255, 0.4);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .zodiac-icon {
+                font-size: 28px;
+                margin-bottom: 5px;
+            }
+
+            .zodiac-name {
+                font-size: 12px;
+                color: white;
+                font-weight: bold;
+            }
+
+            .horoscope-text-box {
+                background: rgba(0, 0, 0, 0.2);
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                text-align: center;
+                color: white;
+                font-size: 14px;
+                line-height: 1.5;
+                border-left: 4px solid #fae100;
+            }
+
+            /* QR Scanner Modal Styles */
+            #qrModal {
+                z-index: 10000;
+            }
+
+            .qr-modal-content {
+                background: #fff;
+                max-width: 600px;
                 width: 95%;
-                margin: 5% auto;
+                border-radius: 20px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                max-height: 90vh;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             }
 
-            #roadview {
-                height: 300px !important;
+            #qr-reader {
+                width: 100%;
+                border: none !important;
+            }
+
+            #qr-reader__dashboard {
+                padding: 20px !important;
+            }
+
+            #qr-reader__status_span {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+
+            .qr-result-container {
+                padding: 20px;
+                background: #f8f9fa;
+                border-top: 1px solid #eee;
+                overflow-y: auto;
+            }
+
+            .qr-game-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px;
+                background: white;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .qr-prize-badge {
+                padding: 4px 12px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: bold;
+                color: white;
+            }
+
+            .prize-none {
+                background: #999;
+            }
+
+            .prize-win {
+                background: #ff5252;
+            }
+
+            /* Frequency Dashboard Styles */
+            .freq-modal-content {
+                background: #fff;
+                max-width: 500px;
+                width: 90%;
+                border-radius: 20px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                max-height: 85vh;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            @media (max-width: 640px) {
+                .freq-modal-content {
+                    width: 95%;
+                    max-height: 90vh;
+                    border-radius: 15px;
+                }
+
+                .freq-body {
+                    padding: 15px 10px;
+                }
+
+                .freq-row {
+                    gap: 8px;
+                }
+
+                .freq-ball {
+                    width: 28px;
+                    height: 28px;
+                    font-size: 0.8rem;
+                }
+
+                .freq-bar-container {
+                    height: 10px;
+                }
+            }
+
+            .freq-header {
+                background: #80cbc4;
+                color: white;
+                padding: 15px;
+                text-align: center;
+                font-size: 1.2rem;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .freq-header .back-btn {
+                cursor: pointer;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .freq-body {
+                padding: 20px;
+                overflow-y: auto;
+                flex: 1;
+            }
+
+            .freq-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 12px;
+                gap: 15px;
+            }
+
+            .freq-ball {
+                width: 32px;
+                height: 32px;
+                border: 2px solid #ccc;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 0.9rem;
+                flex-shrink: 0;
+            }
+
+            .freq-bar-container {
+                flex: 1;
+                height: 12px;
+                background: #e0e0e0;
+                border-radius: 6px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .freq-bar-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #444, #777);
+                border-radius: 6px;
+                transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .freq-disclaimer {
+                font-size: 11px;
+                color: #ff5252;
+                margin-top: 5px;
+                font-weight: 500;
+            }
+
+            .freq-count {
+                width: 35px;
+                text-align: right;
+                font-size: 0.95rem;
+                color: #333;
+                font-weight: 500;
+            }
+
+            .freq-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 25px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 15px;
+            }
+
+            .freq-filter-row {
+                display: flex;
+                gap: 15px;
+                font-size: 0.95rem;
+                color: #1976d2;
+                font-weight: 500;
+                justify-content: center;
+            }
+
+            .freq-filter-item {
+                cursor: pointer;
+                padding: 2px 5px;
+                transition: all 0.2s;
+                text-align: center;
+            }
+
+            .freq-filter-item.active {
+                font-weight: 800;
+                border-bottom: 2px solid #1976d2;
+            }
+
+            .freq-range-display {
+                text-align: center;
+                font-size: 1.1rem;
+                color: #1976d2;
+                margin-top: 5px;
+            }
+
+            /* PC: 제목 줄바꿈 숨김 */
+            .freq-title-br {
+                display: none;
+            }
+
+            /* Mobile Responsive Styles */
+            @media (max-width: 768px) {
+                .stats-card {
+                    padding: 15px 15px 15px 15px;
+                    /* 오른쪽 패딩을 15px로 증가하여 숫자가 왼쪽으로 이동 */
+                }
+
+                .stat-item {
+                    padding-right: 15px;
+                    /* 오른쪽 여백 증가로 숫자가 화면 왼쪽으로 이동 */
+                }
+
+                /* 모바일에서만 제목 줄바꿈 표시 */
+                .freq-title-br {
+                    display: block;
+                }
+
+                /* 모바일에서만 제목 줄 간격 축소 */
+                .freq-header>div:nth-child(2) {
+                    line-height: 1.1;
+                }
+
+                /* 모바일에서만 필터 버튼 간격 확대 (0.3cm) */
+                .freq-filter-row {
+                    gap: 26px;
+                }
+            }
+
+            /* Roadview Modal Styles */
+            .roadview-modal-content {
+                background: white;
+                margin: 2% auto;
+                padding: 0;
+                width: 90%;
+                max-width: 900px;
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            }
+
+            .roadview-header {
+                background: linear-gradient(135deg, #80cbc4 0%, #26a69a 100%);
+                color: white;
+                padding: 15px 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .roadview-title {
+                font-size: 1.1rem;
+                font-weight: bold;
+            }
+
+            .roadview-close-btn {
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                color: white;
+                line-height: 1;
+                transition: transform 0.2s;
+            }
+
+            .roadview-close-btn:hover {
+                transform: scale(1.2);
+            }
+
+            .roadview-help {
+                background: #fff3cd;
+                color: #856404;
+                padding: 8px 15px;
+                text-align: center;
+                font-size: 13px;
+                border-top: 1px solid #ffeaa7;
+            }
+
+            .roadview-notice {
+                background: #fff8e1;
+                color: #f57c00;
+                padding: 10px 15px;
+                text-align: center;
+                font-size: 14px;
+                font-weight: 600;
+                border-top: 1px solid #ffecb3;
             }
 
             .roadview-actions {
-                flex-direction: column;
+                padding: 15px;
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                background: #f8f9fa;
             }
 
             .btn-roadview {
-                width: 100%;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
             }
-        }
+
+            .btn-roadview.btn-copy {
+                background: #4CAF50;
+                color: white;
+            }
+
+            .btn-roadview.btn-copy:hover {
+                background: #45a049;
+                transform: translateY(-2px);
+            }
+
+            .btn-roadview.btn-navi {
+                background: #2196F3;
+                color: white;
+            }
+
+            .btn-roadview.btn-navi:hover {
+                background: #1976D2;
+                transform: translateY(-2px);
+            }
+
+            .btn-roadview.btn-close {
+                background: #9E9E9E;
+                color: white;
+            }
+
+            .btn-roadview.btn-close:hover {
+                background: #757575;
+            }
+
+            .btn-roadview.btn-kakaomap {
+                background: #FF9800;
+                color: white;
+            }
+
+            .btn-roadview.btn-kakaomap:hover {
+                background: #F57C00;
+                transform: translateY(-2px);
+            }
+
+            .btn-roadview.btn-naver {
+                background: #03c75a;
+                color: white;
+            }
+
+            .btn-roadview.btn-naver:hover {
+                background: #02b350;
+                transform: translateY(-2px);
+            }
+
+            @media (max-width: 768px) {
+                .roadview-modal-content {
+                    width: 95%;
+                    margin: 5% auto;
+                }
+
+                #roadview {
+                    height: 300px !important;
+                }
+
+                .roadview-actions {
+                    flex-direction: column;
+                }
+
+                .btn-roadview {
+                    width: 100%;
+                }
+            }
     </style>
 </head>
 
@@ -2862,12 +2892,20 @@
             map = new kakao.maps.Map(mapContainer, mapOption);
 
             // Close InfoWindow when clicking on map background
+            // Close InfoWindow & Toasts when clicking on map background
             kakao.maps.event.addListener(map, 'click', function () {
+                // 1. Close InfoWindow
                 if (currentInfoWindow) {
                     currentInfoWindow.close();
                     currentInfoWindow = null;
                     document.body.classList.remove('iw-open'); // Restore UI
                 }
+
+                // 2. Close All Toasts (including "Nearby Shops")
+                closeAllToasts();
+
+                // 3. Close Side Nav if open (Optional, but good UX)
+                closeNav();
             });
 
             clusterer = new kakao.maps.MarkerClusterer({
