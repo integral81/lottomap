@@ -4794,31 +4794,77 @@
 
         // ============ Roadview Functions ============
 
-        function openRoadview(shop) {
+        function openRoadview(arg1, arg2, arg3, arg4, arg5, arg6) {
             const roadviewContainer = document.getElementById('roadview-modal');
             const roadviewEl = document.getElementById('roadview');
-            const staticImg = document.getElementById('roadviewStaticImage');
-            if (shop.customMessage) {
-                messageEl.textContent = shop.customMessage;
-                messageEl.style.display = 'block';
+
+            let lat, lng, shopName, address, actionType, actionData, shop;
+
+            // Handle Overloaded Arguments
+            if (typeof arg1 === 'object' && arg1 !== null) {
+                // Called with shop object: openRoadview(shop)
+                shop = arg1;
+                lat = shop.lat;
+                lng = shop.lng;
+                shopName = shop.n;
+                address = shop.a;
+                actionType = null;
+                actionData = null;
             } else {
-                messageEl.style.display = 'none';
+                // Called with individual args: openRoadview(lat, lng, name, addr, type, data)
+                lat = arg1;
+                lng = arg2;
+                shopName = arg3;
+                address = arg4;
+                actionType = arg5;
+                actionData = arg6;
+                shop = { lat, lng, n: shopName, a: address }; // Mock shop object
             }
 
-            // Roadview Button Visibility - ALWAYS SHOW
-            const roadviewBtn = document.getElementById('btn-roadview');
-            roadviewBtn.style.display = 'flex';
-            roadviewBtn.onclick = () => openRoadview(shop);
+            // Lazy Initialization
+            if (!roadview) {
+                roadview = new kakao.maps.Roadview(roadviewEl);
+            }
+            if (!roadviewClient) {
+                roadviewClient = new kakao.maps.RoadviewClient();
+            }
 
-            // Map Panning
+            const staticImg = document.getElementById('roadviewStaticImage');
 
-            if (preset && preset.imageUrl) {
+            // Resolve Preset
+            // The original code had `if (preset && preset.imageUrl)` and `if (preset && preset.panoId)`.
+            // This implies 'preset' was already defined or expected to be.
+            // Let's define it here based on the shopName and address.
+            // Assuming ROADVIEW_PRESETS is a global array.
+            const foundPreset = ROADVIEW_PRESETS.find(p => p.name === shopName || (p.addr && address.includes(p.addr)));
+            const activePreset = foundPreset || null;
+
+            // Custom Message Sync
+            const msgOverlay = document.getElementById('roadview-message-overlay');
+            const shopMsgEl = document.getElementById('shop-message');
+
+            if (msgOverlay) {
+                // Priority: shop.customMessage > shop-message element content
+                if (shop.customMessage) {
+                    msgOverlay.textContent = shop.customMessage;
+                    msgOverlay.style.display = 'block';
+                } else if (shopMsgEl && shopMsgEl.textContent && shopMsgEl.style.display !== 'none') {
+                    msgOverlay.textContent = shopMsgEl.textContent;
+                    msgOverlay.style.display = 'block';
+                } else {
+                    msgOverlay.style.display = 'none';
+                }
+            }
+
+
+            // Static Image Mode
+            if (activePreset && activePreset.imageUrl) {
                 // Display Static Image
                 roadviewEl.style.display = 'none';
                 imgContainer.style.display = 'block';
-                staticImg.src = preset.imageUrl;
+                staticImg.src = activePreset.imageUrl;
                 helpText.style.display = 'none';
-                modal.style.display = 'block';
+                roadviewContainer.style.display = 'block';
 
                 // Action buttons setup for Image mode
                 copyBtn.style.display = 'none';
@@ -4834,19 +4880,6 @@
                 return; // End here for image mode
             }
 
-            // Custom Message Sync
-            const msgOverlay = document.getElementById('roadview-message-overlay');
-            const shopMsgEl = document.getElementById('shop-message');
-
-            if (msgOverlay) {
-                if (shopMsgEl && shopMsgEl.textContent && shopMsgEl.style.display !== 'none') {
-                    msgOverlay.textContent = shopMsgEl.textContent;
-                    msgOverlay.style.display = 'block';
-                } else {
-                    msgOverlay.style.display = 'none';
-                }
-            }
-
             // Normal Roadview Mode
             roadviewEl.style.display = 'block';
             imgContainer.style.display = 'none';
@@ -4854,11 +4887,11 @@
 
             const displayRoadview = (finalPanoId, finalPos) => {
                 roadview.setPanoId(finalPanoId, finalPos);
-                modal.style.display = 'block';
+                roadviewContainer.style.display = 'block';
 
-                if (preset) {
+                if (activePreset) {
                     setTimeout(() => {
-                        roadview.setViewpoint(new kakao.maps.Viewpoint(preset.pov.pan, preset.pov.tilt, preset.pov.zoom));
+                        roadview.setViewpoint(new kakao.maps.Viewpoint(activePreset.pov.pan, activePreset.pov.tilt, activePreset.pov.zoom));
                     }, 1200);
                 }
 
@@ -4875,10 +4908,10 @@
                 document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
             };
 
-            if (preset && preset.panoId) {
+            if (activePreset && activePreset.panoId) {
                 // If we have a verified Pano ID, use it directly (bypass search)
                 const verifiedPos = new kakao.maps.LatLng(lat, lng);
-                displayRoadview(preset.panoId, verifiedPos);
+                displayRoadview(activePreset.panoId, verifiedPos);
             } else {
                 // Precise Identification using Places Service
                 const ps = new kakao.maps.services.Places();
@@ -4897,7 +4930,8 @@
         }
 
         function closeRoadview() {
-            document.getElementById('roadviewModal').style.display = 'none';
+            const modal = document.getElementById('roadview-modal');
+            if (modal) modal.style.display = 'none';
         }
 
         function openRoadviewWithCopy(lat, lng, shopName, address) {
