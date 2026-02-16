@@ -2608,6 +2608,19 @@
     </div>
 
     <script>
+        window.onerror = function (message, source, lineno, colno, error) {
+            console.error("Global Error:", message, "at", source, ":", lineno);
+            const mapDiv = document.getElementById('map');
+            if (mapDiv && (!mapDiv.hasChildNodes() || mapDiv.innerHTML.trim() === '')) {
+                mapDiv.innerHTML = `<div style="padding:20px; color:red; background:white; z-index:9999; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); border:2px solid red; padding:20px; background:white;">
+                     <h3>⚠️ 오류 발생</h3>
+                     <p>${message}</p>
+                     <p>${source}:${lineno}</p>
+                 </div>`;
+            }
+        };
+    </script>
+    <script>
         let map;
         let clusterer;
         let allData = [];
@@ -2619,133 +2632,133 @@
         // Premium Roadview POV Presets (User Verified 260210)
         const ROADVIEW_PRESETS = [
             // User Request: Sejin Electronics (Daegu)
-            { name: "세진전자통신", addr: "대구 서구 서대구로", panoid: 1201585664, pov: { pan: 93.03, tilt: 5.09, zoom: -3 } },
-            { name: "세방매점", addr: "경북 경주시 산업로", panoid: 1165999460, pov: { pan: 281.43, tilt: 6.82, zoom: -1 } },
+            { name: "세진전자통신", addr: "대구 서구 서대구로", panoId: 1201585664, pov: { pan: 93.03, tilt: 5.09, zoom: -3 } },
+            { name: "세방매점", addr: "경북 경주시 산업로", panoId: 1165999460, pov: { pan: 281.43, tilt: 6.82, zoom: -1 } },
             // User Request: 4 Recovered Shops (260216)
-            { name: "대박행진 복권랜드", addr: "경기 파주시 금빛로", panoid: 1045548538, pov: { pan: 179.33, tilt: 3.10, zoom: -3 } },
-            { name: "서울로또방", addr: "충북 옥천군 삼금로", panoid: 1185000546, pov: { pan: 206.53, tilt: 3.14, zoom: -3 } },
-            { name: "우정식품", addr: "부산 동래구 온천장로", panoid: 1202699459, pov: { pan: 262.41, tilt: -2.15, zoom: -3 } },
-            { name: "가로판매소", addr: "서울 구로구 새말로", panoid: 1198164443, pov: { pan: 17.40, tilt: 6.76, zoom: 2 } },
-            { name: "원스탑", addr: "서울 송파구 백제고분로7길", panoid: 1197972914, pov: { pan: 27.06, tilt: -6.82, zoom: 0 } },
+            { name: "대박행진 복권랜드", addr: "경기 파주시 금빛로", panoId: 1045548538, pov: { pan: 179.33, tilt: 3.10, zoom: -3 } },
+            { name: "서울로또방", addr: "충북 옥천군 삼금로", panoId: 1185000546, pov: { pan: 206.53, tilt: 3.14, zoom: -3 } },
+            { name: "우정식품", addr: "부산 동래구 온천장로", panoId: 1202699459, pov: { pan: 262.41, tilt: -2.15, zoom: -3 } },
+            { name: "가로판매소", addr: "서울 구로구 새말로", panoId: 1198164443, pov: { pan: 17.40, tilt: 6.76, zoom: 2 } },
+            { name: "원스탑", addr: "서울 송파구 백제고분로7길", panoId: 1197972914, pov: { pan: 27.06, tilt: -6.82, zoom: 0 } },
             // User Request: 18 Recovered Shops (260216-2)
-            { name: "사이버정보통신", addr: "부산 부산진구 동평로", panoid: 1202364869, pov: { pan: 37.89, tilt: 2.99, zoom: -2 } },
-            { name: "나눔로또편의점", addr: "전남 광양시 공영로", panoid: 1205201589, pov: { pan: 183.29, tilt: -2.32, zoom: -1 } },
-            { name: "율암25시편의점", addr: "경기 화성시 시청로", panoid: 1198087972, pov: { pan: 158.58, tilt: 1.36, zoom: 0 } },
-            { name: "해피+24시편의점", addr: "광주 북구 하서로", panoid: 1200291324, pov: { pan: 84.83, tilt: 1.48, zoom: -3 } },
-            { name: "흥양마중물", addr: "강원 원주시 치악로", panoid: 1195199655, pov: { pan: 305.15, tilt: 13.98, zoom: -2 } },
-            { name: "복권마트 & 씨스페이스 홍천점", addr: "강원 홍천군 홍천로", panoid: 1197150362, pov: { pan: 307.89, tilt: 2.54, zoom: -2 } },
-            { name: "한국인세계대박복권", addr: "인천 연수구 독배로197번길", panoid: 1200648162, pov: { pan: 281.03, tilt: -2.90, zoom: -2 } },
-            { name: "하이로또", addr: "서울 금천구 금하로", panoid: 1198115190, pov: { pan: 209.13, tilt: -1.64, zoom: -2 } },
-            { name: "충남상회", addr: "인천 미추홀구 참외전로", panoid: 1199332008, pov: { pan: 287.35, tilt: 2.72, zoom: 0 } },
-            { name: "세븐일레븐화성봉담수기점", addr: "경기 화성시 세자로", panoid: 1197741399, pov: { pan: 154.47, tilt: 0.15, zoom: 2 } },
-            { name: "새상무복권", addr: "광주 서구 치평로", panoid: 1200264571, pov: { pan: 92.32, tilt: 0.07, zoom: -2 } },
-            { name: "한아름매점", addr: "충남 홍성군 광천읍", panoid: 1160927365, pov: { pan: 23.96, tilt: -3.90, zoom: -3 } },
-            { name: "차부상회", addr: "경기 김포시 통진읍", panoid: 1203538717, pov: { pan: 40.20, tilt: -1.06, zoom: -3 } },
-            { name: "행복슈퍼", addr: "서울 성북구 동소문로", panoid: 1198249502, pov: { pan: 8.00, tilt: 11.80, zoom: -3 } },
-            { name: "서해로또방", addr: "경기 화성시 화성로", panoid: 1196541229, pov: { pan: 347.47, tilt: 3.57, zoom: 1 } },
-            { name: "용두천하", addr: "광주 북구 하서로", panoid: 1200286962, pov: { pan: 260.36, tilt: 6.67, zoom: 0 } },
-            { name: "영훈슈퍼마켓", addr: "서울 도봉구 창3동", panoid: 1198487686, pov: { pan: 44.21, tilt: 2.30, zoom: -3 } },
-            { name: "코리아마트(비산점)", addr: "대구 서구 국채보상로", panoid: 1201556335, pov: { pan: 2.80, tilt: 1.39, zoom: 0 } },
+            { name: "사이버정보통신", addr: "부산 부산진구 동평로", panoId: 1202364869, pov: { pan: 37.89, tilt: 2.99, zoom: -2 } },
+            { name: "나눔로또편의점", addr: "전남 광양시 공영로", panoId: 1205201589, pov: { pan: 183.29, tilt: -2.32, zoom: -1 } },
+            { name: "율암25시편의점", addr: "경기 화성시 시청로", panoId: 1198087972, pov: { pan: 158.58, tilt: 1.36, zoom: 0 } },
+            { name: "해피+24시편의점", addr: "광주 북구 하서로", panoId: 1200291324, pov: { pan: 84.83, tilt: 1.48, zoom: -3 } },
+            { name: "흥양마중물", addr: "강원 원주시 치악로", panoId: 1195199655, pov: { pan: 305.15, tilt: 13.98, zoom: -2 } },
+            { name: "복권마트 & 씨스페이스 홍천점", addr: "강원 홍천군 홍천로", panoId: 1197150362, pov: { pan: 307.89, tilt: 2.54, zoom: -2 } },
+            { name: "한국인세계대박복권", addr: "인천 연수구 독배로197번길", panoId: 1200648162, pov: { pan: 281.03, tilt: -2.90, zoom: -2 } },
+            { name: "하이로또", addr: "서울 금천구 금하로", panoId: 1198115190, pov: { pan: 209.13, tilt: -1.64, zoom: -2 } },
+            { name: "충남상회", addr: "인천 미추홀구 참외전로", panoId: 1199332008, pov: { pan: 287.35, tilt: 2.72, zoom: 0 } },
+            { name: "세븐일레븐화성봉담수기점", addr: "경기 화성시 세자로", panoId: 1197741399, pov: { pan: 154.47, tilt: 0.15, zoom: 2 } },
+            { name: "새상무복권", addr: "광주 서구 치평로", panoId: 1200264571, pov: { pan: 92.32, tilt: 0.07, zoom: -2 } },
+            { name: "한아름매점", addr: "충남 홍성군 광천읍", panoId: 1160927365, pov: { pan: 23.96, tilt: -3.90, zoom: -3 } },
+            { name: "차부상회", addr: "경기 김포시 통진읍", panoId: 1203538717, pov: { pan: 40.20, tilt: -1.06, zoom: -3 } },
+            { name: "행복슈퍼", addr: "서울 성북구 동소문로", panoId: 1198249502, pov: { pan: 8.00, tilt: 11.80, zoom: -3 } },
+            { name: "서해로또방", addr: "경기 화성시 화성로", panoId: 1196541229, pov: { pan: 347.47, tilt: 3.57, zoom: 1 } },
+            { name: "용두천하", addr: "광주 북구 하서로", panoId: 1200286962, pov: { pan: 260.36, tilt: 6.67, zoom: 0 } },
+            { name: "영훈슈퍼마켓", addr: "서울 도봉구 창3동", panoId: 1198487686, pov: { pan: 44.21, tilt: 2.30, zoom: -3 } },
+            { name: "코리아마트(비산점)", addr: "대구 서구 국채보상로", panoId: 1201556335, pov: { pan: 2.80, tilt: 1.39, zoom: 0 } },
             { name: "원웨이로또 (폐점)", addr: "서울 서초구 서초동 1571-18 청화빌딩", isClosed: true, customMessage: "과거 6회 당첨 이력이 있으나 현재 폐점되었습니다." },
-            { name: "원스탑", addr: "서울 송파구 백제고분로7길", panoid: 1197972914, pov: { pan: 27.06, tilt: -6.82, zoom: 0 } },
+            { name: "원스탑", addr: "서울 송파구 백제고분로7길", panoId: 1197972914, pov: { pan: 27.06, tilt: -6.82, zoom: 0 } },
             // User Request: 3 Shops (260216-3)
-            { name: "제일복권", addr: "경남 양산시 양산역2길", panoid: 1204952001, pov: { pan: 21.04, tilt: -3.52, zoom: 0 } },
-            { name: "터미널식품", addr: "경기 의정부시 의정로", panoid: 1174621640, pov: { pan: 68.32, tilt: -2.09, zoom: 1 } },
-            { name: "진양호", addr: "경남 진주시 남강로", panoid: 1192787482, pov: { pan: 245.24, tilt: 1.05, zoom: 3 } },
+            { name: "제일복권", addr: "경남 양산시 양산역2길", panoId: 1204952001, pov: { pan: 21.04, tilt: -3.52, zoom: 0 } },
+            { name: "터미널식품", addr: "경기 의정부시 의정로", panoId: 1174621640, pov: { pan: 68.32, tilt: -2.09, zoom: 1 } },
+            { name: "진양호", addr: "경남 진주시 남강로", panoId: 1192787482, pov: { pan: 245.24, tilt: 1.05, zoom: 3 } },
             // User Request: 13 Shops (260216-4)
-            { name: "작은신부", addr: "충남 서산시 구진로", panoid: 1177372374, pov: { pan: 95.48, tilt: -0.98, zoom: 2 } },
-            { name: "보경복권", addr: "울산 북구 명촌6길", panoid: 1202119790, pov: { pan: 349.51, tilt: 0.35, zoom: 1 } },
-            { name: "로또야놀자", addr: "경북 경주시 양정로", panoid: 1187157120, pov: { pan: 265.02, tilt: 0.41, zoom: -2 } },
-            { name: "로또또", addr: "경기 김포시 봉수대로", panoid: 1203018324, pov: { pan: 343.01, tilt: 1.95, zoom: -3 } },
-            { name: "삼성포토랜드", addr: "인천 강화군 북문길", panoid: 1199442921, pov: { pan: 105.41, tilt: 2.36, zoom: -3 } },
-            { name: "세븐일레븐 현풍대로점", addr: "대구 달성군 비슬로", panoid: 1200939879, pov: { pan: 198.04, tilt: -0.79, zoom: 0 } },
-            { name: "우두로또", addr: "강원 춘천시 영서로", panoid: 1195653386, pov: { pan: 27.37, tilt: -1.48, zoom: 2 } },
-            { name: "송내매표소", addr: "경기 부천시 소사구", panoid: 1203623206, pov: { pan: 303.66, tilt: -6.13, zoom: 2 } },
-            { name: "온천로또방", addr: "대전 유성구 계룡로", panoid: 1200704937, pov: { pan: 260.53, tilt: -4.97, zoom: 2 } },
-            { name: "한경종합광고", addr: "서울 송파구 백제고분로", panoid: 1197947148, pov: { pan: 210.81, tilt: 2.59, zoom: 3 } },
-            { name: "그린로또", addr: "강원 양양군 양양로", panoid: 1196252686, pov: { pan: 175.22, tilt: -0.57, zoom: 1 } },
-            { name: "호반할인마트", addr: "광주 광산구 도산로9번길", panoid: 1200129909, pov: { pan: 318.66, tilt: 1.75, zoom: -3 } },
-            { name: "로또스튜디오", addr: "충북 청주시 청원구", panoid: 1170630295, pov: { pan: 53.76, tilt: 0.21, zoom: -3 } },
+            { name: "작은신부", addr: "충남 서산시 구진로", panoId: 1177372374, pov: { pan: 95.48, tilt: -0.98, zoom: 2 } },
+            { name: "보경복권", addr: "울산 북구 명촌6길", panoId: 1202119790, pov: { pan: 349.51, tilt: 0.35, zoom: 1 } },
+            { name: "로또야놀자", addr: "경북 경주시 양정로", panoId: 1187157120, pov: { pan: 265.02, tilt: 0.41, zoom: -2 } },
+            { name: "로또또", addr: "경기 김포시 봉수대로", panoId: 1203018324, pov: { pan: 343.01, tilt: 1.95, zoom: -3 } },
+            { name: "삼성포토랜드", addr: "인천 강화군 북문길", panoId: 1199442921, pov: { pan: 105.41, tilt: 2.36, zoom: -3 } },
+            { name: "세븐일레븐 현풍대로점", addr: "대구 달성군 비슬로", panoId: 1200939879, pov: { pan: 198.04, tilt: -0.79, zoom: 0 } },
+            { name: "우두로또", addr: "강원 춘천시 영서로", panoId: 1195653386, pov: { pan: 27.37, tilt: -1.48, zoom: 2 } },
+            { name: "송내매표소", addr: "경기 부천시 소사구", panoId: 1203623206, pov: { pan: 303.66, tilt: -6.13, zoom: 2 } },
+            { name: "온천로또방", addr: "대전 유성구 계룡로", panoId: 1200704937, pov: { pan: 260.53, tilt: -4.97, zoom: 2 } },
+            { name: "한경종합광고", addr: "서울 송파구 백제고분로", panoId: 1197947148, pov: { pan: 210.81, tilt: 2.59, zoom: 3 } },
+            { name: "그린로또", addr: "강원 양양군 양양로", panoId: 1196252686, pov: { pan: 175.22, tilt: -0.57, zoom: 1 } },
+            { name: "호반할인마트", addr: "광주 광산구 도산로9번길", panoId: 1200129909, pov: { pan: 318.66, tilt: 1.75, zoom: -3 } },
+            { name: "로또스튜디오", addr: "충북 청주시 청원구", panoId: 1170630295, pov: { pan: 53.76, tilt: 0.21, zoom: -3 } },
             // User Request: 6 Shops (260216-5)
-            { name: "코사마트금강점", addr: "대구 달서구 용산로", panoid: 1201616618, pov: { pan: 87.20, tilt: 5.74, zoom: -3 } },
-            { name: "황금대박점", addr: "서울 노원구 공릉로", panoid: 1197986422, pov: { pan: 75.30, tilt: 2.10, zoom: 2 } },
-            { name: "봉황로또", addr: "전북 임실군 운수로", panoid: 1184544406, pov: { pan: 277.47, tilt: -7.51, zoom: 2 } },
-            { name: "운수대통", addr: "인천 부평구 동암광장로", panoid: 1199147716, pov: { pan: 221.75, tilt: -1.58, zoom: 2 } },
-            { name: "울릉로또", addr: "경북 울릉군 봉래2길", panoid: 1196322336, pov: { pan: 192.70, tilt: -3.11, zoom: -3 } },
-            { name: "제주대림점", addr: "제주 제주시 과원북2길", panoid: 1182183945, pov: { pan: 156.35, tilt: -4.86, zoom: 1 } },
+            { name: "코사마트금강점", addr: "대구 달서구 용산로", panoId: 1201616618, pov: { pan: 87.20, tilt: 5.74, zoom: -3 } },
+            { name: "황금대박점", addr: "서울 노원구 공릉로", panoId: 1197986422, pov: { pan: 75.30, tilt: 2.10, zoom: 2 } },
+            { name: "봉황로또", addr: "전북 임실군 운수로", panoId: 1184544406, pov: { pan: 277.47, tilt: -7.51, zoom: 2 } },
+            { name: "운수대통", addr: "인천 부평구 동암광장로", panoId: 1199147716, pov: { pan: 221.75, tilt: -1.58, zoom: 2 } },
+            { name: "울릉로또", addr: "경북 울릉군 봉래2길", panoId: 1196322336, pov: { pan: 192.70, tilt: -3.11, zoom: -3 } },
+            { name: "제주대림점", addr: "제주 제주시 과원북2길", panoId: 1182183945, pov: { pan: 156.35, tilt: -4.86, zoom: 1 } },
             // User Request: D-mart (260216-6)
-            { name: "D-마트 담배", addr: "강원 속초시 조양상가길", panoid: 1196877412, pov: { pan: 235.90, tilt: -3.77, zoom: -3 }, customMessage: "롯데마트 내부 1층에 있습니다." },
+            { name: "D-마트 담배", addr: "강원 속초시 조양상가길", panoId: 1196877412, pov: { pan: 235.90, tilt: -3.77, zoom: -3 }, customMessage: "롯데마트 내부 1층에 있습니다." },
             // User Request: 3 Shops (260216-7)
-            { name: "스카이편의점", addr: "경기 안양시 만안구", panoid: 1202967509, pov: { pan: 172.54, tilt: -3.97, zoom: -3 } },
-            { name: "이삭", addr: "전남 목포시 통일대로", panoid: 1192652943, pov: { pan: 346.05, tilt: -3.16, zoom: 1 } },
-            { name: "대박유통", addr: "부산 중구 구덕로", panoid: 1202686590, pov: { pan: 326.06, tilt: -4.19, zoom: 1 } },
+            { name: "스카이편의점", addr: "경기 안양시 만안구", panoId: 1202967509, pov: { pan: 172.54, tilt: -3.97, zoom: -3 } },
+            { name: "이삭", addr: "전남 목포시 통일대로", panoId: 1192652943, pov: { pan: 346.05, tilt: -3.16, zoom: 1 } },
+            { name: "대박유통", addr: "부산 중구 구덕로", panoId: 1202686590, pov: { pan: 326.06, tilt: -4.19, zoom: 1 } },
             // User Request: 6 Shops (260216-8)
-            { name: "안성맞춤", addr: "경기 안성시 안성맞춤대로", panoid: 1176067110, pov: { pan: 201.02, tilt: 4.96, zoom: -2 } },
-            { name: "신세계", addr: "제주 제주시 고마로14길", panoid: 1182352878, pov: { pan: 115.48, tilt: -1.66, zoom: -3 } },
-            { name: "구담쌀슈퍼", addr: "경북 안동시 경동로", panoid: 1166243556, pov: { pan: 213.59, tilt: -1.80, zoom: -3 } },
-            { name: "토토복권", addr: "대구 서구 달서로12길", panoid: 1201339587, pov: { pan: 9.12, tilt: -3.19, zoom: -3 } },
-            { name: "우리은행금호동지점앞가판", addr: "서울 성동구 장터길", panoid: 1198891800, pov: { pan: 264.88, tilt: -10.57, zoom: -3 } },
-            { name: "외동복권", addr: "경남 김해시 동남로49번길", panoid: 1193704600, pov: { pan: 167.72, tilt: -1.15, zoom: -3 } },
+            { name: "안성맞춤", addr: "경기 안성시 안성맞춤대로", panoId: 1176067110, pov: { pan: 201.02, tilt: 4.96, zoom: -2 } },
+            { name: "신세계", addr: "제주 제주시 고마로14길", panoId: 1182352878, pov: { pan: 115.48, tilt: -1.66, zoom: -3 } },
+            { name: "구담쌀슈퍼", addr: "경북 안동시 경동로", panoId: 1166243556, pov: { pan: 213.59, tilt: -1.80, zoom: -3 } },
+            { name: "토토복권", addr: "대구 서구 달서로12길", panoId: 1201339587, pov: { pan: 9.12, tilt: -3.19, zoom: -3 } },
+            { name: "우리은행금호동지점앞가판", addr: "서울 성동구 장터길", panoId: 1198891800, pov: { pan: 264.88, tilt: -10.57, zoom: -3 } },
+            { name: "외동복권", addr: "경남 김해시 동남로49번길", panoId: 1193704600, pov: { pan: 167.72, tilt: -1.15, zoom: -3 } },
             // User Request: Closed Shop (260216-9)
             { name: "엘도라도복권전문점", addr: "서울 광진구 중곡동 124-65", isClosed: true, customMessage: "현재 폐점되었습니다." },
             // User Request: 3 Shops (260216-10)
-            { name: "하프타임(괴정점)", addr: "부산 사하구 사하로", panoid: 1202279089, pov: { pan: 191.71, tilt: -0.16, zoom: -1 } },
-            { name: "동홍코사마트", addr: "제주 서귀포시 동홍서로", panoid: 1181313516, pov: { pan: 92.42, tilt: 4.57, zoom: -3 } },
-            { name: "토큰박스", addr: "경기 남양주시 진건오남로", panoid: 1185000546, pov: { pan: 209.59, tilt: 3.38, zoom: -3 } },
+            { name: "하프타임(괴정점)", addr: "부산 사하구 사하로", panoId: 1202279089, pov: { pan: 191.71, tilt: -0.16, zoom: -1 } },
+            { name: "동홍코사마트", addr: "제주 서귀포시 동홍서로", panoId: 1181313516, pov: { pan: 92.42, tilt: 4.57, zoom: -3 } },
+            { name: "토큰박스", addr: "경기 남양주시 진건오남로", panoId: 1185000546, pov: { pan: 209.59, tilt: 3.38, zoom: -3 } },
             // User Request: Today (260216-11)
-            { name: "Today", addr: "서울 광진구 광나루로56길", panoid: 1198490195, pov: { pan: 148.43, tilt: -3.00, zoom: -3 }, customMessage: "테크노파크 9층에 매장있음" },
+            { name: "Today", addr: "서울 광진구 광나루로56길", panoId: 1198490195, pov: { pan: 148.43, tilt: -3.00, zoom: -3 }, customMessage: "테크노파크 9층에 매장있음" },
             // User Request: New Signboard (260216-12)
-            { name: "신간판", addr: "서울 중구 무교동 12-1", panoid: 1198684037, pov: { pan: 77.59, tilt: -6.13, zoom: -1 }, customMessage: "곰국시집 앞 가판이 맞습니다." },
+            { name: "신간판", addr: "서울 중구 무교동 12-1", panoId: 1198684037, pov: { pan: 77.59, tilt: -6.13, zoom: -1 }, customMessage: "곰국시집 앞 가판이 맞습니다." },
             // User Request: 2 Shops (260216-13)
-            { name: "버스카드판매대", addr: "서울 관악구 신림로", panoid: 1198278084, pov: { pan: 223.84, tilt: -0.59, zoom: -3 } },
-            { name: "마리오슈퍼", addr: "경기 부천시 송내대로265번길", panoid: 1203673840, pov: { pan: 188.39, tilt: -0.22, zoom: -1 }, customMessage: "뱅뱅프라자 1층 내부에 매장있음." },
+            { name: "버스카드판매대", addr: "서울 관악구 신림로", panoId: 1198278084, pov: { pan: 223.84, tilt: -0.59, zoom: -3 } },
+            { name: "마리오슈퍼", addr: "경기 부천시 송내대로265번길", panoId: 1203673840, pov: { pan: 188.39, tilt: -0.22, zoom: -1 }, customMessage: "뱅뱅프라자 1층 내부에 매장있음." },
             // User Request: 6 Shops (260216-14)
-            { name: "원동슈퍼", addr: "충남 보령시 중앙로", panoid: 1176675568, pov: { pan: 101.32, tilt: 4.96, zoom: -3 } },
-            { name: "현암꽃플라워", addr: "대전 동구 태전로", panoid: 1201410105, pov: { pan: 227.22, tilt: -2.16, zoom: -3 } },
-            { name: "미래유통", addr: "전남 목포시 영산로", panoid: 1192393614, pov: { pan: 282.37, tilt: 1.75, zoom: -1 } },
-            { name: "장군슈퍼", addr: "경기 부천시 오정구", panoid: 1203452762, pov: { pan: 315.13, tilt: -1.34, zoom: 0 } },
-            { name: "신명", addr: "서울 강서구 방화2동", panoid: 1198209762, pov: { pan: 307.53, tilt: 0.56, zoom: 0 } },
-            { name: "대광슈퍼", addr: "경기 군포시 고산로", panoid: 1175371099, pov: { pan: 334.69, tilt: -2.37, zoom: 2 } },
+            { name: "원동슈퍼", addr: "충남 보령시 중앙로", panoId: 1176675568, pov: { pan: 101.32, tilt: 4.96, zoom: -3 } },
+            { name: "현암꽃플라워", addr: "대전 동구 태전로", panoId: 1201410105, pov: { pan: 227.22, tilt: -2.16, zoom: -3 } },
+            { name: "미래유통", addr: "전남 목포시 영산로", panoId: 1192393614, pov: { pan: 282.37, tilt: 1.75, zoom: -1 } },
+            { name: "장군슈퍼", addr: "경기 부천시 오정구", panoId: 1203452762, pov: { pan: 315.13, tilt: -1.34, zoom: 0 } },
+            { name: "신명", addr: "서울 강서구 방화2동", panoId: 1198209762, pov: { pan: 307.53, tilt: 0.56, zoom: 0 } },
+            { name: "대광슈퍼", addr: "경기 군포시 고산로", panoId: 1175371099, pov: { pan: 334.69, tilt: -2.37, zoom: 2 } },
             // User Request: 9 Shops (260216-15)
-            { name: "혹시나도", addr: "충북 음성군 감곡면", panoid: 1164851877, pov: { pan: 16.89, tilt: 5.51, zoom: 2 } },
-            { name: "나라시스컴", addr: "서울 영등포구 영등포로", panoid: 1198373900, pov: { pan: 20.51, tilt: 2.58, zoom: 2 } },
-            { name: "나눔이매로또", addr: "경기 성남시 분당구", panoid: 1199105925, pov: { pan: 313.10, tilt: 0.42, zoom: 1 } },
-            { name: "대림통상", addr: "울산 중구 태화동", panoid: 1201823875, pov: { pan: 24.91, tilt: 3.83, zoom: 1 } },
-            { name: "제일슈퍼", addr: "인천 연수구 앵고개로", panoid: 1199991356, pov: { pan: 303.39, tilt: 1.72, zoom: 0 } },
-            { name: "경기상회", addr: "인천 남동구 만수동", panoid: 1199316390, pov: { pan: 177.01, tilt: 2.38, zoom: 1 } },
-            { name: "스포츠베팅샵", addr: "서울 서초구 양재대로11길", panoid: 1198055141, pov: { pan: 182.79, tilt: 2.40, zoom: 2 } },
-            { name: "우미슈퍼", addr: "광주 서구 풍암동", panoid: 1200542640, pov: { pan: 294.37, tilt: 1.70, zoom: 2 } },
-            { name: "진성식품", addr: "충북 제천시 의병대로", panoid: 1185296414, pov: { pan: 197.87, tilt: -0.77, zoom: 1 } },
+            { name: "혹시나도", addr: "충북 음성군 감곡면", panoId: 1164851877, pov: { pan: 16.89, tilt: 5.51, zoom: 2 } },
+            { name: "나라시스컴", addr: "서울 영등포구 영등포로", panoId: 1198373900, pov: { pan: 20.51, tilt: 2.58, zoom: 2 } },
+            { name: "나눔이매로또", addr: "경기 성남시 분당구", panoId: 1199105925, pov: { pan: 313.10, tilt: 0.42, zoom: 1 } },
+            { name: "대림통상", addr: "울산 중구 태화동", panoId: 1201823875, pov: { pan: 24.91, tilt: 3.83, zoom: 1 } },
+            { name: "제일슈퍼", addr: "인천 연수구 앵고개로", panoId: 1199991356, pov: { pan: 303.39, tilt: 1.72, zoom: 0 } },
+            { name: "경기상회", addr: "인천 남동구 만수동", panoId: 1199316390, pov: { pan: 177.01, tilt: 2.38, zoom: 1 } },
+            { name: "스포츠베팅샵", addr: "서울 서초구 양재대로11길", panoId: 1198055141, pov: { pan: 182.79, tilt: 2.40, zoom: 2 } },
+            { name: "우미슈퍼", addr: "광주 서구 풍암동", panoId: 1200542640, pov: { pan: 294.37, tilt: 1.70, zoom: 2 } },
+            { name: "진성식품", addr: "충북 제천시 의병대로", panoId: 1185296414, pov: { pan: 197.87, tilt: -0.77, zoom: 1 } },
             // User Request: 18 Recovered Shops (260216-2)
-            { name: "사이버정보통신", addr: "부산 부산진구 동평로", panoid: 1202364869, pov: { pan: 37.89, tilt: 2.99, zoom: -2 } },
-            { name: "나눔로또편의점", addr: "전남 광양시 공영로", panoid: 1205201589, pov: { pan: 183.29, tilt: -2.32, zoom: -1 } },
-            { name: "율암25시편의점", addr: "경기 화성시 시청로", panoid: 1198087972, pov: { pan: 158.58, tilt: 1.36, zoom: 0 } },
-            { name: "해피+24시편의점", addr: "광주 북구 하서로", panoid: 1200291324, pov: { pan: 84.83, tilt: 1.48, zoom: -3 } },
-            { name: "흥양마중물", addr: "강원 원주시 치악로", panoid: 1195199655, pov: { pan: 305.15, tilt: 13.98, zoom: -2 } },
-            { name: "복권마트 & 씨스페이스 홍천점", addr: "강원 홍천군 홍천로", panoid: 1197150362, pov: { pan: 307.89, tilt: 2.54, zoom: -2 } },
-            { name: "한국인세계대박복권", addr: "인천 연수구 독배로197번길", panoid: 1200648162, pov: { pan: 281.03, tilt: -2.90, zoom: -2 } },
-            { name: "하이로또", addr: "서울 금천구 금하로", panoid: 1198115190, pov: { pan: 209.13, tilt: -1.64, zoom: -2 } },
-            { name: "충남상회", addr: "인천 미추홀구 참외전로", panoid: 1199332008, pov: { pan: 287.35, tilt: 2.72, zoom: 0 } },
-            { name: "세븐일레븐화성봉담수기점", addr: "경기 화성시 세자로", panoid: 1197741399, pov: { pan: 154.47, tilt: 0.15, zoom: 2 } },
-            { name: "새상무복권", addr: "광주 서구 치평로", panoid: 1200264571, pov: { pan: 92.32, tilt: 0.07, zoom: -2 } },
-            { name: "한아름매점", addr: "충남 홍성군 광천읍", panoid: 1160927365, pov: { pan: 23.96, tilt: -3.90, zoom: -3 } },
-            { name: "차부상회", addr: "경기 김포시 통진읍", panoid: 1203538717, pov: { pan: 40.20, tilt: -1.06, zoom: -3 } },
-            { name: "행복슈퍼", addr: "서울 성북구 동소문로", panoid: 1198249502, pov: { pan: 8.00, tilt: 11.80, zoom: -3 } },
-            { name: "서해로또방", addr: "경기 화성시 화성로", panoid: 1196541229, pov: { pan: 347.47, tilt: 3.57, zoom: 1 } },
-            { name: "용두천하", addr: "광주 북구 하서로", panoid: 1200286962, pov: { pan: 260.36, tilt: 6.67, zoom: 0 } },
-            { name: "영훈슈퍼마켓", addr: "서울 도봉구 창3동", panoid: 1198487686, pov: { pan: 44.21, tilt: 2.30, zoom: -3 } },
-            { name: "코리아마트(비산점)", addr: "대구 서구 국채보상로", panoid: 1201556335, pov: { pan: 2.80, tilt: 1.39, zoom: 0 } },
+            { name: "사이버정보통신", addr: "부산 부산진구 동평로", panoId: 1202364869, pov: { pan: 37.89, tilt: 2.99, zoom: -2 } },
+            { name: "나눔로또편의점", addr: "전남 광양시 공영로", panoId: 1205201589, pov: { pan: 183.29, tilt: -2.32, zoom: -1 } },
+            { name: "율암25시편의점", addr: "경기 화성시 시청로", panoId: 1198087972, pov: { pan: 158.58, tilt: 1.36, zoom: 0 } },
+            { name: "해피+24시편의점", addr: "광주 북구 하서로", panoId: 1200291324, pov: { pan: 84.83, tilt: 1.48, zoom: -3 } },
+            { name: "흥양마중물", addr: "강원 원주시 치악로", panoId: 1195199655, pov: { pan: 305.15, tilt: 13.98, zoom: -2 } },
+            { name: "복권마트 & 씨스페이스 홍천점", addr: "강원 홍천군 홍천로", panoId: 1197150362, pov: { pan: 307.89, tilt: 2.54, zoom: -2 } },
+            { name: "한국인세계대박복권", addr: "인천 연수구 독배로197번길", panoId: 1200648162, pov: { pan: 281.03, tilt: -2.90, zoom: -2 } },
+            { name: "하이로또", addr: "서울 금천구 금하로", panoId: 1198115190, pov: { pan: 209.13, tilt: -1.64, zoom: -2 } },
+            { name: "충남상회", addr: "인천 미추홀구 참외전로", panoId: 1199332008, pov: { pan: 287.35, tilt: 2.72, zoom: 0 } },
+            { name: "세븐일레븐화성봉담수기점", addr: "경기 화성시 세자로", panoId: 1197741399, pov: { pan: 154.47, tilt: 0.15, zoom: 2 } },
+            { name: "새상무복권", addr: "광주 서구 치평로", panoId: 1200264571, pov: { pan: 92.32, tilt: 0.07, zoom: -2 } },
+            { name: "한아름매점", addr: "충남 홍성군 광천읍", panoId: 1160927365, pov: { pan: 23.96, tilt: -3.90, zoom: -3 } },
+            { name: "차부상회", addr: "경기 김포시 통진읍", panoId: 1203538717, pov: { pan: 40.20, tilt: -1.06, zoom: -3 } },
+            { name: "행복슈퍼", addr: "서울 성북구 동소문로", panoId: 1198249502, pov: { pan: 8.00, tilt: 11.80, zoom: -3 } },
+            { name: "서해로또방", addr: "경기 화성시 화성로", panoId: 1196541229, pov: { pan: 347.47, tilt: 3.57, zoom: 1 } },
+            { name: "용두천하", addr: "광주 북구 하서로", panoId: 1200286962, pov: { pan: 260.36, tilt: 6.67, zoom: 0 } },
+            { name: "영훈슈퍼마켓", addr: "서울 도봉구 창3동", panoId: 1198487686, pov: { pan: 44.21, tilt: 2.30, zoom: -3 } },
+            { name: "코리아마트(비산점)", addr: "대구 서구 국채보상로", panoId: 1201556335, pov: { pan: 2.80, tilt: 1.39, zoom: 0 } },
             { name: "교통카드판매대", addr: "서울 강동구 고덕동 210-1", isClosed: true, customMessage: "현재 폐점되었습니다 (구서울승합종점앞 가판대)." },
             { name: "부일카서비스", addr: "부산 동구 범일동", panoId: 1202519412, pov: { pan: 236.39, tilt: 6.54, zoom: -3 } },
             { name: "일등복권편의점", addr: "대구 달서구 본리동", panoId: 1201526676, pov: { pan: 349.47, tilt: 12.34, zoom: -1 } },
             // User Request: Buheung Fruit (260216-16) - Verified from Link
-            { name: "부흥청과식품점", addr: "경북 경산시 하양읍 금락리", panoid: 1187452657, pov: { pan: 293.20, tilt: -0.90, zoom: 0 } },
-            // User Request: Buyeong Mart (260216-17) - Verified Same Location/Relocation
-            { name: "부영마트", addr: "서울 중랑구 상봉동 108", panoid: 1197812240, pov: { pan: 21.50, tilt: -0.50, zoom: 1 }, customMessage: "상봉동 108번지 (면목로 481) 동일 매장입니다." },
+            { name: "부흥청과식품점", addr: "경북 경산시 하양읍 금락리", panoId: 1187452657, pov: { pan: 293.20, tilt: -0.90, zoom: 0 } },
+            // User Request: Buyeong Mart (260216-17) - Verified Final Location (Jungnang-yeok-ro 9)
+            { name: "부영마트", addr: "서울 중랑구 상봉동", panoId: 1198489183, pov: { pan: 85.38, tilt: 2.03, zoom: 1 }, customMessage: "최종 이전: 중랑역로 9 (상봉동 108/면목로 481 통합)" },
             // User Request: Lucky Super (260216-18) - Verified Relocation
-            { name: "럭키슈퍼", addr: "서울 용산구 후암동", panoid: 1197374162, pov: { pan: 79.24, tilt: 0.96, zoom: 2 }, customMessage: "후암동 446 -> 후암로 52 (이전/동일매장)" },
+            { name: "럭키슈퍼", addr: "서울 용산구 후암동", panoId: 1197374162, pov: { pan: 79.24, tilt: 0.96, zoom: 2 }, customMessage: "후암동 446 -> 후암로 52 (이전/동일매장)" },
             // User Request: Jun (260216-18)
-            { name: "준", addr: "경기 평택시 포승읍", panoid: 1196771227, pov: { pan: 103.33, tilt: -2.22, zoom: 2 } },
+            { name: "준", addr: "경기 평택시 포승읍", panoId: 1196771227, pov: { pan: 103.33, tilt: -2.22, zoom: 2 } },
             { name: "스파", addr: "서울 노원구 상계동", panoId: 1198397843, pov: { pan: 316.53, tilt: 2.76, zoom: -1 } },
             { name: "로또명당인주점", addr: "충남 아산시 서해로", panoId: 1152034899, pov: { pan: 324.00, tilt: 3.71, zoom: -3 } },
             { name: "뉴빅마트", addr: "부산 기장군 정관중앙로", panoId: 1202061273, pov: { pan: 113.90, tilt: -1.64, zoom: 1 } },
@@ -2774,8 +2787,8 @@
             { name: "묵동식품", addr: "서울 중랑구 묵동 238-11", panoId: 1198447963, pov: { pan: 268.85, tilt: 2.27, zoom: 3 } },
             { name: "목화휴게소", addr: "경남 사천시 용현면", panoId: 1188432049, pov: { pan: 103.75, tilt: 8.02, zoom: 1 } },
             { name: "목화휴게소", addr: "경남 사천시 사천대로 912", panoId: 1188272977, pov: { pan: 34.24, tilt: 0.74, zoom: 0 } },
-            { name: "복권백화점", addr: "경기 파주시 평화로", panoid: 1202862935, pov: { pan: 48.22, tilt: 2.81, zoom: 1 } },
-            { name: "복권백화점(대백.한라앞)", addr: "대구 달서구 이곡동", panoid: 1201505680, pov: { pan: 341.21, tilt: 4.46, zoom: 0 } },
+            { name: "복권백화점", addr: "경기 파주시 평화로", panoId: 1202862935, pov: { pan: 48.22, tilt: 2.81, zoom: 1 } },
+            { name: "복권백화점(대백.한라앞)", addr: "대구 달서구 이곡동", panoId: 1201505680, pov: { pan: 341.21, tilt: 4.46, zoom: 0 } },
             { name: "영화유통(1등복권방)", addr: "울산 남구 신정로", panoId: 1202168610, pov: { pan: 262.28, tilt: 6.84, zoom: -3 } },
             { name: "종합복권슈퍼", addr: "경기 시흥시 마유로", panoId: 1175858045, pov: { pan: 129.49, tilt: 4.68, zoom: 3 } },
             { name: "한꿈복권방", addr: "울산 중구 번영로", panoId: 1202017794, pov: { pan: 168.99, tilt: -1.41, zoom: 3 } },
@@ -2802,17 +2815,17 @@
             { name: "NG24", addr: "경북 칠곡군 석적읍", panoId: 1166639892, pov: { pan: 332.83, tilt: 10.69, zoom: -2 } },
             { name: "소리창고", addr: "서울 강서구 내발산동", panoId: 1198604052, pov: { pan: 104.79, tilt: 1.68, zoom: -1 } },
             { name: "팡팡복권마트.잡화슈퍼", addr: "전북 전주시 덕진구", panoId: 1171843139, pov: { pan: 340.71, tilt: 2.47, zoom: -1 } },
-            { name: "황금로또", addr: "강원 원주시 태장2동 1390-16", panoid: 1196038632, pov: { pan: 222.54, tilt: 1.87, zoom: -3 } },
+            { name: "황금로또", addr: "강원 원주시 태장2동 1390-16", panoId: 1196038632, pov: { pan: 222.54, tilt: 1.87, zoom: -3 } },
             { name: "로또복권두정점", addr: "충남 천안시 서북구", panoId: 1195549516, pov: { pan: 4.85, tilt: 6.66, zoom: -3 } },
             { name: "대산슈퍼", addr: "충남 천안시 동남구", panoId: 1193995561, pov: { pan: 182.45, tilt: 4.26, zoom: -2 } },
-            { name: "에스비 상사", addr: "서울 중구 퇴계로86길 29", panoid: 1198788741, pov: { pan: 68.90, tilt: 4.57, zoom: -3 } },
+            { name: "에스비 상사", addr: "서울 중구 퇴계로86길 29", panoId: 1198788741, pov: { pan: 68.90, tilt: 4.57, zoom: -3 } },
             { name: "청솔서점", addr: "부산 사하구 하신번영로", panoId: 1161907485, pov: { pan: 192.32, tilt: 5.42, zoom: -1 } },
             { name: "대전우표사", addr: "대전 동구 중앙로204번길", panoId: 1163576030, pov: { pan: 55.45, tilt: 1.93, zoom: -3 } },
             { name: "주택복권방", addr: "경기 용인시 수지구", panoId: 1199750326, pov: { pan: 141.11, tilt: 3.85, zoom: 1 } },
             { name: "미나식품(로또판매점)", addr: "서울 강서구 금낭화로", panoId: 1198192808, pov: { pan: 323.87, tilt: -2.11, zoom: -3 } },
             { name: "나눔로또봉평점", addr: "경남 통영시 도남로 81", panoId: 1204285725, pov: { pan: 15.6, tilt: 2.0, zoom: -1 } },
             { name: "천하명당", addr: "경기 시흥시 신천3길", panoId: 1175741916, pov: { pan: 335.65, tilt: 6.06, zoom: -2 } },
-            { name: "로터리복권방", addr: "부산 서구 자갈치로 4-1 1층", panoid: 1202119889, pov: { pan: 175.81, tilt: 2.55, zoom: -1 } },
+            { name: "로터리복권방", addr: "부산 서구 자갈치로 4-1 1층", panoId: 1202119889, pov: { pan: 175.81, tilt: 2.55, zoom: -1 } },
             { name: "천하명당복권방", addr: "경남 거제시 옥포성안로", panoId: 1204368030, pov: { pan: 96.19, tilt: 6.22, zoom: -1 } },
             { name: "신문가판점", addr: "서울 용산구 한강대로", panoId: 1197632086, pov: { pan: 256.46, tilt: 4.87, zoom: -3 } },
             { name: "대운", addr: "경기 김포시 대명항로", panoId: 1203824304, pov: { pan: 177.65, tilt: 9.98, zoom: 0 } },
@@ -2832,57 +2845,57 @@
             { name: "대박슈퍼", addr: "인천 부평구 경원대로", panoId: 1199058573, pov: { pan: 177.81, tilt: -2.27, zoom: 1 } },
             { name: "진평양행", addr: "강원 강릉시 임영로", panoId: 1194087150, pov: { pan: 256.26, tilt: -4.05, zoom: -1 } },
             { name: "운좋은날", addr: "서울 강동구 풍성로", panoId: 1198599079, pov: { pan: 11.15, tilt: 3.08, zoom: -1 } },
-            { name: "바이더웨이녹번중앙점", addr: "서울 은평구 녹번동", panoid: 1197941920, pov: { pan: 7.17, tilt: 4.71, zoom: 2 } },
-            { name: "포항오거리CU복권", addr: "경북 포항시 북구 죽도로 33", panoid: 1187942783, pov: { pan: 98.45, tilt: -3.21, zoom: -3 } },
-            { name: "꾸미로또복권", addr: "서울 강북구 솔샘로67길 118", panoid: 1197850243, pov: { pan: 140.19, tilt: 4.97, zoom: -3 } },
+            { name: "바이더웨이녹번중앙점", addr: "서울 은평구 녹번동", panoId: 1197941920, pov: { pan: 7.17, tilt: 4.71, zoom: 2 } },
+            { name: "포항오거리CU복권", addr: "경북 포항시 북구 죽도로 33", panoId: 1187942783, pov: { pan: 98.45, tilt: -3.21, zoom: -3 } },
+            { name: "꾸미로또복권", addr: "서울 강북구 솔샘로67길 118", panoId: 1197850243, pov: { pan: 140.19, tilt: 4.97, zoom: -3 } },
             { name: "복권전문점", addr: "경기 시흥시 중심상가로", panoId: 1176040872, pov: { pan: 38.81, tilt: 7.94, zoom: 0 } },
-            { name: "세븐복권방", addr: "경기 파주시 해올2길 16", panoid: 1203125581, pov: { pan: 349.39, tilt: -3.14, zoom: 2 } },
-            { name: "짱복권", addr: "서울 종로구 종로 269", panoid: 1197814790, pov: { pan: 0.65, tilt: -0.16, zoom: 2 } },
+            { name: "세븐복권방", addr: "경기 파주시 해올2길 16", panoId: 1203125581, pov: { pan: 349.39, tilt: -3.14, zoom: 2 } },
+            { name: "짱복권", addr: "서울 종로구 종로 269", panoId: 1197814790, pov: { pan: 0.65, tilt: -0.16, zoom: 2 } },
             { name: "행운복권방", addr: "경기 의정부시 충의로 55", panoId: 1174093159, pov: { pan: 277.0, tilt: 0.0, zoom: 0 } },
             { name: "왕대박복권 (인더라인)", addr: "인천 부평구 십정동 577-6", panoId: 1203625174, pov: { pan: 190.23, tilt: -5.06, zoom: -3 } },
-            { name: "프렌드24시", addr: "광주 광산구 첨단중앙로 164", panoid: 1199708554, pov: { pan: 171.41, tilt: -6.19, zoom: 1 } },
+            { name: "프렌드24시", addr: "광주 광산구 첨단중앙로 164", panoId: 1199708554, pov: { pan: 171.41, tilt: -6.19, zoom: 1 } },
             { name: "알리바이금당점", addr: "전남 순천시 대석길", panoId: 1173674879, pov: { pan: 359.32, tilt: 3.55, zoom: -2 } },
             { name: "해뜰날", addr: "경기 동두천시 중앙로", panoId: 1175647022, pov: { pan: 167.43, tilt: 0.87, zoom: 0 } },
             { name: "노다지복권방", addr: "경기 용인시 처인구 마평동 735-1", panoId: 1198953144, pov: { pan: 126.6, tilt: 2.2, zoom: 2 } },
-            { name: "GS25(계산동경점)", addr: "인천 계양구 계산동", panoid: 1199151424, pov: { pan: 353.80, tilt: -2.31, zoom: -2 } },
-            { name: "창원병원앞매표소", addr: "경남 창원시 성산구", panoid: 1204481691, pov: { pan: 36.51, tilt: 4.43, zoom: 2 } },
-            { name: "역전광장상회", addr: "경기 파주시 금촌1동 329-19", panoid: 1203271929, pov: { pan: 158.43, tilt: 1.88, zoom: 1 } },
-            { name: "복권방", addr: "부산 부산진구 당감동", panoid: 1202678221, pov: { pan: 228.64, tilt: 1.60, zoom: -2 } },
+            { name: "GS25(계산동경점)", addr: "인천 계양구 계산동", panoId: 1199151424, pov: { pan: 353.80, tilt: -2.31, zoom: -2 } },
+            { name: "창원병원앞매표소", addr: "경남 창원시 성산구", panoId: 1204481691, pov: { pan: 36.51, tilt: 4.43, zoom: 2 } },
+            { name: "역전광장상회", addr: "경기 파주시 금촌1동 329-19", panoId: 1203271929, pov: { pan: 158.43, tilt: 1.88, zoom: 1 } },
+            { name: "복권방", addr: "부산 부산진구 당감동", panoId: 1202678221, pov: { pan: 228.64, tilt: 1.60, zoom: -2 } },
             { name: "대광복권방", addr: "전남 화순군 화순읍 대리 97-3", panoId: 1192902741, pov: { pan: 339.4, tilt: 4.4, zoom: 0 } },
             { name: "명당골복권방", addr: "경기 수원시 권선구", panoId: 1199751659, pov: { pan: 187.22, tilt: 5.79, zoom: -3 } },
-            { name: "다터져복권방", addr: "경기 평택시 합정동", panoid: 1197642715, pov: { pan: 284.10, tilt: 1.67, zoom: -3 } },
+            { name: "다터져복권방", addr: "경기 평택시 합정동", panoId: 1197642715, pov: { pan: 284.10, tilt: 1.67, zoom: -3 } },
             { name: "행운의집", addr: "경북 안동시 북문동 23-7", isClosed: true, customMessage: "현재는 폐업상태의 점포입니다" },
             { name: "지원물산", addr: "서울 노원구 공릉동", panoId: 1198350307, pov: { pan: 61.24, tilt: -1.90, zoom: -3 } },
             { name: "데이션나잇", addr: "서울 성북구 종암동 132", panoId: 1198236406, pov: { pan: 52.6, tilt: 10.3, zoom: 0 } },
             { name: "파란만장복권방", addr: "경기 화성시 진안동", panoId: 1198278713, pov: { pan: 156.78, tilt: -2.10, zoom: 3 } },
             { name: "황실복권방", addr: "충남 천안시 동남구", panoId: 1193993670, pov: { pan: 346.95, tilt: 4.35, zoom: 3 } },
             { name: "GS25(대전시네마점)", addr: "대전 서구 괴정동", panoId: 1201429942, pov: { pan: 132.97, tilt: 5.70, zoom: -3 } },
-            { name: "로또복권역전점", addr: "경북 경주시 노서동", panoid: 1187221443, pov: { pan: 58.22, tilt: -0.16, zoom: 0 } },
+            { name: "로또복권역전점", addr: "경북 경주시 노서동", panoId: 1187221443, pov: { pan: 58.22, tilt: -0.16, zoom: 0 } },
             { name: "셀프카메라", addr: "부산 부산진구 개금동", panoId: 1202587961, pov: { pan: 100.14, tilt: -0.54, zoom: -3 } },
             { name: "올인(allin)", addr: "경기 화성시 향남읍", panoId: 1197247800, pov: { pan: 301.07, tilt: 9.93, zoom: -3 } },
             { name: "로또복권방", addr: "경기 용인시 처인구", panoId: 1199530907, pov: { pan: 306.53, tilt: 1.09, zoom: 0 } },
             { name: "버스판매소", addr: "서울 영등포구 영등포동4가 441-10", panoId: 1198368804, pov: { pan: 64.0, tilt: 0.9, zoom: 0 } },
             { name: "GS25(양산문성)", addr: "경남 양산시 평산동 31-5", panoId: 1204592950, pov: { pan: 269.6, tilt: 1.0, zoom: 1 } },
-            { name: "우리들공업탑점", addr: "울산 남구 신정동", panoid: 1201811174, pov: { pan: 25.20, tilt: 4.52, zoom: 2 } },
+            { name: "우리들공업탑점", addr: "울산 남구 신정동", panoId: 1201811174, pov: { pan: 25.20, tilt: 4.52, zoom: 2 } },
             { name: "메트로센터점", addr: "대구 중구 덕산동 88 (달구벌대로 지하 2100) C412호", imageUrl: "assets/img/metro_260213.jpg", customMessage: "반월당역 지하상가(C412호) 중심부에 위치하고 있습니다. (기존 4회 + 로드명주소 5회 합산 총 9회 당첨)" },
             { name: "행복한사람들(흥부네)", addr: "경기 광주시 경충대로 763 (초월읍 산이리 13-1)", imageUrl: "assets/img/happypeople_260213.jpg", customMessage: "이 점포는 도로 인접성 문제로 로드뷰 제공이 어려워 현장 사진으로 대체합니다. (기존 1회 + 도로명주소 5회 합산 총 6회 당첨)" },
             { name: "인터넷 복권판매사이트", addr: "서울특별시 서초구 남부순환로", customLink: "https://www.dhlottery.co.kr/userGuide", customMessage: "동 판매점은 온라인 구매가능한 동행복권 싸이트로 연결드립니다." },
             { name: "25시슈퍼", addr: "함송로14번길 13-17", panoId: 1176030807, pov: { pan: 310.46, tilt: 0.85, zoom: -1 } },
             { name: "복권판매점", addr: "동탄중심상가2길 37 1층으", panoId: 1198012866, pov: { pan: 212.35, tilt: -1.20, zoom: -2 } },
-            { name: "(I.A) 로또마트", addr: "경기 안산시 단원구", panoid: 1204115898, pov: { pan: 181.61, tilt: 0.91, zoom: -3 } },
-            { name: "1등로또방", addr: "광주 동구 중앙로", panoid: 1200326817, pov: { pan: 308.61, tilt: 15.32, zoom: 0 } },
-            { name: "1등명당", addr: "충남 서천군 장항로", panoid: 1177595058, pov: { pan: 210.48, tilt: 5.06, zoom: -3 } },
-            { name: "1번지복권방", addr: "경기 성남시 중원구", panoid: 1198797521, pov: { pan: 186.72, tilt: 0.43, zoom: -3 } },
-            { name: "CU(거제해금강)", addr: "경남 거제시 고현동", panoid: 1204667361, pov: { pan: 283.99, tilt: 2.14, zoom: 1 } },
-            { name: "CU(달동초이스점)", addr: "울산 남구 달동", panoid: 1202053722, pov: { pan: 125.30, tilt: 5.99, zoom: 1 } },
-            { name: "CU(제천역점)", addr: "충북 제천시 화산동", panoid: 1185322618, pov: { pan: 176.31, tilt: 1.59, zoom: 1 } },
-            { name: "CU노서점", addr: "경북 경주시 금성로259번길", panoid: 1187221443, pov: { pan: 51.09, tilt: 3.66, zoom: -1 } },
-            { name: "GMART", addr: "경북 구미시 구미중앙로", panoid: 1165801425, pov: { pan: 10.82, tilt: 3.71, zoom: 0 } },
-            { name: "GS25(고양주교점)", addr: "경기 고양시 덕양구", panoid: 1203877767, pov: { pan: 206.52, tilt: -2.65, zoom: -1 } },
-            { name: "GS25(구로제일)", addr: "서울 구로구 구로동", panoid: 1198518853, pov: { pan: 259.12, tilt: -0.82, zoom: 0 } },
-            { name: "GS25(청주수곡점)", addr: "충북 청주시 서원구", panoid: 1170580086, pov: { pan: 231.04, tilt: 2.27, zoom: 0 } },
-            { name: "Goodday복권전문점", addr: "경남 창원시 성산구", panoid: 1204230685, pov: { pan: 322.84, tilt: 9.00, zoom: -3 } },
-            { name: "LG슈퍼", addr: "경기 광명시 철산동", panoid: 1203337015, pov: { pan: 49.06, tilt: 1.76, zoom: -3 } },
+            { name: "(I.A) 로또마트", addr: "경기 안산시 단원구", panoId: 1204115898, pov: { pan: 181.61, tilt: 0.91, zoom: -3 } },
+            { name: "1등로또방", addr: "광주 동구 중앙로", panoId: 1200326817, pov: { pan: 308.61, tilt: 15.32, zoom: 0 } },
+            { name: "1등명당", addr: "충남 서천군 장항로", panoId: 1177595058, pov: { pan: 210.48, tilt: 5.06, zoom: -3 } },
+            { name: "1번지복권방", addr: "경기 성남시 중원구", panoId: 1198797521, pov: { pan: 186.72, tilt: 0.43, zoom: -3 } },
+            { name: "CU(거제해금강)", addr: "경남 거제시 고현동", panoId: 1204667361, pov: { pan: 283.99, tilt: 2.14, zoom: 1 } },
+            { name: "CU(달동초이스점)", addr: "울산 남구 달동", panoId: 1202053722, pov: { pan: 125.30, tilt: 5.99, zoom: 1 } },
+            { name: "CU(제천역점)", addr: "충북 제천시 화산동", panoId: 1185322618, pov: { pan: 176.31, tilt: 1.59, zoom: 1 } },
+            { name: "CU노서점", addr: "경북 경주시 금성로259번길", panoId: 1187221443, pov: { pan: 51.09, tilt: 3.66, zoom: -1 } },
+            { name: "GMART", addr: "경북 구미시 구미중앙로", panoId: 1165801425, pov: { pan: 10.82, tilt: 3.71, zoom: 0 } },
+            { name: "GS25(고양주교점)", addr: "경기 고양시 덕양구", panoId: 1203877767, pov: { pan: 206.52, tilt: -2.65, zoom: -1 } },
+            { name: "GS25(구로제일)", addr: "서울 구로구 구로동", panoId: 1198518853, pov: { pan: 259.12, tilt: -0.82, zoom: 0 } },
+            { name: "GS25(청주수곡점)", addr: "충북 청주시 서원구", panoId: 1170580086, pov: { pan: 231.04, tilt: 2.27, zoom: 0 } },
+            { name: "Goodday복권전문점", addr: "경남 창원시 성산구", panoId: 1204230685, pov: { pan: 322.84, tilt: 9.00, zoom: -3 } },
+            { name: "LG슈퍼", addr: "경기 광명시 철산동", panoId: 1203337015, pov: { pan: 49.06, tilt: 1.76, zoom: -3 } },
             { name: "SK@24시편의점", addr: "경기 파주시 아동동 589-10", isClosed: true, customMessage: "현재 폐점된 매장입니다." },
             { name: "GS25(안산산호)", addr: "경기 안산시 단원구 선부동 1081산호한양상가101호", imageUrl: "assets/img/GS 안산산호점_260214.jpg", customMessage: "산호한양상가 1층에 위치한 GS25 편의점입니다." },
             { name: "가판", addr: "서울 마포구 도화2동 169 고려2 앞가판", isClosed: true, customMessage: "현재 폐점되었습니다 (가든호텔정문옆가판으로 이전 확인)" },
@@ -2890,136 +2903,136 @@
             { name: "가판점", addr: "서울 서초구 서초동(서초3동) 1602-2 가판", isClosed: true, customMessage: "현재 폐점된 가판대입니다." },
             { name: "가로가판대", addr: "서울 관악구 신림동(조원동) 1643-6" },
             { name: "가로판매대", addr: "서울 강동구 올림픽로 648 천호역 3번 출구 앞(가판점)" },
-            { name: "가로판매점", addr: "서울 용산구 원효로 179", panoid: 1197440869, pov: { pan: 297.07, tilt: -5.58, zoom: -2 }, customMessage: "신한은행(ATM) 옆 가판점입니다. (주차부스 바로 옆 확인)" },
-            { name: "고덕로또복권", addr: "서울 강동구 상일로15길 18 1층 (상일동역 4번 출구)", panoid: 1198588621, pov: { pan: 4.14, tilt: 4.14, zoom: 1 }, customMessage: "고덕로 397에서 이전한 6회 당첨 명당입니다." },
-            { name: "가로판매대", addr: "서울 종로구 교남동", panoid: 1201585664, pov: { pan: 87.39, tilt: 13.86, zoom: -2 } },
-            { name: "가자복권천국", addr: "전남 목포시 상동", panoid: 1192597069, pov: { pan: 352.61, tilt: -0.23, zoom: 3 } },
-            { name: "가든호텔정문옆가판", addr: "서울 마포구 도화동 169-1", panoid: 1197820704, pov: { pan: 109.3, tilt: -0.9, zoom: 0 } },
-            { name: "건강마트", addr: "경기 하남시 신장2동", panoid: 1173493468, pov: { pan: 130.32, tilt: 5.56, zoom: -2 } },
-            { name: "경동G-PLUS할인마트", addr: "부산 해운대구 좌동", panoid: 1202480351, pov: { pan: 217.60, tilt: 6.09, zoom: 3 } },
-            { name: "경성식품", addr: "서울 동대문구 휘경1동", panoid: 1198205251, pov: { pan: 15.21, tilt: 3.58, zoom: 0 } },
-            { name: "공원슈퍼", addr: "경기 수원시 장안구", panoid: 1199575474, pov: { pan: 327.50, tilt: 4.59, zoom: -2 } },
-            { name: "교하로또판매점", addr: "경기 파주시 파주로", panoid: 1203181718, pov: { pan: 275.18, tilt: -2.11, zoom: -3 } },
-            { name: "구산복권방", addr: "경남 김해시 구산동", panoid: 1193912431, pov: { pan: 241.41, tilt: 0.35, zoom: 0 } },
-            { name: "구포라인점", addr: "부산 북구 구포동", panoid: 1202526440, pov: { pan: 256.93, tilt: -2.56, zoom: 0 } },
-            { name: "굿타임", addr: "서울 서대문구 연희동 353-94", panoid: 1197871361, pov: { pan: 194.7, tilt: 0.3, zoom: 0 } },
-            { name: "그린마트", addr: "경기 성남시 분당구 대왕판교로 255 107호", panoid: 1198963691, pov: { pan: 274.7, tilt: 1.2, zoom: 4 } },
-            { name: "그린마트", addr: "서울 송파구 백제고분로19길", panoid: 1197973342, pov: { pan: 85.96, tilt: 9.15, zoom: -2 } },
-            { name: "금강복권", addr: "경기 김포시 율생로 3", panoid: 1203805177, pov: { pan: 152.85, tilt: 5.78, zoom: 0 } },
-            { name: "기장슈퍼", addr: "부산 기장군 차성동로 69", panoid: 1033564888, pov: { pan: 350.25, tilt: 1.40, zoom: -3 } },
-            { name: "까치복권방", addr: "경기 시흥시 중심상가로 326 1동 102호", panoid: 1176040887, pov: { pan: 245.5, tilt: -0.8, zoom: 1 } },
-            { name: "나나 복권판매소", addr: "경남 양산시 상북면 상북중앙로 319", panoid: 1204563526, pov: { pan: 275.4, tilt: 0.6, zoom: 3 }, customMessage: "석계리 272-18에서 이전된 1등 5회 명당입니다. (상북중앙로 319 위치)" },
-            { name: "나래복권", addr: "충북 충주시 충원대로 952", panoid: 1163813266, pov: { pan: 104.78, tilt: 1.24, zoom: 2 }, isClosed: true, customMessage: "현재 폐점 또는 로또 판매 중단 상태입니다. (과거 1등 4회 명당)" },
-            { name: "넝쿨째(블루25 중앙점)", addr: "경남 창원시 마산합포구 중앙동2가 2-280", panoid: 1204644268, pov: { pan: 309.7, tilt: -9.2, zoom: 1 }, customMessage: "788회차에서 1등 3명이 동시에 배출된 진기록의 명당입니다." },
-            { name: "노다지로또", addr: "인천 서구 완정로 179 검단제이원빌딩 108호", panoid: 1199025335, pov: { pan: 205.74, tilt: -0.60, zoom: -3 } },
-            { name: "노다지복권방", addr: "부산 북구 덕천로 287", panoid: 1202267577, pov: { pan: 19.9, tilt: 6.4, zoom: 2 } },
-            { name: "노다지복권방", addr: "인천 미추홀구 학익동 264-6 외7필지 125호", panoid: 1172510557, pov: { pan: 107.12, tilt: 11.54, zoom: -3 } },
-            { name: "노다지복권방", addr: "서울 종로구 창신동 302-5", panoid: 1197814475, pov: { pan: 347.36, tilt: 4.46, zoom: -2 } },
-            { name: "노다지복권방", addr: "경기 오산시 오산동 394-1", panoid: 1174611564, pov: { pan: 162.70, tilt: 10.85, zoom: -3 } },
-            { name: "노다지복권방서정지점", addr: "경기 평택시 서정동 335-27", panoid: 1198305791, pov: { pan: 277.1, tilt: 2.9, zoom: 1 } },
-            { name: "다드림복권", addr: "경기 김포시 월하로 930 1층 101호", panoid: 1203372471, pov: { pan: 231.20, tilt: 8.58, zoom: -3 } },
-            { name: "당하복권명당", addr: "인천 서구 서곶로 788", panoid: 1199615169, pov: { pan: 68.28, tilt: 1.45, zoom: -3 } },
-            { name: "대박", addr: "경기 구리시 안골로103번길 46", panoid: 1203302213, pov: { pan: 356.83, tilt: 0.69, zoom: -1 } },
-            { name: "대박로또판매점", addr: "경기 수원시 장안구 영화로 2129-1 인동", panoid: 1199673044, pov: { pan: 243.99, tilt: 0.39, zoom: -3 } },
-            { name: "대박마트", addr: "충남 천안시 동남구 봉명동 494 봉명청솔아파트상가 103호", panoid: 1194827511, pov: { pan: 284.9, tilt: -5.5, zoom: 0 } },
-            { name: "대박명당", addr: "경기 양주시 옥정동로5길 6", panoid: 1204022501, pov: { pan: 342.4, tilt: 3.8, zoom: 1 } },
-            { name: "대박의터", addr: "강원 춘천시 영서로 1786", panoid: 1195798040, pov: { pan: 63.49, tilt: 1.37, zoom: -1 } },
-            { name: "대박찬스", addr: "경기 성남시 중원구 산성대로 4460", panoid: 1198939639, pov: { pan: 303.94, tilt: -2.44, zoom: 1 } },
-            { name: "대박찬스", addr: "광주 북구 오치동 776-7", panoid: 1200654276, pov: { pan: 84.34, tilt: -1.70, zoom: -3 } },
-            { name: "대박행진복권랜드", addr: "경기 파주시 금촌동 989-1 금촌프라자 107호", panoid: 1045548538, pov: { pan: 166.7, tilt: -1.1, zoom: 0 } },
-            { name: "대야지복권", addr: "광주 남구 주월동 961-24", panoid: 1200569355, pov: { pan: 336.8, tilt: -0.3, zoom: 1 } },
-            { name: "대영당안경원", addr: "부산 동래구 충렬대로237번길 9", panoid: 1202730682, pov: { pan: 292.71, tilt: 0.30, zoom: -3 } },
-            { name: "대운복권", addr: "경기 성남시 중원구 성남대로 1149", panoid: 1199005721, pov: { pan: 247.83, tilt: 3.95, zoom: 1 } },
-            { name: "대흥당", addr: "전북 정읍시 관통로 102", panoid: 1183542559, pov: { pan: 307.0, tilt: 0.9, zoom: 0 } },
-            { name: "도깨비", addr: "경기 하남시 서하남로 136", panoid: 1173958844, pov: { pan: 178.97, tilt: 7.88, zoom: -3 } },
-            { name: "도소매복권방", addr: "전남 광양시 광영동 759-4", panoid: 1205328614, pov: { pan: 108.57, tilt: 5.52, zoom: -3 } },
-            { name: "동남슈퍼", addr: "전북 부안군 부안읍 동중리 130-5", panoid: 1182567764, pov: { pan: 337.8, tilt: 0.8, zoom: 0 } },
-            { name: "동원슈퍼", addr: "광주 남구 월산5동 1053-22", panoid: 1200403334, pov: { pan: 228.78, tilt: 5.68, zoom: -3 } },
-            { name: "동일통신", addr: "부산 해운대구 반여1동 1361-2", panoid: 1202252207, pov: { pan: 96.27, tilt: 11.77, zoom: -3 } },
-            { name: "돼지복권명당", addr: "부산 기장군 철마면 임기리 365-1", panoid: 1201909627, pov: { pan: 325.76, tilt: 11.68, zoom: -3 } },
-            { name: "둘리복권방", addr: "경기 시흥시 중심상가2길 12-6 한강1차101호", panoid: 1176042805, pov: { pan: 297.91, tilt: -0.61, zoom: -3 } },
-            { name: "드림메드", addr: "경기 안산시 상록구 월피로 56 101호", panoid: 1204153598, pov: { pan: 120.5, tilt: -2.8, zoom: 0 } },
-            { name: "따봉복권방", addr: "인천 부평구 부평4동 889-5", panoid: 1199330283, pov: { pan: 269.89, tilt: 4.38, zoom: -3 } },
-            { name: "떴다GO 1등", addr: "경기 화성시 동탄반석로 172 1층 138호(동탄 파라곤점)", panoid: 1198012743, pov: { pan: 101.0, tilt: -4.0, zoom: 0 } },
-            { name: "또와식품", addr: "서울 강서구 염창동 264-8", panoid: 1198500709, pov: { pan: 223.70, tilt: 0.06, zoom: -3 } },
-            { name: "럭키복권방", addr: "서울 도봉구 창동 134-36 우림빌딩106", panoid: 1197759119, pov: { pan: 7.9, tilt: 3.7, zoom: 0 } },
-            { name: "로또", addr: "충남 홍성군 홍성읍 오관리 311-5", panoid: 1161022501, pov: { pan: 200.38, tilt: 6.42, zoom: -1 } },
-            { name: "로또 명당 가판점", addr: "서울 금천구 남부순환로 1390", panoid: 1198477792, pov: { pan: 154.59, tilt: -1.43, zoom: -3 } },
-            { name: "로또25시", addr: "경기 수원시 권선구 권선동 1295-3 104호", panoid: 1199507269, pov: { pan: 91.76, tilt: 7.74, zoom: -3 } },
-            { name: "로또로복권", addr: "전북 전주시 완산구 평화동2가 4729", panoid: 1172287937, pov: { pan: 293.02, tilt: -1.94, zoom: -3 } },
-            { name: "로또매점", addr: "충남 당진시 송산면 유곡리 876-2", panoid: 1172172781, pov: { pan: 276.95, tilt: 4.01, zoom: 0 } },
-            { name: "로또명당", addr: "경기 시흥시 신현로 21-1 101호", panoid: 1175428410, pov: { pan: 141.2, tilt: -1.0, zoom: 1 } },
-            { name: "로또명당", addr: "인천 남구 문학동", panoid: 1200600347, pov: { pan: 254.27, tilt: 7.89, zoom: 0 } },
-            { name: "로또복권", addr: "경북 김천시 신음동 462-24", panoid: 1165059457, pov: { pan: 21.12, tilt: -1.34, zoom: -3 } },
-            { name: "로또복권", addr: "경기 화성시 송산면", panoid: 1198585012, pov: { pan: 181.41, tilt: 4.46, zoom: -1 } },
-            { name: "로또복권 하대점", addr: "경남 진주시 하대동 188", panoid: 1193106643, pov: { pan: 82.61, tilt: 1.05, zoom: -3 } },
-            { name: "로또복권방", addr: "경기 가평군 가평읍 읍내리 448-3", panoid: 1175611447, pov: { pan: 14.37, tilt: 5.66, zoom: -3 } },
+            { name: "가로판매점", addr: "서울 용산구 원효로 179", panoId: 1197440869, pov: { pan: 297.07, tilt: -5.58, zoom: -2 }, customMessage: "신한은행(ATM) 옆 가판점입니다. (주차부스 바로 옆 확인)" },
+            { name: "고덕로또복권", addr: "서울 강동구 상일로15길 18 1층 (상일동역 4번 출구)", panoId: 1198588621, pov: { pan: 4.14, tilt: 4.14, zoom: 1 }, customMessage: "고덕로 397에서 이전한 6회 당첨 명당입니다." },
+            { name: "가로판매대", addr: "서울 종로구 교남동", panoId: 1201585664, pov: { pan: 87.39, tilt: 13.86, zoom: -2 } },
+            { name: "가자복권천국", addr: "전남 목포시 상동", panoId: 1192597069, pov: { pan: 352.61, tilt: -0.23, zoom: 3 } },
+            { name: "가든호텔정문옆가판", addr: "서울 마포구 도화동 169-1", panoId: 1197820704, pov: { pan: 109.3, tilt: -0.9, zoom: 0 } },
+            { name: "건강마트", addr: "경기 하남시 신장2동", panoId: 1173493468, pov: { pan: 130.32, tilt: 5.56, zoom: -2 } },
+            { name: "경동G-PLUS할인마트", addr: "부산 해운대구 좌동", panoId: 1202480351, pov: { pan: 217.60, tilt: 6.09, zoom: 3 } },
+            { name: "경성식품", addr: "서울 동대문구 휘경1동", panoId: 1198205251, pov: { pan: 15.21, tilt: 3.58, zoom: 0 } },
+            { name: "공원슈퍼", addr: "경기 수원시 장안구", panoId: 1199575474, pov: { pan: 327.50, tilt: 4.59, zoom: -2 } },
+            { name: "교하로또판매점", addr: "경기 파주시 파주로", panoId: 1203181718, pov: { pan: 275.18, tilt: -2.11, zoom: -3 } },
+            { name: "구산복권방", addr: "경남 김해시 구산동", panoId: 1193912431, pov: { pan: 241.41, tilt: 0.35, zoom: 0 } },
+            { name: "구포라인점", addr: "부산 북구 구포동", panoId: 1202526440, pov: { pan: 256.93, tilt: -2.56, zoom: 0 } },
+            { name: "굿타임", addr: "서울 서대문구 연희동 353-94", panoId: 1197871361, pov: { pan: 194.7, tilt: 0.3, zoom: 0 } },
+            { name: "그린마트", addr: "경기 성남시 분당구 대왕판교로 255 107호", panoId: 1198963691, pov: { pan: 274.7, tilt: 1.2, zoom: 4 } },
+            { name: "그린마트", addr: "서울 송파구 백제고분로19길", panoId: 1197973342, pov: { pan: 85.96, tilt: 9.15, zoom: -2 } },
+            { name: "금강복권", addr: "경기 김포시 율생로 3", panoId: 1203805177, pov: { pan: 152.85, tilt: 5.78, zoom: 0 } },
+            { name: "기장슈퍼", addr: "부산 기장군 차성동로 69", panoId: 1033564888, pov: { pan: 350.25, tilt: 1.40, zoom: -3 } },
+            { name: "까치복권방", addr: "경기 시흥시 중심상가로 326 1동 102호", panoId: 1176040887, pov: { pan: 245.5, tilt: -0.8, zoom: 1 } },
+            { name: "나나 복권판매소", addr: "경남 양산시 상북면 상북중앙로 319", panoId: 1204563526, pov: { pan: 275.4, tilt: 0.6, zoom: 3 }, customMessage: "석계리 272-18에서 이전된 1등 5회 명당입니다. (상북중앙로 319 위치)" },
+            { name: "나래복권", addr: "충북 충주시 충원대로 952", panoId: 1163813266, pov: { pan: 104.78, tilt: 1.24, zoom: 2 }, isClosed: true, customMessage: "현재 폐점 또는 로또 판매 중단 상태입니다. (과거 1등 4회 명당)" },
+            { name: "넝쿨째(블루25 중앙점)", addr: "경남 창원시 마산합포구 중앙동2가 2-280", panoId: 1204644268, pov: { pan: 309.7, tilt: -9.2, zoom: 1 }, customMessage: "788회차에서 1등 3명이 동시에 배출된 진기록의 명당입니다." },
+            { name: "노다지로또", addr: "인천 서구 완정로 179 검단제이원빌딩 108호", panoId: 1199025335, pov: { pan: 205.74, tilt: -0.60, zoom: -3 } },
+            { name: "노다지복권방", addr: "부산 북구 덕천로 287", panoId: 1202267577, pov: { pan: 19.9, tilt: 6.4, zoom: 2 } },
+            { name: "노다지복권방", addr: "인천 미추홀구 학익동 264-6 외7필지 125호", panoId: 1172510557, pov: { pan: 107.12, tilt: 11.54, zoom: -3 } },
+            { name: "노다지복권방", addr: "서울 종로구 창신동 302-5", panoId: 1197814475, pov: { pan: 347.36, tilt: 4.46, zoom: -2 } },
+            { name: "노다지복권방", addr: "경기 오산시 오산동 394-1", panoId: 1174611564, pov: { pan: 162.70, tilt: 10.85, zoom: -3 } },
+            { name: "노다지복권방서정지점", addr: "경기 평택시 서정동 335-27", panoId: 1198305791, pov: { pan: 277.1, tilt: 2.9, zoom: 1 } },
+            { name: "다드림복권", addr: "경기 김포시 월하로 930 1층 101호", panoId: 1203372471, pov: { pan: 231.20, tilt: 8.58, zoom: -3 } },
+            { name: "당하복권명당", addr: "인천 서구 서곶로 788", panoId: 1199615169, pov: { pan: 68.28, tilt: 1.45, zoom: -3 } },
+            { name: "대박", addr: "경기 구리시 안골로103번길 46", panoId: 1203302213, pov: { pan: 356.83, tilt: 0.69, zoom: -1 } },
+            { name: "대박로또판매점", addr: "경기 수원시 장안구 영화로 2129-1 인동", panoId: 1199673044, pov: { pan: 243.99, tilt: 0.39, zoom: -3 } },
+            { name: "대박마트", addr: "충남 천안시 동남구 봉명동 494 봉명청솔아파트상가 103호", panoId: 1194827511, pov: { pan: 284.9, tilt: -5.5, zoom: 0 } },
+            { name: "대박명당", addr: "경기 양주시 옥정동로5길 6", panoId: 1204022501, pov: { pan: 342.4, tilt: 3.8, zoom: 1 } },
+            { name: "대박의터", addr: "강원 춘천시 영서로 1786", panoId: 1195798040, pov: { pan: 63.49, tilt: 1.37, zoom: -1 } },
+            { name: "대박찬스", addr: "경기 성남시 중원구 산성대로 4460", panoId: 1198939639, pov: { pan: 303.94, tilt: -2.44, zoom: 1 } },
+            { name: "대박찬스", addr: "광주 북구 오치동 776-7", panoId: 1200654276, pov: { pan: 84.34, tilt: -1.70, zoom: -3 } },
+            { name: "대박행진복권랜드", addr: "경기 파주시 금촌동 989-1 금촌프라자 107호", panoId: 1045548538, pov: { pan: 166.7, tilt: -1.1, zoom: 0 } },
+            { name: "대야지복권", addr: "광주 남구 주월동 961-24", panoId: 1200569355, pov: { pan: 336.8, tilt: -0.3, zoom: 1 } },
+            { name: "대영당안경원", addr: "부산 동래구 충렬대로237번길 9", panoId: 1202730682, pov: { pan: 292.71, tilt: 0.30, zoom: -3 } },
+            { name: "대운복권", addr: "경기 성남시 중원구 성남대로 1149", panoId: 1199005721, pov: { pan: 247.83, tilt: 3.95, zoom: 1 } },
+            { name: "대흥당", addr: "전북 정읍시 관통로 102", panoId: 1183542559, pov: { pan: 307.0, tilt: 0.9, zoom: 0 } },
+            { name: "도깨비", addr: "경기 하남시 서하남로 136", panoId: 1173958844, pov: { pan: 178.97, tilt: 7.88, zoom: -3 } },
+            { name: "도소매복권방", addr: "전남 광양시 광영동 759-4", panoId: 1205328614, pov: { pan: 108.57, tilt: 5.52, zoom: -3 } },
+            { name: "동남슈퍼", addr: "전북 부안군 부안읍 동중리 130-5", panoId: 1182567764, pov: { pan: 337.8, tilt: 0.8, zoom: 0 } },
+            { name: "동원슈퍼", addr: "광주 남구 월산5동 1053-22", panoId: 1200403334, pov: { pan: 228.78, tilt: 5.68, zoom: -3 } },
+            { name: "동일통신", addr: "부산 해운대구 반여1동 1361-2", panoId: 1202252207, pov: { pan: 96.27, tilt: 11.77, zoom: -3 } },
+            { name: "돼지복권명당", addr: "부산 기장군 철마면 임기리 365-1", panoId: 1201909627, pov: { pan: 325.76, tilt: 11.68, zoom: -3 } },
+            { name: "둘리복권방", addr: "경기 시흥시 중심상가2길 12-6 한강1차101호", panoId: 1176042805, pov: { pan: 297.91, tilt: -0.61, zoom: -3 } },
+            { name: "드림메드", addr: "경기 안산시 상록구 월피로 56 101호", panoId: 1204153598, pov: { pan: 120.5, tilt: -2.8, zoom: 0 } },
+            { name: "따봉복권방", addr: "인천 부평구 부평4동 889-5", panoId: 1199330283, pov: { pan: 269.89, tilt: 4.38, zoom: -3 } },
+            { name: "떴다GO 1등", addr: "경기 화성시 동탄반석로 172 1층 138호(동탄 파라곤점)", panoId: 1198012743, pov: { pan: 101.0, tilt: -4.0, zoom: 0 } },
+            { name: "또와식품", addr: "서울 강서구 염창동 264-8", panoId: 1198500709, pov: { pan: 223.70, tilt: 0.06, zoom: -3 } },
+            { name: "럭키복권방", addr: "서울 도봉구 창동 134-36 우림빌딩106", panoId: 1197759119, pov: { pan: 7.9, tilt: 3.7, zoom: 0 } },
+            { name: "로또", addr: "충남 홍성군 홍성읍 오관리 311-5", panoId: 1161022501, pov: { pan: 200.38, tilt: 6.42, zoom: -1 } },
+            { name: "로또 명당 가판점", addr: "서울 금천구 남부순환로 1390", panoId: 1198477792, pov: { pan: 154.59, tilt: -1.43, zoom: -3 } },
+            { name: "로또25시", addr: "경기 수원시 권선구 권선동 1295-3 104호", panoId: 1199507269, pov: { pan: 91.76, tilt: 7.74, zoom: -3 } },
+            { name: "로또로복권", addr: "전북 전주시 완산구 평화동2가 4729", panoId: 1172287937, pov: { pan: 293.02, tilt: -1.94, zoom: -3 } },
+            { name: "로또매점", addr: "충남 당진시 송산면 유곡리 876-2", panoId: 1172172781, pov: { pan: 276.95, tilt: 4.01, zoom: 0 } },
+            { name: "로또명당", addr: "경기 시흥시 신현로 21-1 101호", panoId: 1175428410, pov: { pan: 141.2, tilt: -1.0, zoom: 1 } },
+            { name: "로또명당", addr: "인천 남구 문학동", panoId: 1200600347, pov: { pan: 254.27, tilt: 7.89, zoom: 0 } },
+            { name: "로또복권", addr: "경북 김천시 신음동 462-24", panoId: 1165059457, pov: { pan: 21.12, tilt: -1.34, zoom: -3 } },
+            { name: "로또복권", addr: "경기 화성시 송산면", panoId: 1198585012, pov: { pan: 181.41, tilt: 4.46, zoom: -1 } },
+            { name: "로또복권 하대점", addr: "경남 진주시 하대동 188", panoId: 1193106643, pov: { pan: 82.61, tilt: 1.05, zoom: -3 } },
+            { name: "로또복권방", addr: "경기 가평군 가평읍 읍내리 448-3", panoId: 1175611447, pov: { pan: 14.37, tilt: 5.66, zoom: -3 } },
             { name: "로또복권장항점", addr: "충남 서천군 장항읍 창선리 632-2", isClosed: true, customMessage: "현재 폐업 상태로 장항 지역의 다른 명당(1등명당 등)을 이용해 주세요." },
-            { name: "로또복권짱", addr: "경기 용인시 처인구 남사읍 어비리 582-3", panoid: 1198953409, pov: { pan: 54.76, tilt: -1.02, zoom: -2 } },
-            { name: "로또통신", addr: "경남 김해시 외동 1251-1 104호 (함박로101번길 22)", panoid: 1194388308, pov: { pan: 83.23, tilt: -3.87, zoom: -2 } },
-            { name: "로또판매점", addr: "경기 포천시 신북면 가채리 23-2", panoid: 1176226525, pov: { pan: 97.77, tilt: 0.82, zoom: -2 } },
-            { name: "로또판매점", addr: "충북 음성군 대소면 오산리 533-1", panoid: 1165303745, pov: { pan: 110.98, tilt: 4.60, zoom: -3 } },
-            { name: "로또행운마트", addr: "경남 김해시 능동로 177 복권판매점", panoid: 1194480714, pov: { pan: 203.39, tilt: -2.23, zoom: 1 } },
-            { name: "장미슈퍼", addr: "충남 부여군 계백로 265", panoid: 1178842351, pov: { pan: 265.99, tilt: 9.55, zoom: -3 } },
-            { name: "까치복권방", addr: "경기 시흥시 중심상가로 326", panoid: 1176040884, pov: { pan: 216.52, tilt: -1.90, zoom: -3 } },
-            { name: "로또복권", addr: "경기 평택시 원평로 55", panoid: 1197645349, pov: { pan: 221.40, tilt: 6.81, zoom: -2 } },
-            { name: "복권나라", addr: "충북 청주시 상당구 상당로 9", panoid: 1169915133, pov: { pan: 266.59, tilt: 6.92, zoom: 2 } },
-            { name: "세계로생활가전", addr: "서울 동작구 보라매로 104", panoid: 1197780011, pov: { pan: 92.63, tilt: 3.58, zoom: 0 } },
-            { name: "도깨비방망이", addr: "전남 완도군 장보고대로 220", panoid: 1188939916, pov: { pan: 209.79, tilt: -1.13, zoom: 2 } },
-            { name: "현대사", addr: "경기 성남시 분당구 미금일로 77", panoid: 1198797713, pov: { pan: 178.56, tilt: 1.66, zoom: 2 } },
-            { name: "가로판매점", addr: "서울 서대문구 신촌로 103", panoid: 1198907641, pov: { pan: 114.23, tilt: -0.21, zoom: 0 } },
-            { name: "알리바이금당점", addr: "전남 순천시 대석길 44", panoid: 1205278170, pov: { pan: 354.56, tilt: 10.79, zoom: 0 } },
-            { name: "세원로또복권방", addr: "부산 수영구 수영로725번길 53", panoid: 1202601334, pov: { pan: 169.46, tilt: 6.04, zoom: -3 } },
-            { name: "초월대박복권방", addr: "경기 광주시 경충대로 1252", panoid: 1203793227, pov: { pan: 46.47, tilt: 3.95, zoom: 0 } },
-            { name: "경성식품", addr: "서울 동대문구 망우로21길 52", panoid: 1198205251, pov: { pan: 356.19, tilt: 0.06, zoom: 0 } },
-            { name: "복권닷컴", addr: "강원 양양군 양양로 62", panoid: 1196252827, pov: { pan: 352.91, tilt: -4.50, zoom: 0 } },
-            { name: "헬로마트", addr: "서울 도봉구 도봉로170길 8", panoid: 1197897753, pov: { pan: 166.06, tilt: 3.20, zoom: 2 } },
-            { name: "로또명당", addr: "경기 시흥시 신현로 21-1", panoid: 1175428413, pov: { pan: 125.58, tilt: 0.25, zoom: 2 } },
-            { name: "황금복권마트", addr: "경기 이천시 증신로325번길 5", panoid: 1174834139, pov: { pan: 202.46, tilt: -4.78, zoom: 3 } },
-            { name: "로또", addr: "서울 중구 퇴계로86길 42", panoid: 1198788751, pov: { pan: 286.63, tilt: 0.96, zoom: -3 } },
-            { name: "CU(군포덕산점)", addr: "경기 군포시 고산로250번길 32", panoid: 1175428530, pov: { pan: 27.11, tilt: -2.77, zoom: -2 } },
-            { name: "롯데무역", addr: "부산 영도구 남항동1가 197-1번지 (꿈나무길 197)", panoid: 1202691794, pov: { pan: 108.98, tilt: 5.95, zoom: -3 } },
-            { name: "마이마트", addr: "인천 서구 심곡동 302 한국상가 제1층 101호", panoid: 1199391535, pov: { pan: 182.2, tilt: -3.9, zoom: 0 }, customMessage: "기존 '이마트(인천 심곡)' 명칭으로 알려진 1등 4회 대박 명당입니다." },
-            { name: "메가마트", addr: "경기 시흥시 정왕대로 64 메가쇼핑몰 1층 123호", panoid: 1176237881, pov: { pan: 20.5, tilt: -1.3, zoom: 1 } },
-            { name: "광성슈퍼", addr: "경기 이천시 단월로", panoid: 1175073795, pov: { pan: 281.59, tilt: 0.26, zoom: -3 } },
-            { name: "명성복권방", addr: "경기 화성시 경기대로 1043", panoid: 1198300197, pov: { pan: 207.00, tilt: -5.25, zoom: 3 } },
-            { name: "명당마트", addr: "서울 강서구 양천로 91", panoid: 1198194653, pov: { pan: 70.47, tilt: -2.31, zoom: -3 } },
-            { name: "명신사", addr: "서울 마포구 월드컵로 97", panoid: 1197543347, pov: { pan: 225.25, tilt: 6.55, zoom: -3 } },
-            { name: "명진슈퍼", addr: "경기 의왕시 고천동 295-26", panoid: 1174117026, pov: { pan: 262.24, tilt: 5.16, zoom: -3 } },
-            { name: "매물도복권점", addr: "경남 통영시 통영해안로 225-1 (서호동 177-336)", panoid: 1204407783, pov: { pan: 347.4, tilt: 5.4, zoom: 4 }, customMessage: "기존 '바다로또방(1등 3회)'의 당첨 기운을 이어받아 통합 운영 중인 명당입니다." },
-            { name: "버스매표소", addr: "인천 부평구 부평대로 3 (부평동 549-39)", panoid: 1199209059, pov: { pan: 329.47, tilt: 1.58, zoom: -3 }, customMessage: "부평역 광장 가판대로 역사적인 당첨 기록을 보유한 명당입니다." },
-            { name: "버스표판매소", addr: "경기 고양시 덕양구 화신로 76 샘터마을1단지 가판", panoid: 1203599815, pov: { pan: 212.0, tilt: 4.9, zoom: 0 }, customMessage: "행신동 샘터마을1단지 앞 가판대 명당입니다." },
-            { name: "베스토아(용전2호)", addr: "대전 동구 동서대로 1689 복합터미널서관1층59호 (용전동 63-3)", panoid: 1201601961, pov: { pan: 248.2, tilt: 1.6, zoom: 0 }, customMessage: "동행복권 기록상 도로명/지번 주소 분산으로 인해 3+4회로 나뉘어 있던 총 7회 당첨의 전설적인 명당입니다." },
-            { name: "보람복권방", addr: "울산 남구 화합로194번길 18-1 (삼산동 1567-6 우리들마트 내)", panoid: 1201998535, pov: { pan: 190.2, tilt: 0.9, zoom: 0 }, customMessage: "도로명/지번 주소 분산으로 4+4회로 나뉘어 있던 총 8회 당첨의 엄청난 명당입니다." },
-            { name: "보경식품", addr: "서울 강북구 미아동 207-2", panoid: 1197862462, pov: { pan: 249.90, tilt: 1.60, zoom: -1 } },
-            { name: "복권", addr: "경기 의정부시 태평로 75", panoid: 1174093159, pov: { pan: 277.0, tilt: 0.0, zoom: 0 } },
-            { name: "복권나라", addr: "경북 포항시 북구 죽도동 140-9 (죽도로 9)", panoid: 1187494212, pov: { pan: 348.69, tilt: 12.87, zoom: -3 }, customMessage: "포항 죽도동의 명실상부한 1등 3회 배출 명당입니다." },
-            { name: "복권나라", addr: "강원 원주시 평원로 23", panoid: 1196398296, pov: { pan: 277.97, tilt: 0.34, zoom: 0 } },
-            { name: "복권나라", addr: "충북 증평군 증평읍 중앙로 15-3 (중동리 15-3)", panoid: 1184345935, pov: { pan: 303.17, tilt: -2.56, zoom: 1 } },
-            { name: "복권나라", addr: "서울 성동구 용답중앙15길", panoid: 1198738844, pov: { pan: 125.91, tilt: 5.76, zoom: -1 }, customMessage: "기존 용답동 14-1번지(3회)에서 이전하여 총 5회 1등을 배출한 저력 있는 명당입니다." },
-            { name: "복권나라", addr: "전남 여수시 중앙로 62", panoid: 1205476848, pov: { pan: 182.73, tilt: 3.14, zoom: -1 } },
-            { name: "복권나라", addr: "인천 서구 석남동 586-2", panoid: 1200085676, pov: { pan: 180.1, tilt: 2.3, zoom: 0 } },
-            { name: "복권명당", addr: "경기 안성시 공도읍 승두길 62 (승두리 60-129)", panoid: 1176200480, pov: { pan: 171.58, tilt: 1.98, zoom: -1 }, customMessage: "지번/도로명 주소 분산 기록을 포함하여 총 4회 1등을 배출한 명당입니다." },
-            { name: "복권명당", addr: "경북 경산시 경안로 214 (중방동 436-11)", panoid: 1187314576, pov: { pan: 30.42, tilt: 4.74, zoom: 2 } },
-            { name: "복권명당", addr: "대전 중구 목중로 47 (중촌동 21-18)", panoid: 1201428533, pov: { pan: 216.8, tilt: 0.7, zoom: 0 }, customMessage: "지번/도로명 주소 분산 기록을 포함하여 총 4회 1등을 배출한 명당입니다." },
-            { name: "복권방", addr: "경기 수원시 팔달구 인계로 213 (인계동 1037-2)", panoid: 1199811682, pov: { pan: 176.89, tilt: 1.16, zoom: -2 }, customMessage: "지번/도로명 주소 분산 기록을 포함하여 총 4회 1등을 배출한 인계동 명당입니다." },
-            { name: "복권방", addr: "서울 구로구 구로동 409-80 (구로동로35길 6)", panoid: 1198456741, pov: { pan: 299.0, tilt: 3.0, zoom: 3 }, isClosed: true, customMessage: "과거 1등을 3회 배출했으나 현재는 폐점된 매장입니다." },
-            { name: "복권방", addr: "경기 하남시 신장로 122", panoid: 1173490651, pov: { pan: 27.4, tilt: -6.5, zoom: 0 }, customMessage: "하남 신장동의 대표 명당으로, 인근 폐점된 지점(2회)과 합산하여 총 6회 1등을 배출한 저력 있는 곳입니다. LG U+ 매장 내에 위치하고 있습니다." },
-            { name: "CU 원주관설점", addr: "강원 원주시 관설동 1702-1 (나비허리길 160)", panoid: 1195742104, pov: { pan: 172.47, tilt: 3.39, zoom: -3 }, customMessage: "기존 '복권방'의 당첨 이력을 승계하여 운영 중인 편의점 명당입니다." },
-            { name: "복권백화점", addr: "경기 여주시 세종로 41", panoid: 1174873101, pov: { pan: 132.31, tilt: 2.55, zoom: 2 } },
-            { name: "복권사랑", addr: "경기 양주시 평화로 1421 (덕계동 462-2)", panoid: 1204107039, pov: { pan: 112.71, tilt: 1.11, zoom: 1 } },
-            { name: "복권전문점", addr: "대전 유성구 계룡로 132번길 10 (봉명동 568-4)", panoid: 1201068426, pov: { pan: 205.90, tilt: 4.45, zoom: -3 } },
-            { name: "복권천국", addr: "부산 서구 구덕로 207-1 (부민동2가 10-8)", panoid: 1202160948, pov: { pan: 215.57, tilt: 6.67, zoom: 0 } },
-            { name: "복권천국방", addr: "서울 마포구 어울마당로 125 (서교동 480-1)", panoid: 1197902493, pov: { pan: 172.06, tilt: 8.06, zoom: 0 } },
-            { name: "복돼지복권방", addr: "전북 익산시 선화로1길 4 (배산시티프라자 107호)", panoid: 1179805782, pov: { pan: 16.3, tilt: 2.2, zoom: 5 }, customMessage: "지번/도로명 및 중복 주소 기록을 통합하여 총 4회 1등을 배출한 익산 명당입니다." },
-            { name: "부강 돈벼락", addr: "경남 양산시 물금로 41 (물금리 800-5, 양우내안애5차 상가 108호)", panoid: 1204485832, pov: { pan: 44.5, tilt: -1.0, zoom: 3 }, customMessage: "양산 물금읍의 숨은 명당으로 로또 1등 3회 배출 기록을 보유하고 있습니다." },
-            { name: "부자랑", addr: "서울 성동구 둘레15길 23", panoid: 1198725466, pov: { pan: 247.57, tilt: 5.20, zoom: -3 } },
-            { name: "북부슈퍼", addr: "경기 의정부시 가능로125번길 22", panoid: 1174088094, pov: { pan: 46.90, tilt: 10.25, zoom: -3 } },
-            { name: "돈벼락", addr: "경기 부천시 범안로 220 제근린생활시설2동 1층 103호", panoid: 1203479413, pov: { pan: 335.2, tilt: 4.8, zoom: 0 } },
-            { name: "돈벼락맞는곳", addr: "부산 사상구 낙동대로 910 마트월드 A-160호", panoid: 1202359872, pov: { pan: 90.17, tilt: 4.12, zoom: 0 } },
-            { name: "돈벼락맞는곳", addr: "대전 서구 복수남로 16", panoid: 1200853943, pov: { pan: 42.10, tilt: 1.51, zoom: -3 } },
-            { name: "돈벼락맞는곳", addr: "경남 김해시 한림면 신천리 980-7", panoid: 1194446892, pov: { pan: 206.04, tilt: 4.71, zoom: 0 } },
-            { name: "돈벼락복권방", addr: "대구 북구 동변동 686", panoid: 1201176065, pov: { pan: 79.5, tilt: 0.5, zoom: 0 } },
+            { name: "로또복권짱", addr: "경기 용인시 처인구 남사읍 어비리 582-3", panoId: 1198953409, pov: { pan: 54.76, tilt: -1.02, zoom: -2 } },
+            { name: "로또통신", addr: "경남 김해시 외동 1251-1 104호 (함박로101번길 22)", panoId: 1194388308, pov: { pan: 83.23, tilt: -3.87, zoom: -2 } },
+            { name: "로또판매점", addr: "경기 포천시 신북면 가채리 23-2", panoId: 1176226525, pov: { pan: 97.77, tilt: 0.82, zoom: -2 } },
+            { name: "로또판매점", addr: "충북 음성군 대소면 오산리 533-1", panoId: 1165303745, pov: { pan: 110.98, tilt: 4.60, zoom: -3 } },
+            { name: "로또행운마트", addr: "경남 김해시 능동로 177 복권판매점", panoId: 1194480714, pov: { pan: 203.39, tilt: -2.23, zoom: 1 } },
+            { name: "장미슈퍼", addr: "충남 부여군 계백로 265", panoId: 1178842351, pov: { pan: 265.99, tilt: 9.55, zoom: -3 } },
+            { name: "까치복권방", addr: "경기 시흥시 중심상가로 326", panoId: 1176040884, pov: { pan: 216.52, tilt: -1.90, zoom: -3 } },
+            { name: "로또복권", addr: "경기 평택시 원평로 55", panoId: 1197645349, pov: { pan: 221.40, tilt: 6.81, zoom: -2 } },
+            { name: "복권나라", addr: "충북 청주시 상당구 상당로 9", panoId: 1169915133, pov: { pan: 266.59, tilt: 6.92, zoom: 2 } },
+            { name: "세계로생활가전", addr: "서울 동작구 보라매로 104", panoId: 1197780011, pov: { pan: 92.63, tilt: 3.58, zoom: 0 } },
+            { name: "도깨비방망이", addr: "전남 완도군 장보고대로 220", panoId: 1188939916, pov: { pan: 209.79, tilt: -1.13, zoom: 2 } },
+            { name: "현대사", addr: "경기 성남시 분당구 미금일로 77", panoId: 1198797713, pov: { pan: 178.56, tilt: 1.66, zoom: 2 } },
+            { name: "가로판매점", addr: "서울 서대문구 신촌로 103", panoId: 1198907641, pov: { pan: 114.23, tilt: -0.21, zoom: 0 } },
+            { name: "알리바이금당점", addr: "전남 순천시 대석길 44", panoId: 1205278170, pov: { pan: 354.56, tilt: 10.79, zoom: 0 } },
+            { name: "세원로또복권방", addr: "부산 수영구 수영로725번길 53", panoId: 1202601334, pov: { pan: 169.46, tilt: 6.04, zoom: -3 } },
+            { name: "초월대박복권방", addr: "경기 광주시 경충대로 1252", panoId: 1203793227, pov: { pan: 46.47, tilt: 3.95, zoom: 0 } },
+            { name: "경성식품", addr: "서울 동대문구 망우로21길 52", panoId: 1198205251, pov: { pan: 356.19, tilt: 0.06, zoom: 0 } },
+            { name: "복권닷컴", addr: "강원 양양군 양양로 62", panoId: 1196252827, pov: { pan: 352.91, tilt: -4.50, zoom: 0 } },
+            { name: "헬로마트", addr: "서울 도봉구 도봉로170길 8", panoId: 1197897753, pov: { pan: 166.06, tilt: 3.20, zoom: 2 } },
+            { name: "로또명당", addr: "경기 시흥시 신현로 21-1", panoId: 1175428413, pov: { pan: 125.58, tilt: 0.25, zoom: 2 } },
+            { name: "황금복권마트", addr: "경기 이천시 증신로325번길 5", panoId: 1174834139, pov: { pan: 202.46, tilt: -4.78, zoom: 3 } },
+            { name: "로또", addr: "서울 중구 퇴계로86길 42", panoId: 1198788751, pov: { pan: 286.63, tilt: 0.96, zoom: -3 } },
+            { name: "CU(군포덕산점)", addr: "경기 군포시 고산로250번길 32", panoId: 1175428530, pov: { pan: 27.11, tilt: -2.77, zoom: -2 } },
+            { name: "롯데무역", addr: "부산 영도구 남항동1가 197-1번지 (꿈나무길 197)", panoId: 1202691794, pov: { pan: 108.98, tilt: 5.95, zoom: -3 } },
+            { name: "마이마트", addr: "인천 서구 심곡동 302 한국상가 제1층 101호", panoId: 1199391535, pov: { pan: 182.2, tilt: -3.9, zoom: 0 }, customMessage: "기존 '이마트(인천 심곡)' 명칭으로 알려진 1등 4회 대박 명당입니다." },
+            { name: "메가마트", addr: "경기 시흥시 정왕대로 64 메가쇼핑몰 1층 123호", panoId: 1176237881, pov: { pan: 20.5, tilt: -1.3, zoom: 1 } },
+            { name: "광성슈퍼", addr: "경기 이천시 단월로", panoId: 1175073795, pov: { pan: 281.59, tilt: 0.26, zoom: -3 } },
+            { name: "명성복권방", addr: "경기 화성시 경기대로 1043", panoId: 1198300197, pov: { pan: 207.00, tilt: -5.25, zoom: 3 } },
+            { name: "명당마트", addr: "서울 강서구 양천로 91", panoId: 1198194653, pov: { pan: 70.47, tilt: -2.31, zoom: -3 } },
+            { name: "명신사", addr: "서울 마포구 월드컵로 97", panoId: 1197543347, pov: { pan: 225.25, tilt: 6.55, zoom: -3 } },
+            { name: "명진슈퍼", addr: "경기 의왕시 고천동 295-26", panoId: 1174117026, pov: { pan: 262.24, tilt: 5.16, zoom: -3 } },
+            { name: "매물도복권점", addr: "경남 통영시 통영해안로 225-1 (서호동 177-336)", panoId: 1204407783, pov: { pan: 347.4, tilt: 5.4, zoom: 4 }, customMessage: "기존 '바다로또방(1등 3회)'의 당첨 기운을 이어받아 통합 운영 중인 명당입니다." },
+            { name: "버스매표소", addr: "인천 부평구 부평대로 3 (부평동 549-39)", panoId: 1199209059, pov: { pan: 329.47, tilt: 1.58, zoom: -3 }, customMessage: "부평역 광장 가판대로 역사적인 당첨 기록을 보유한 명당입니다." },
+            { name: "버스표판매소", addr: "경기 고양시 덕양구 화신로 76 샘터마을1단지 가판", panoId: 1203599815, pov: { pan: 212.0, tilt: 4.9, zoom: 0 }, customMessage: "행신동 샘터마을1단지 앞 가판대 명당입니다." },
+            { name: "베스토아(용전2호)", addr: "대전 동구 동서대로 1689 복합터미널서관1층59호 (용전동 63-3)", panoId: 1201601961, pov: { pan: 248.2, tilt: 1.6, zoom: 0 }, customMessage: "동행복권 기록상 도로명/지번 주소 분산으로 인해 3+4회로 나뉘어 있던 총 7회 당첨의 전설적인 명당입니다." },
+            { name: "보람복권방", addr: "울산 남구 화합로194번길 18-1 (삼산동 1567-6 우리들마트 내)", panoId: 1201998535, pov: { pan: 190.2, tilt: 0.9, zoom: 0 }, customMessage: "도로명/지번 주소 분산으로 4+4회로 나뉘어 있던 총 8회 당첨의 엄청난 명당입니다." },
+            { name: "보경식품", addr: "서울 강북구 미아동 207-2", panoId: 1197862462, pov: { pan: 249.90, tilt: 1.60, zoom: -1 } },
+            { name: "복권", addr: "경기 의정부시 태평로 75", panoId: 1174093159, pov: { pan: 277.0, tilt: 0.0, zoom: 0 } },
+            { name: "복권나라", addr: "경북 포항시 북구 죽도동 140-9 (죽도로 9)", panoId: 1187494212, pov: { pan: 348.69, tilt: 12.87, zoom: -3 }, customMessage: "포항 죽도동의 명실상부한 1등 3회 배출 명당입니다." },
+            { name: "복권나라", addr: "강원 원주시 평원로 23", panoId: 1196398296, pov: { pan: 277.97, tilt: 0.34, zoom: 0 } },
+            { name: "복권나라", addr: "충북 증평군 증평읍 중앙로 15-3 (중동리 15-3)", panoId: 1184345935, pov: { pan: 303.17, tilt: -2.56, zoom: 1 } },
+            { name: "복권나라", addr: "서울 성동구 용답중앙15길", panoId: 1198738844, pov: { pan: 125.91, tilt: 5.76, zoom: -1 }, customMessage: "기존 용답동 14-1번지(3회)에서 이전하여 총 5회 1등을 배출한 저력 있는 명당입니다." },
+            { name: "복권나라", addr: "전남 여수시 중앙로 62", panoId: 1205476848, pov: { pan: 182.73, tilt: 3.14, zoom: -1 } },
+            { name: "복권나라", addr: "인천 서구 석남동 586-2", panoId: 1200085676, pov: { pan: 180.1, tilt: 2.3, zoom: 0 } },
+            { name: "복권명당", addr: "경기 안성시 공도읍 승두길 62 (승두리 60-129)", panoId: 1176200480, pov: { pan: 171.58, tilt: 1.98, zoom: -1 }, customMessage: "지번/도로명 주소 분산 기록을 포함하여 총 4회 1등을 배출한 명당입니다." },
+            { name: "복권명당", addr: "경북 경산시 경안로 214 (중방동 436-11)", panoId: 1187314576, pov: { pan: 30.42, tilt: 4.74, zoom: 2 } },
+            { name: "복권명당", addr: "대전 중구 목중로 47 (중촌동 21-18)", panoId: 1201428533, pov: { pan: 216.8, tilt: 0.7, zoom: 0 }, customMessage: "지번/도로명 주소 분산 기록을 포함하여 총 4회 1등을 배출한 명당입니다." },
+            { name: "복권방", addr: "경기 수원시 팔달구 인계로 213 (인계동 1037-2)", panoId: 1199811682, pov: { pan: 176.89, tilt: 1.16, zoom: -2 }, customMessage: "지번/도로명 주소 분산 기록을 포함하여 총 4회 1등을 배출한 인계동 명당입니다." },
+            { name: "복권방", addr: "서울 구로구 구로동 409-80 (구로동로35길 6)", panoId: 1198456741, pov: { pan: 299.0, tilt: 3.0, zoom: 3 }, isClosed: true, customMessage: "과거 1등을 3회 배출했으나 현재는 폐점된 매장입니다." },
+            { name: "복권방", addr: "경기 하남시 신장로 122", panoId: 1173490651, pov: { pan: 27.4, tilt: -6.5, zoom: 0 }, customMessage: "하남 신장동의 대표 명당으로, 인근 폐점된 지점(2회)과 합산하여 총 6회 1등을 배출한 저력 있는 곳입니다. LG U+ 매장 내에 위치하고 있습니다." },
+            { name: "CU 원주관설점", addr: "강원 원주시 관설동 1702-1 (나비허리길 160)", panoId: 1195742104, pov: { pan: 172.47, tilt: 3.39, zoom: -3 }, customMessage: "기존 '복권방'의 당첨 이력을 승계하여 운영 중인 편의점 명당입니다." },
+            { name: "복권백화점", addr: "경기 여주시 세종로 41", panoId: 1174873101, pov: { pan: 132.31, tilt: 2.55, zoom: 2 } },
+            { name: "복권사랑", addr: "경기 양주시 평화로 1421 (덕계동 462-2)", panoId: 1204107039, pov: { pan: 112.71, tilt: 1.11, zoom: 1 } },
+            { name: "복권전문점", addr: "대전 유성구 계룡로 132번길 10 (봉명동 568-4)", panoId: 1201068426, pov: { pan: 205.90, tilt: 4.45, zoom: -3 } },
+            { name: "복권천국", addr: "부산 서구 구덕로 207-1 (부민동2가 10-8)", panoId: 1202160948, pov: { pan: 215.57, tilt: 6.67, zoom: 0 } },
+            { name: "복권천국방", addr: "서울 마포구 어울마당로 125 (서교동 480-1)", panoId: 1197902493, pov: { pan: 172.06, tilt: 8.06, zoom: 0 } },
+            { name: "복돼지복권방", addr: "전북 익산시 선화로1길 4 (배산시티프라자 107호)", panoId: 1179805782, pov: { pan: 16.3, tilt: 2.2, zoom: 5 }, customMessage: "지번/도로명 및 중복 주소 기록을 통합하여 총 4회 1등을 배출한 익산 명당입니다." },
+            { name: "부강 돈벼락", addr: "경남 양산시 물금로 41 (물금리 800-5, 양우내안애5차 상가 108호)", panoId: 1204485832, pov: { pan: 44.5, tilt: -1.0, zoom: 3 }, customMessage: "양산 물금읍의 숨은 명당으로 로또 1등 3회 배출 기록을 보유하고 있습니다." },
+            { name: "부자랑", addr: "서울 성동구 둘레15길 23", panoId: 1198725466, pov: { pan: 247.57, tilt: 5.20, zoom: -3 } },
+            { name: "북부슈퍼", addr: "경기 의정부시 가능로125번길 22", panoId: 1174088094, pov: { pan: 46.90, tilt: 10.25, zoom: -3 } },
+            { name: "돈벼락", addr: "경기 부천시 범안로 220 제근린생활시설2동 1층 103호", panoId: 1203479413, pov: { pan: 335.2, tilt: 4.8, zoom: 0 } },
+            { name: "돈벼락맞는곳", addr: "부산 사상구 낙동대로 910 마트월드 A-160호", panoId: 1202359872, pov: { pan: 90.17, tilt: 4.12, zoom: 0 } },
+            { name: "돈벼락맞는곳", addr: "대전 서구 복수남로 16", panoId: 1200853943, pov: { pan: 42.10, tilt: 1.51, zoom: -3 } },
+            { name: "돈벼락맞는곳", addr: "경남 김해시 한림면 신천리 980-7", panoId: 1194446892, pov: { pan: 206.04, tilt: 4.71, zoom: 0 } },
+            { name: "돈벼락복권방", addr: "대구 북구 동변동 686", panoId: 1201176065, pov: { pan: 79.5, tilt: 0.5, zoom: 0 } },
             { name: "NBA(엔비에이)", addr: "운서동 2803-1 128호", panoId: 1199042496, pov: { pan: 185.43, tilt: -3.07, zoom: 2 } },
             { name: "헬로마트", addr: "서울 도봉구 도봉2동 89-148", panoId: 1197897753, pov: { pan: 137.1, tilt: 6.5, zoom: 2 } },
             { name: "북문복권방", addr: "정조로 927-1", panoId: 1199757912, pov: { pan: 147.1, tilt: 4.8, zoom: 2 } },
@@ -3041,7 +3054,7 @@
             { name: "금강종합공구", addr: "경기 김포시 대곶면", panoId: 1203805177, pov: { pan: 152.44, tilt: 6.16, zoom: 1 } },
             { name: "금곡로", addr: "경기 수원시 권선구", panoId: 1199869934, pov: { pan: 223.14, tilt: -10.18, zoom: 1 } },
             { name: "김포로또", addr: "경기 김포시 사우동", panoId: 1203803036, pov: { pan: 30.03, tilt: 0.32, zoom: 1 } },
-            { name: "나눔로또 판교역점", addr: "경기 성남시 분당구 대왕판교로606번길 39", panoid: 1199366275, pov: { pan: 355.75, tilt: -3.62, zoom: 1 }, customMessage: "건물 내부에 매장이 있습니다" },
+            { name: "나눔로또 판교역점", addr: "경기 성남시 분당구 대왕판교로606번길 39", panoId: 1199366275, pov: { pan: 355.75, tilt: -3.62, zoom: 1 }, customMessage: "건물 내부에 매장이 있습니다" },
             { name: "노다지복권", addr: "강원 횡성군 문정로", panoId: 1197181543, pov: { pan: 217.60, tilt: 1.34, zoom: -1 } },
             { name: "다모아복권", addr: "서울 구로구 오류동", panoId: 1198581650, pov: { pan: 54.87, tilt: 2.77, zoom: -3 } },
             { name: "다모아복권방", addr: "서울 구로구 오류동", panoId: 1198548447, pov: { pan: 256.07, tilt: 0.72, zoom: -3 } },
@@ -3051,7 +3064,7 @@
             { name: "대원슈퍼마켓", addr: "부산 수영구 광안2동", panoId: 1202817759, pov: { pan: 102.41, tilt: 4.05, zoom: -3 } },
             { name: "돈벼락맞는곳", addr: "부산 기장군 읍내로", panoId: 1162339595, pov: { pan: 354.91, tilt: -2.05, zoom: -3 } },
             { name: "동원복권", addr: "경남 양산시 북정동", panoId: 1204826032, pov: { pan: 118.64, tilt: 0.81, zoom: -3 } },
-            { name: "드림", addr: "경기 수원시 권선구", panoid: 1200109952, pov: { pan: 311.37, tilt: 0.30, zoom: 0 } },
+            { name: "드림", addr: "경기 수원시 권선구", panoId: 1200109952, pov: { pan: 311.37, tilt: 0.30, zoom: 0 } },
             { name: "드림마트", addr: "인천 서구 검단로", panoId: 1198835640, pov: { pan: 148.68, tilt: 2.64, zoom: -3 } },
             { name: "로또", addr: "경기 포천시 죽엽산로196번길", panoId: 1175927131, pov: { pan: 316.68, tilt: -1.36, zoom: -3 } },
             { name: "로또(파발마점)", addr: "경기 시흥시 정왕동", panoId: 1175870702, pov: { pan: 114.75, tilt: -1.36, zoom: -3 } },
@@ -3086,7 +3099,7 @@
             { name: "수퍼복권대박", addr: "인천 연수구 용담로", panoId: 1200644068, pov: { pan: 201.2, tilt: -4.2, zoom: 0 } },
             { name: "신불당로또", addr: "충남 천안시 서북구", panoId: 1195219571, pov: { pan: 267.81, tilt: -0.01, zoom: 0 } },
             { name: "신영슈퍼", addr: "서울 강남구 광평로51길", panoId: 1198825857, pov: { pan: 11.28, tilt: -0.54, zoom: 0 } },
-            { name: "씨스페이스 어방점", addr: "경남 김해시 인제로170번길 15-6 편의점 내", panoid: 1195018021, pov: { pan: 46.35, tilt: 5.03, zoom: 1 } },
+            { name: "씨스페이스 어방점", addr: "경남 김해시 인제로170번길 15-6 편의점 내", panoId: 1195018021, pov: { pan: 46.35, tilt: 5.03, zoom: 1 } },
             { name: "씨유 대전반석역점", addr: "대전 유성구 반석로", panoId: 1200979469, pov: { pan: 21.38, tilt: 1.42, zoom: 0 } },
             { name: "아이러브마트복권방", addr: "울산 중구 유곡로", panoId: 1202037956, pov: { pan: 166.5, tilt: 1.3, zoom: -1 } },
             { name: "알리바이", addr: "광주 광산구 신가동", panoId: 1199874247, pov: { pan: 46.58, tilt: -6.28, zoom: -3 } },
@@ -3119,39 +3132,7 @@
             { name: "하늘과바다", addr: "인천 부평구 부개동", panoId: 1199223112, pov: { pan: 0.36, tilt: -0.01, zoom: -2 } },
             { name: "하당복권방", addr: "전남 목포시 옥암동", panoId: 1192600420, pov: { pan: 304.76, tilt: 1.45, zoom: -3 } },
             { name: "하영", addr: "인천 서구 청라에메랄드로", panoId: 1199762293, pov: { pan: 254.5, tilt: -13.8, zoom: 1 } },
-            { name: "해수로또", addr: "충북 청주시 상당구 산성로", panoid: 1168821889, pov: { pan: 87.7, tilt: -8.7, zoom: 0 } },
-            { name: "행운방", addr: "경기 용인시 기흥구 보정동", panoid: 1194380962, pov: { pan: 99.2, tilt: 3.0, zoom: -1 } },
-            { name: "행운복권", addr: "충북 제천시 의림동", panoid: 1184953799, pov: { pan: 14.56, tilt: 5.01, zoom: 0 } },
-            { name: "행운복권", addr: "경기 군포시 대야미동", panoid: 1175680167, pov: { pan: 302.4, tilt: 7.5, zoom: -1 } },
-            { name: "행운복권방", addr: "부산 중구 남포동5가", panoId: 1202742263, pov: { pan: 162.33, tilt: -1.85, zoom: -2 } },
-            { name: "행운복권방", addr: "경기 의정부시 용현동", panoId: 1174558837, pov: { pan: 255.27, tilt: -1.13, zoom: -3 } },
-            { name: "행운복권방", addr: "강원 인제군 북면", panoId: 1196203792, pov: { pan: 216.8, tilt: -5.2, zoom: 0 } },
-            { name: "행운을주는사람들", addr: "충북 충주시 연수동", panoid: 1165060593, pov: { pan: 232.92, tilt: 3.33, zoom: -3 } },
-            { name: "형제상회", addr: "대전 서구 용문동", panoId: 1201235032, pov: { pan: 231.57, tilt: 11.75, zoom: -3 } },
-            { name: "현대사", addr: "경기 성남시 분당구 구미동 144-1 102호", panoId: 1199011246, pov: { pan: 359.56, tilt: 1.25, zoom: -3 } },
-            { name: "행운복권방", addr: "서울 도봉구 창동", panoId: 1197759123, pov: { pan: 334.7, tilt: -0.9, zoom: 0 } },
-            { name: "천하명당초량점", addr: "부산 동구 중앙대로221번길 3", panoid: 1202441096, pov: { pan: 189.21, tilt: 7.73, zoom: -3 } },
-            { name: "선경로또", addr: "충북 제천시용두대로 59", panoid: 1185117093, pov: { pan: 309.50, tilt: -2.42, zoom: 1 } },
-            { name: "바로전산", addr: "경기 광명시 오리로 1000", panoid: 1203338330, pov: { pan: 20.22, tilt: 0.87, zoom: 1 } },
-            { name: "가로판매점", addr: "서울 금천구 시흥대로 480 가판", panoid: 1198112467, pov: { pan: 47.89, tilt: 1.89, zoom: 2 } },
-            { name: "행운복권", addr: "경북 구미시 야은로 763", panoid: 1166471666, pov: { pan: 11.23, tilt: 2.02, zoom: 0 } },
-            { name: "행복미니슈퍼", addr: "경기 부천시 원미구", panoId: 1203727268, pov: { pan: 6.0, tilt: 2.8, zoom: 5 } },
-            { name: "행복복권방", addr: "경남 창원시 의창구", panoId: 1205303190, pov: { pan: 306.09, tilt: 0.16, zoom: 2 } },
-            { name: "소답시내버스매표소", addr: "경남 창원시 의창구 의안로2번길 17 가판", panoid: 1204901032, pov: { pan: 343.63, tilt: -0.00, zoom: 1 } },
-            { name: "행운의집", addr: "서울 강동구 구천면로 222", panoid: 1198592857, pov: { pan: 133.80, tilt: 4.49, zoom: 1 } },
-            { name: "금집복권", addr: "광주 북구 첨단연신로108번길 134", panoid: 1200811114, pov: { pan: 87.22, tilt: -1.84, zoom: -1 } },
-            { name: "1등복권방", addr: "울산 울주군 동문길 84", panoid: 1201776500, pov: { pan: 254.00, tilt: 1.12, zoom: -1 } },
-            { name: "대동도기상사", addr: "경북 영천시 금완로 30", panoid: 1200482286, pov: { pan: 178.75, tilt: 12.90, zoom: -1 } },
-            { name: "행운을주는로또판매점", addr: "경기 안산시 단원구 초지로 90", panoid: 1204019935, pov: { pan: 93.36, tilt: -0.99, zoom: 3 } },
-            { name: "나눔로또 판교역점", addr: "경기 성남시 분당구 대왕판교로606번길 39", panoid: 1199366275, pov: { pan: 355.75, tilt: -3.62, zoom: 1 }, customMessage: "건물 내부에 매장이 있습니다" },
-            { name: "복권왕국", addr: "전남 여수시 여수산단로 48 1층101호", panoid: 1205610765, pov: { pan: 114.04, tilt: 0.85, zoom: 1 } },
-            { name: "청룡마트", addr: "충남 천안시 동남구 풍세로 1010-31", panoid: 1194562374, pov: { pan: 134.12, tilt: 4.56, zoom: 1 } },
-            { name: "돈벼락맞는곳", addr: "경남 김해시 김해대로 2793", panoid: 1194076312, pov: { pan: 42.87, tilt: 3.36, zoom: 2 } },
-            { name: "남평로또점", addr: "전남 나주시 남평1로 12", panoid: 1191039911, pov: { pan: 186.94, tilt: 4.05, zoom: 1 } },
-            { name: "불국사명당복권", addr: "경북 경주시 산업로 3033", panoid: 1187507967, pov: { pan: 229.11, tilt: -4.51, zoom: 1 } },
-            { name: "잘찍어로또방", addr: "경기 평택시 안현로서5길 62", panoid: 1197880799, pov: { pan: 114.08, tilt: -4.66, zoom: 1 } },
-            { name: "로또복권판매도통점", addr: "전북 남원시 용성로 232", panoid: 1181200294, pov: { pan: 253.83, tilt: 0.40, zoom: 1 } },
-            { name: "해뜰날", addr: "경기 동두천시 중앙로 134-30", panoid: 1175647022, pov: { pan: 173.89, tilt: 2.93, zoom: 1 } },
+            { name: "해수로또", addr: "충북 청주시 상당구 산성로", panoId: 1168821889, pov: { pan: 87.7, tilt: -8.7, zoom: 0 } },
             { name: "행운방", addr: "경기 용인시 기흥구 보정동", panoId: 1194380962, pov: { pan: 99.2, tilt: 3.0, zoom: -1 } },
             { name: "행운복권", addr: "충북 제천시 의림동", panoId: 1184953799, pov: { pan: 14.56, tilt: 5.01, zoom: 0 } },
             { name: "행운복권", addr: "경기 군포시 대야미동", panoId: 1175680167, pov: { pan: 302.4, tilt: 7.5, zoom: -1 } },
@@ -3162,12 +3143,44 @@
             { name: "형제상회", addr: "대전 서구 용문동", panoId: 1201235032, pov: { pan: 231.57, tilt: 11.75, zoom: -3 } },
             { name: "현대사", addr: "경기 성남시 분당구 구미동 144-1 102호", panoId: 1199011246, pov: { pan: 359.56, tilt: 1.25, zoom: -3 } },
             { name: "행운복권방", addr: "서울 도봉구 창동", panoId: 1197759123, pov: { pan: 334.7, tilt: -0.9, zoom: 0 } },
-            { name: "천하명당초량점", addr: "부산 동구 중앙대로221번길 3", panoid: 1202441096, pov: { pan: 189.21, tilt: 7.73, zoom: -3 } },
-            { name: "선경로또", addr: "충북 제천시용두대로 59", panoid: 1185117093, pov: { pan: 309.50, tilt: -2.42, zoom: 1 } },
-            { name: "바로전산", addr: "경기 광명시 오리로 1000", panoid: 1203338330, pov: { pan: 20.22, tilt: 0.87, zoom: 1 } },
-            { name: "가로판매점", addr: "서울 금천구 시흥대로 480 가판", panoid: 1198112467, pov: { pan: 47.89, tilt: 1.89, zoom: 2 } },
-            { name: "포시즌마전점", addr: "인천 서구 완정로10번길", panoid: 1199590585, pov: { pan: 103.21, tilt: 1.73, zoom: -3 } },
-            { name: "로또판매점", addr: "경기 고양시 일산동구", panoid: 1203808276, pov: { pan: 156.30, tilt: 1.44, zoom: -1 }, customMessage: "건물 내부에 매장이 있습니다" },
+            { name: "천하명당초량점", addr: "부산 동구 중앙대로221번길 3", panoId: 1202441096, pov: { pan: 189.21, tilt: 7.73, zoom: -3 } },
+            { name: "선경로또", addr: "충북 제천시용두대로 59", panoId: 1185117093, pov: { pan: 309.50, tilt: -2.42, zoom: 1 } },
+            { name: "바로전산", addr: "경기 광명시 오리로 1000", panoId: 1203338330, pov: { pan: 20.22, tilt: 0.87, zoom: 1 } },
+            { name: "가로판매점", addr: "서울 금천구 시흥대로 480 가판", panoId: 1198112467, pov: { pan: 47.89, tilt: 1.89, zoom: 2 } },
+            { name: "행운복권", addr: "경북 구미시 야은로 763", panoId: 1166471666, pov: { pan: 11.23, tilt: 2.02, zoom: 0 } },
+            { name: "행복미니슈퍼", addr: "경기 부천시 원미구", panoId: 1203727268, pov: { pan: 6.0, tilt: 2.8, zoom: 5 } },
+            { name: "행복복권방", addr: "경남 창원시 의창구", panoId: 1205303190, pov: { pan: 306.09, tilt: 0.16, zoom: 2 } },
+            { name: "소답시내버스매표소", addr: "경남 창원시 의창구 의안로2번길 17 가판", panoId: 1204901032, pov: { pan: 343.63, tilt: -0.00, zoom: 1 } },
+            { name: "행운의집", addr: "서울 강동구 구천면로 222", panoId: 1198592857, pov: { pan: 133.80, tilt: 4.49, zoom: 1 } },
+            { name: "금집복권", addr: "광주 북구 첨단연신로108번길 134", panoId: 1200811114, pov: { pan: 87.22, tilt: -1.84, zoom: -1 } },
+            { name: "1등복권방", addr: "울산 울주군 동문길 84", panoId: 1201776500, pov: { pan: 254.00, tilt: 1.12, zoom: -1 } },
+            { name: "대동도기상사", addr: "경북 영천시 금완로 30", panoId: 1200482286, pov: { pan: 178.75, tilt: 12.90, zoom: -1 } },
+            { name: "행운을주는로또판매점", addr: "경기 안산시 단원구 초지로 90", panoId: 1204019935, pov: { pan: 93.36, tilt: -0.99, zoom: 3 } },
+            { name: "나눔로또 판교역점", addr: "경기 성남시 분당구 대왕판교로606번길 39", panoId: 1199366275, pov: { pan: 355.75, tilt: -3.62, zoom: 1 }, customMessage: "건물 내부에 매장이 있습니다" },
+            { name: "복권왕국", addr: "전남 여수시 여수산단로 48 1층101호", panoId: 1205610765, pov: { pan: 114.04, tilt: 0.85, zoom: 1 } },
+            { name: "청룡마트", addr: "충남 천안시 동남구 풍세로 1010-31", panoId: 1194562374, pov: { pan: 134.12, tilt: 4.56, zoom: 1 } },
+            { name: "돈벼락맞는곳", addr: "경남 김해시 김해대로 2793", panoId: 1194076312, pov: { pan: 42.87, tilt: 3.36, zoom: 2 } },
+            { name: "남평로또점", addr: "전남 나주시 남평1로 12", panoId: 1191039911, pov: { pan: 186.94, tilt: 4.05, zoom: 1 } },
+            { name: "불국사명당복권", addr: "경북 경주시 산업로 3033", panoId: 1187507967, pov: { pan: 229.11, tilt: -4.51, zoom: 1 } },
+            { name: "잘찍어로또방", addr: "경기 평택시 안현로서5길 62", panoId: 1197880799, pov: { pan: 114.08, tilt: -4.66, zoom: 1 } },
+            { name: "로또복권판매도통점", addr: "전북 남원시 용성로 232", panoId: 1181200294, pov: { pan: 253.83, tilt: 0.40, zoom: 1 } },
+            { name: "해뜰날", addr: "경기 동두천시 중앙로 134-30", panoId: 1175647022, pov: { pan: 173.89, tilt: 2.93, zoom: 1 } },
+            { name: "행운방", addr: "경기 용인시 기흥구 보정동", panoId: 1194380962, pov: { pan: 99.2, tilt: 3.0, zoom: -1 } },
+            { name: "행운복권", addr: "충북 제천시 의림동", panoId: 1184953799, pov: { pan: 14.56, tilt: 5.01, zoom: 0 } },
+            { name: "행운복권", addr: "경기 군포시 대야미동", panoId: 1175680167, pov: { pan: 302.4, tilt: 7.5, zoom: -1 } },
+            { name: "행운복권방", addr: "부산 중구 남포동5가", panoId: 1202742263, pov: { pan: 162.33, tilt: -1.85, zoom: -2 } },
+            { name: "행운복권방", addr: "경기 의정부시 용현동", panoId: 1174558837, pov: { pan: 255.27, tilt: -1.13, zoom: -3 } },
+            { name: "행운복권방", addr: "강원 인제군 북면", panoId: 1196203792, pov: { pan: 216.8, tilt: -5.2, zoom: 0 } },
+            { name: "행운을주는사람들", addr: "충북 충주시 연수동", panoId: 1165060593, pov: { pan: 232.92, tilt: 3.33, zoom: -3 } },
+            { name: "형제상회", addr: "대전 서구 용문동", panoId: 1201235032, pov: { pan: 231.57, tilt: 11.75, zoom: -3 } },
+            { name: "현대사", addr: "경기 성남시 분당구 구미동 144-1 102호", panoId: 1199011246, pov: { pan: 359.56, tilt: 1.25, zoom: -3 } },
+            { name: "행운복권방", addr: "서울 도봉구 창동", panoId: 1197759123, pov: { pan: 334.7, tilt: -0.9, zoom: 0 } },
+            { name: "천하명당초량점", addr: "부산 동구 중앙대로221번길 3", panoId: 1202441096, pov: { pan: 189.21, tilt: 7.73, zoom: -3 } },
+            { name: "선경로또", addr: "충북 제천시용두대로 59", panoId: 1185117093, pov: { pan: 309.50, tilt: -2.42, zoom: 1 } },
+            { name: "바로전산", addr: "경기 광명시 오리로 1000", panoId: 1203338330, pov: { pan: 20.22, tilt: 0.87, zoom: 1 } },
+            { name: "가로판매점", addr: "서울 금천구 시흥대로 480 가판", panoId: 1198112467, pov: { pan: 47.89, tilt: 1.89, zoom: 2 } },
+            { name: "포시즌마전점", addr: "인천 서구 완정로10번길", panoId: 1199590585, pov: { pan: 103.21, tilt: 1.73, zoom: -3 } },
+            { name: "로또판매점", addr: "경기 고양시 일산동구", panoId: 1203808276, pov: { pan: 156.30, tilt: 1.44, zoom: -1 }, customMessage: "건물 내부에 매장이 있습니다" },
         ];
 
 
@@ -3252,82 +3265,95 @@
         }
 
         window.onload = async function () {
-            if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
-                handleScriptError();
-                return;
+            try {
+                if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
+                    handleScriptError();
+                    return;
+                }
+                const mapContainer = document.getElementById('map');
+                const mapOptions = {
+                    center: new kakao.maps.LatLng(36.2683, 127.6358),
+                    level: 12
+                };
+                map = new kakao.maps.Map(mapContainer, mapOptions);
+
+                // Close InfoWindow when clicking on map background
+                // Close InfoWindow & Toasts when clicking on map background
+                kakao.maps.event.addListener(map, 'click', function () {
+                    // 1. Close InfoWindow
+                    if (currentInfoWindow) {
+                        currentInfoWindow.close();
+                        currentInfoWindow = null;
+                        document.body.classList.remove('iw-open'); // Restore UI
+                    }
+
+                    // 2. Close All Toasts (including "Nearby Shops")
+                    closeAllToasts();
+
+                    // 3. Close Side Nav if open (Optional, but good UX)
+                    closeNav();
+                });
+
+                clusterer = new kakao.maps.MarkerClusterer({
+                    map: map, averageCenter: true, minLevel: 10,
+                    styles: [{
+                        width: '40px', height: '40px', background: 'rgba(211, 47, 47, 0.8)',
+                        color: '#fff', textAlign: 'center', lineHeight: '40px',
+                        borderRadius: '20px', fontWeight: 'bold'
+                    }]
+                });
+
+                await loadData();
+
+                // --- Add Map Idle Listener for "Nearby Sync" (Fix iPhone/Mobile desync issue) ---
+                kakao.maps.event.addListener(map, 'idle', function () {
+                    const toast = document.getElementById('nearby-shops-toast');
+                    if (toast) {
+                        const center = map.getCenter();
+                        // Update list based on map center, but don't re-pan (prevent infinite loop)
+                        findNearestShop(center.getLat(), center.getLng(), "지도 중심", false);
+                    }
+                });
+
+                // Auto-reflect GPS location on initial load (User Request)
+                console.log('Initiating automatic GPS request on load...');
+                requestMyLocation();
+            } catch (err) {
+                console.error("Critical Init Error:", err);
+                const mapDiv = document.getElementById('map');
+                if (mapDiv) mapDiv.innerHTML = `<div style="padding:20px; color:red; font-weight:bold;">초기화 오류: ${err.message}</div>`;
             }
-
-            const mapContainer = document.getElementById('map');
-            const mapOption = { center: new kakao.maps.LatLng(36.2683, 127.6358), level: 12 };
-            map = new kakao.maps.Map(mapContainer, mapOption);
-
-            // Close InfoWindow when clicking on map background
-            // Close InfoWindow & Toasts when clicking on map background
-            kakao.maps.event.addListener(map, 'click', function () {
-                // 1. Close InfoWindow
-                if (currentInfoWindow) {
-                    currentInfoWindow.close();
-                    currentInfoWindow = null;
-                    document.body.classList.remove('iw-open'); // Restore UI
-                }
-
-                // 2. Close All Toasts (including "Nearby Shops")
-                closeAllToasts();
-
-                // 3. Close Side Nav if open (Optional, but good UX)
-                closeNav();
-            });
-
-            clusterer = new kakao.maps.MarkerClusterer({
-                map: map, averageCenter: true, minLevel: 10,
-                styles: [{
-                    width: '40px', height: '40px', background: 'rgba(211, 47, 47, 0.8)',
-                    color: '#fff', textAlign: 'center', lineHeight: '40px',
-                    borderRadius: '20px', fontWeight: 'bold'
-                }]
-            });
-
-            await loadData();
-
-            // --- Add Map Idle Listener for "Nearby Sync" (Fix iPhone/Mobile desync issue) ---
-            kakao.maps.event.addListener(map, 'idle', function () {
-                const toast = document.getElementById('nearby-shops-toast');
-                if (toast) {
-                    const center = map.getCenter();
-                    // Update list based on map center, but don't re-pan (prevent infinite loop)
-                    findNearestShop(center.getLat(), center.getLng(), "지도 중심", false);
-                }
-            });
-
-            // Auto-reflect GPS location on initial load (User Request)
-            console.log('Initiating automatic GPS request on load...');
-            requestMyLocation();
         };
 
         async function loadData() {
             const countEl = document.getElementById('totalDataCount');
             console.log('Loading data...');
+
             const cacheBuster = '?v=' + Date.now();
 
             try {
-                // Using simple          pat         are most reliable on GitHub Pages
                 const [lottoData, historyData] = await Promise.all([
                     fetch('https://integral81.github.io/lottomap/lotto_data.json' + cacheBuster).then(res => {
-                        if (!res.ok) throw new Error('Data file not found (404)');
+                        if (!res.ok) throw new Error('lotto_data.json 404');
                         return res.json();
                     }),
                     fetch('https://integral81.github.io/lottomap/lotto_history.json' + cacheBuster).then(res => {
-                        if (!res.ok) throw new Error('History file not found (404)');
+                        if (!res.ok) throw new Error('lotto_history.json 404');
                         return res.json();
                     })
                 ]);
 
                 window.lottoHistory = historyData;
                 processLoadedData(lottoData);
+
             } catch (err) {
                 console.error('Data load failed:', err);
                 countEl.innerHTML = `<span style="color:red; font-size:11px;">로드 실패</span>`;
-                alert('데이터 파일 로드 중 에러가 발생했습니다.\n\n주소 끝에 / 를 붙였는지 확인해 주세요.\n(예: k-inov.com/lottomap/)');
+                // Show visible error for debugging
+                const mapDiv = document.getElementById('map');
+                mapDiv.innerHTML = `<div style="padding:20px; color:red; font-weight:bold; background:white; position:absolute; top:100px; left:20px; z-index:9999; border:2px solid red;">
+                    데이터 로드 실패:<br>${err.message}
+                </div>`;
             }
         }
 
@@ -4964,8 +4990,8 @@
         }
 
         function openDirections(lat, lng, name) {
-            const url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${, ${ lng }`;
-         en(url, '_blank');
+            const url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+            window.open(url, '_blank');
         }
 
         function shareToKakao() {
@@ -5101,7 +5127,7 @@
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
-                    showToast(`📋 번호가 복사되었습니다: ${ text } `);
+                    showToast(`📋 번호가 복사되었습니다: ${text} `);
                 }).catch(err => {
                     showToast('복사 실패: ' + err);
                 });
@@ -5247,8 +5273,8 @@
                 displayRoadview(activePreset.panoId, verifiedPos);
             } else {
                 // Precise Identification using Places Service
-                const ps = new o.mvices.Places();
-                ps.keywordSearch(`${ address } ${ shopName } `, function (data, status) {
+                const ps = new kakao.maps.services.Places();
+                ps.keywordSearch(`${address} ${shopName} `, function (data, status) {
                     let targetPos = new kakao.maps.LatLng(lat, lng);
                     if (status === kakao.maps.services.Status.OK) {
                         const target = data.find(p => p.category_name.includes('복권') || p.place_name.includes(shopName)) || data[0];
