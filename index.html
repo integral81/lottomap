@@ -338,6 +338,15 @@
             transition: opacity 0.3s;
         }
 
+        /* Mobile Layout Adjustment for Tall Content */
+        @media (max-width: 768px) {
+            .omr-modal-overlay {
+                align-items: flex-end;
+                /* Bottom sheet style or safe alignment */
+                padding-bottom: 0;
+            }
+        }
+
         .omr-modal-overlay.show {
             opacity: 1;
             pointer-events: auto;
@@ -362,15 +371,21 @@
             }
 
             .ai-modal-content {
-                width: 90%;
-                padding: 20px;
-                /* iPhone 15 Fix (v3): Reduce height further to 70dvh */
-                max-height: 70dvh;
+                width: 100%;
+                /* Full width for bottom sheet feel */
+                max-width: 100%;
+                padding: 25px 20px;
+                /* iPhone 15 Fix (v4): Bottom Sheet Style */
+                max-height: 75dvh;
+                /* Safe height */
+                border-radius: 25px 25px 0 0;
+                /* Rounded top only */
                 overflow-y: auto;
                 overscroll-behavior: contain;
-                padding-bottom: 100px;
-                /* Ample padding for scrolling */
-                border-radius: 20px;
+                padding-bottom: 80px;
+                /* Reset transform if any */
+                transform: none !important;
+                margin-bottom: 0;
             }
         }
 
