@@ -11,29 +11,20 @@ def load_index_presets():
     try:
         with open('index.html', 'r', encoding='utf-8') as f:
             content = f.read()
-            # Extract ROADVIEW_PRESETS array content
-            match = re.search(r'const ROADVIEW_PRESETS = \[\s*(.*?)\s*\];', content, re.DOTALL)
-            if match:
-                preset_str = match.group(1)
-                # Parse objects roughly
-                # This is a bit hacky, but we just need names and addresses
-                # lines like: { name: "...", addr: "...", ... },
-                lines = preset_str.split('\n')
-                for line in lines:
-                    line = line.strip()
-                    if not line or line.startswith('//'): continue
-                    
-                    name_match = re.search(r'name:\s*"([^"]+)"', line)
-                    addr_match = re.search(r'addr:\s*"([^"]+)"', line)
-                    
-                    if name_match and addr_match:
-                        presets.append({
-                            'name': name_match.group(1),
-                            'addr': addr_match.group(1)
-                        })
+            
+            # Robust Parsing: Find all { name: "...", addr: "..." } patterns globally
+            # This avoids issues with block capturing regex failing on comments or nested brackets
+            matches = re.finditer(r'name:\s*"([^"]+)",\s*addr:\s*"([^"]+)"', content)
+            
+            for m in matches:
+                name = m.group(1).strip()
+                addr = m.group(2).strip()
+                presets.append({'name': name, 'addr': addr})
+                
     except Exception as e:
         print(f"Error reading index.html: {e}")
-    print(f"Loaded {len(presets)} presets from index.html")
+        
+    print(f"Loaded {len(presets)} presets from index.html (Robust Parse)")
     return presets
 
 def main():
@@ -91,19 +82,24 @@ def main():
     registered_names = [p['name'] for p in presets]
     registered_addrs = [normalize(p['addr']) for p in presets]
     
-    final_list = []
-    print(f"Filtering against {len(presets)} registered shops...")
-    
+    # 2. Filter for 4+ wins AND not in presets
+    targets = []
     count_excluded_name = 0
     count_excluded_addr = 0
-
-    for t in targets:
-        t_name = t['name']
+    
+    print(f"Filtering against {len(registered_names)} registered shops...")
+    
+    for k, v in shop_stats.items():
+        if v['wins'] >= 4:
+            t_name = v['name']
+            t_addr = v['address']
+        else:
+            continue
+            
         t_name_norm = normalize(t_name)
-        t_addr_norm = normalize(t['address'])
+        t_addr_norm = normalize(t_addr)
         
         # 1. Name Match (Normalized Exact OR Partial)
-        # Catches "행복한사람들 (흥부네)" vs "행복한사람들(흥부네)" (Space difference)
         is_name_match = False
         
         for r_name in registered_names:
@@ -122,8 +118,18 @@ def main():
                 # print(f"Excluded by Name: {t_name} matches {r_name}")
                 break
                 
+        if "세방매점" in t_name:
+            print(f"DEBUG: Processing {t_name}")
+            print(f"  is_name_match: {is_name_match}")
+            if not is_name_match:
+                 print("  Searching in registered_names:")
+                 for r in registered_names:
+                     if "세방" in r:
+                         print(f"    - Found candidate: {r}")
+
         if is_name_match:
             count_excluded_name += 1
+            print(f"EXCLUDED: {t_name}")
             continue
             
         # 2. Address Match (Loose)
@@ -133,31 +139,39 @@ def main():
             if len(r_addr) < 5: continue # Skip too short addresses to avoid false positives
             if t_addr_norm in r_addr or r_addr in t_addr_norm:
                 is_registered = True
+                print(f"EXCLUDED (Addr): {t_name}")
                 break
         
         if is_registered:
             count_excluded_addr += 1
+            print(f"EXCLUDED (Addr): {t_name}")
             continue
             
-        final_list.append(t)
+        targets.append({
+            'name': t_name,
+            'address': t_addr,
+            'wins': v['wins'],
+            'lat': v['lat'],
+            'lng': v['lng']
+        })
 
     print(f"Excluded {count_excluded_name} by Name, {count_excluded_addr} by Address.")
 
     # Sort by wins desc
-    final_list.sort(key=lambda x: x['wins'], reverse=True)
+    targets.sort(key=lambda x: x['wins'], reverse=True)
     
-    print(f"Final targets count: {len(final_list)}")
+    print(f"Final targets count (4+ wins): {len(targets)}")
 
     # 5. Write to admin_targets.js
     js_content = "const adminTargets = [\n"
     
-    for shop in final_list:
+    for t in targets:
         js_content += "  {\n"
-        js_content += f'    "name": "{shop["name"]}",\n'
-        js_content += f'    "address": "{shop["address"]}",\n'
-        js_content += f'    "wins": {shop["wins"]},\n'
-        js_content += f'    "lat": {shop["lat"] if shop["lat"] else "null"},\n'
-        js_content += f'    "lng": {shop["lng"] if shop["lng"] else "null"}\n'
+        js_content += f'    "name": "{t["name"]}",\n'
+        js_content += f'    "address": "{t["address"]}",\n'
+        js_content += f'    "wins": {t["wins"]},\n'
+        js_content += f'    "lat": {t["lat"] if t["lat"] else "null"},\n'
+        js_content += f'    "lng": {t["lng"] if t["lng"] else "null"}\n'
         js_content += "  },\n"
         
     js_content += "];\n"
