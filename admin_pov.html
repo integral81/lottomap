@@ -196,7 +196,7 @@
         <div id="content">
             <div id="viewer-container">
                 <div id="map"></div>
-                <div id="roadview"></div>
+                <div id="roadview" tabindex="0"></div>
             </div>
             <div id="control-panel">
                 <div class="control-group">
@@ -253,10 +253,20 @@
                 kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
                 kakao.maps.event.addListener(marker, 'dragend', () => loadRoadview(marker.getPosition().getLat(), marker.getPosition().getLng()));
 
-                if (window.allMissingShops && window.allMissingShops.length > 0) {
+                // Map click to move roadview
+                kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
+                    const latlng = mouseEvent.latLng;
+                    marker.setPosition(latlng);
+                    map.setCenter(latlng);
+                    loadRoadview(latlng.getLat(), latlng.getLng());
+                });
+
+                if (typeof adminTargets !== 'undefined') {
+                    allMissingShops = adminTargets;
+                } else if (window.allMissingShops && window.allMissingShops.length > 0) {
                     allMissingShops = window.allMissingShops;
                 } else {
-                    console.error("No data found in window.allMissingShops");
+                    console.error("No data found in adminTargets or window.allMissingShops");
                 }
 
                 renderShopList();
@@ -295,12 +305,26 @@
             const pos = new kakao.maps.LatLng(shop.lat, shop.lng);
             map.setCenter(pos);
             marker.setPosition(pos);
-            loadRoadview(shop.lat, shop.lng);
+
+            if (shop.panoId) {
+                rv.setPanoId(shop.panoId, pos);
+                if (shop.pov) {
+                    rv.setViewpoint(shop.pov);
+                }
+            } else {
+                loadRoadview(shop.lat, shop.lng);
+            }
+            // Focus for keyboard access - increased delay and force click
+            setTimeout(() => {
+                const rvDiv = document.getElementById('roadview');
+                rvDiv.focus();
+                rvDiv.click(); // Force interaction to enable keyboard
+            }, 500);
         }
 
         function loadRoadview(lat, lng) {
             const pos = new kakao.maps.LatLng(lat, lng);
-            rvClient.getNearestPanoId(pos, 100, (id) => {
+            rvClient.getNearestPanoId(pos, 500, (id) => {
                 if (id) rv.setPanoId(id, pos);
                 else alert('로드뷰 불가');
             });
