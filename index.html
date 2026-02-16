@@ -364,6 +364,91 @@
             overflow-y: auto;
         }
 
+        /* AI Modal Fixed Header Structure */
+        .ai-modal-content {
+            width: 90%;
+            max-width: 350px;
+            height: 80vh;
+            /* Fallback */
+            height: 80dvh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            /* Reset inline styles override */
+            padding: 0 !important;
+        }
+
+        .ai-modal-header {
+            flex-shrink: 0;
+            padding: 20px 20px 10px 20px;
+            text-align: center;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .ai-modal-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 20px 80px 20px;
+            /* Bottom padding for scrolling */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .ai-close-btn-fixed {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            z-index: 20;
+            font-weight: bold;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .ai-close-btn-fixed:hover {
+            opacity: 1;
+        }
+
+        .kakao-share-btn {
+            background: #fae100;
+            color: #3c1e1e;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 320px;
+            animation: pulse-soft 2s infinite;
+        }
+
+        @keyframes pulse-soft {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
         /* Mobile-specific: Reduce OMR modal height by 5% */
         @media (max-width: 768px) {
             .omr-modal-content {
@@ -2229,33 +2314,32 @@
     </div>
 
     <div id="adModal" class="modal" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <div id="adContent"
-                style="width:100%; height:450px; padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-
-                <!-- Mode Selection Menu -->
-                <div id="modeSelection" style="width:100%; max-width:400px;">
-                    <div style="background:#fae100; color:#3c1e1e; padding:8px 15px; text-align:center; font-weight:bold; cursor:pointer; font-size:14px; border-radius:8px; margin-bottom:15px; box-shadow:0 2px 4px rgba(0,0,0,0.1);"
-                        onclick="shareToKakao()">
-                        📢 카톡 공유하고 당첨 확률 높이기 (클릭)
+        <!-- AI Modal Content (Fixed Header + Scrollable Body) -->
+        <div id="adContent" class="ai-modal-content" onclick="event.stopPropagation()">
+            <!-- Fixed Header -->
+            <div class="ai-modal-header">
+                <span class="ai-close-btn-fixed" onclick="closeModal()">✕</span>
+                <div class="ai-header-content">
+                    <div class="ai-title" style="font-size:22px; margin-bottom:5px;">✨ AI 로또 분석 시스템</div>
+                    <div class="ai-tags">
+                        <div class="ai-tag">📈 실시간 분석</div>
+                        <div class="ai-tag">🪄 AI 예측</div>
+                        <div class="ai-tag">📊 27개 분석도구</div>
                     </div>
+                </div>
+            </div>
 
-                    <!-- AI Analysis System Card -->
-                    <div class="ai-system-card">
-                        <div class="ai-title">✨ AI 로또 분석 시스템</div>
-                        <div class="ai-desc">
-                            1,200회차 이상의 역대 당첨 데이터를 AI가 심층 분석하여 통계 기반 인사이트를 제공합니다.
-                        </div>
-                        <div class="ai-tags">
-                            <div class="ai-tag">📈 실시간 분석</div>
-                            <div class="ai-tag">🪄 AI 예측</div>
-                            <div class="ai-tag">📊 27개 분석도구</div>
-                        </div>
-                    </div>
+            <!-- Scrollable Body -->
+            <div class="ai-modal-body">
+                <!-- Kakao Share Button (Top of Scroll) -->
+                <div class="kakao-share-btn" onclick="shareToKakao()">
+                    📢 카톡 공유하고 당첨 확률 높이기 (클릭)
+                </div>
 
+                <!-- Mode Selection -->
+                <div id="modeSelection" style="width:100%; display:flex; flex-direction:column; align-items:center;">
                     <h2
-                        style="color:white; text-align:center; margin-bottom:15px; font-size:20px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                        style="color:white; text-align:center; margin-bottom:15px; font-size:18px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
                         🔮 번호 생성 방식을 선택하세요
                     </h2>
 
@@ -2265,7 +2349,7 @@
                             <div class="selection-icon">📊</div>
                             <div class="selection-info">
                                 <span class="selection-title">데이터 정밀 분석</span>
-                                <span class="selection-desc">명당의 과거 당첨 패턴을 정밀 분석</span>
+                                <span class="selection-desc">명당으 과거 당첨 패턴을 정밀 분석</span>
                             </div>
                         </div>
 
@@ -2289,16 +2373,16 @@
                     </div>
                 </div>
 
-                <!-- Loading Animation (Initially Hidden) -->
-                <div id="analysisLoading" class="loader-container">
+                <!-- Loading Animation -->
+                <div id="analysisLoading" class="loader-container" style="display:none;">
                     <div class="spinner"></div>
                     <h3 style="margin:10px 0; font-size:22px;">데이터 분석 중...</h3>
                     <p style="font-size:14px; opacity:0.9;">명당의 기운을 모으고 있습니다</p>
                 </div>
 
-                <!-- Placeholders for Step 2 & 3 -->
-                <div id="modeDreamInput" class="input-container">
-                    <h2 style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                <!-- Dream Input -->
+                <div id="modeDreamInput" class="input-container" style="display:none;">
+                    <h2 style="color:white; font-size:18px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
                         🌙 어젯밤 무슨 꿈을 꾸셨나요?
                     </h2>
 
@@ -2318,12 +2402,17 @@
                     </div>
 
                     <div style="margin-top:20px;">
-                        <button class="btn-sm" style="background:rgba(0,0,0,0.3);" onclick="resetToModeSelection()">🔙
-                            뒤로가기</button>
+                        <button class="btn-sm"
+                            style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:15px;"
+                            onclick="resetToModeSelection()">
+                            🔙 뒤로가기
+                        </button>
                     </div>
                 </div>
-                <div id="modeHoroscopeSelect" class="input-container">
-                    <h2 style="color:white; font-size:20px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+
+                <!-- Horoscope Select -->
+                <div id="modeHoroscopeSelect" class="input-container" style="display:none;">
+                    <h2 style="color:white; font-size:18px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
                         🐅 당신의 띠를 선택하세요
                     </h2>
                     <div class="zodiac-grid">
@@ -2352,40 +2441,49 @@
                         <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
                                 class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
                     </div>
-
                     <div style="margin-top:20px;">
-                        <button class="btn-sm" style="background:rgba(0,0,0,0.3);" onclick="resetToModeSelection()">🔙
-                            뒤로가기</button>
+                        <button class="btn-sm"
+                            style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:15px;"
+                            onclick="resetToModeSelection()">
+                            🔙 뒤로가기
+                        </button>
                     </div>
                 </div>
-            </div>
+            </div> <!-- End ai-modal-body -->
         </div>
-        <div id="resultContent"
-            style="display:none; position:relative; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; max-height:70vh; overflow-y:auto;">
+
+        <!-- Result Content (Updated with similar container style for consistency) -->
+        <div id="resultContent" onclick="event.stopPropagation()"
+            style="display:none; position:relative; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; max-height:80dvh; overflow-y:auto; width:90%; max-width:350px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
             <span
                 style="position:absolute; top:15px; right:20px; color:white; font-size:28px; font-weight:bold; cursor:pointer; z-index:10;"
-                onclick="closeModal()">&times;</span>
-            <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.2);">🎉 추천 번호 생성 완료! 🎉</h2>
-            <p id="resultInfoText" style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px;">
+                onclick="closeModal()">✕</span>
+            <h2 style="color:white; text-shadow:0 2px 4px rgba(0,0,0,0.2); text-align:center;">🎉 추천 번호 생성 완료! 🎉</h2>
+            <p id="resultInfoText"
+                style="font-size:13px; color:rgba(255,255,255,0.95); margin-bottom:10px; text-align:center;">
                 이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
                 (<span id="paramRounds"></span> 등)
             </p>
-            <div class="lucky-balls" id="luckyBalls">
+            <div class="lucky-balls" id="luckyBalls"
+                style="display:flex; justify-content:center; gap:5px; flex-wrap:wrap; margin:15px 0;">
                 <!-- Balls go here -->
             </div>
-            <p style="font-size:12px; color:rgba(255,255,255,0.8);">* 재미로만 봐주세요. 과도한 구매는 금물!</p>
-            <button class="btn-apply btn-navi"
-                style="margin-top:10px; background:#fae100; color:#3c1e1e; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
-                onclick="goToShop()">
-                🚗 지금 당장 사러 가기 (길찾기)
-            </button>
+            <p style="font-size:12px; color:rgba(255,255,255,0.8); text-align:center;">* 재미로만 봐주세요. 과도한 구매는 금물!</p>
+            <div style="text-align:center;">
+                <button class="btn-apply btn-navi"
+                    style="margin-top:10px; background:#fae100; color:#3c1e1e; border:none; padding:12px 30px; border-radius:25px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
+                    onclick="goToShop()">
+                    🚗 지금 당장 사러 가기 (길찾기)
+                </button>
+            </div>
             <button class="btn-sm"
-                style="display:block; margin:15px auto 0; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); padding:8px 20px; border-radius:20px; color:white;"
+                style="display:block; margin:20px auto 0; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); padding:8px 25px; border-radius:20px; color:white;"
                 onclick="closeModal()">
                 닫기
             </button>
-        </div> <!-- end info-modal -->
-    </div> <!-- end ad-content -->
+        </div>
+    </div>
+    <!-- end ad-content -->
     <!-- Frequency Statistics Modal -->
     <div id="statModal" class="modal">
         <div class="freq-modal-content">
