@@ -244,7 +244,20 @@
         async function init() {
             try {
                 const mapContainer = document.getElementById('map');
-                map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.4815, 127.0145), level: 3 });
+                const mapOption = {
+                    center: new kakao.maps.LatLng(37.4815, 127.0145),
+                    level: 3,
+                    draggable: true,
+                    scrollwheel: true // Enabled
+                };
+
+                map = new kakao.maps.Map(mapContainer, mapOption);
+
+                // Add Zoom Control
+                var zoomControl = new kakao.maps.ZoomControl();
+                map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+                map.setZoomable(true);
+
                 rv = new kakao.maps.Roadview(document.getElementById('roadview'));
                 rvClient = new kakao.maps.RoadviewClient();
                 marker = new kakao.maps.Marker({ position: map.getCenter(), map: map, draggable: true });
