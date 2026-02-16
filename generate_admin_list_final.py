@@ -1,113 +1,87 @@
-
 import json
 from collections import defaultdict
 
 def generate_final_admin_list():
-    print("Generating admin_targets.js... (Excluding ALL shops with POV)")
+    print("Generating admin_targets.js with PRIORITY...")
     
     with open('lotto_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
     
-    # First, aggregate by shop (name + address)
+    # Aggregate data
     shop_data = defaultdict(lambda: {
-        'name': '',
-        'address': '',
-        'wins': 0,
-        'lat': 0,
-        'lng': 0,
-        'pov': None,
-        'rounds': []
+        'name': '', 'address': '', 'wins': 0, 'lat': 0, 'lng': 0, 'pov': None, 'rounds': []
     })
     
     for item in data:
-        name = item['n']
-        addr = item['a']
-        key = f"{name}|{addr}"
-        
-        # Aggregate
-        shop_data[key]['name'] = name
-        shop_data[key]['address'] = addr
+        key = f"{item['n']}|{item['a']}"
+        shop_data[key]['name'] = item['n']
+        shop_data[key]['address'] = item['a']
         shop_data[key]['wins'] += 1
         shop_data[key]['lat'] = item.get('lat', 0)
         shop_data[key]['lng'] = item.get('lng', 0)
-        shop_data[key]['rounds'].append(item.get('r', 0))
-        
-        # Keep POV if exists
         if item.get('pov') and item['pov'].get('id') != 'N/A':
             shop_data[key]['pov'] = item['pov']
-            
-    # Categories
-    gapan = []
-    golden = []
-    rest = []
-    missing = []
+
+    # Filter targets (3+ wins, No POV)
+    all_targets = []
     
-    excluded_count = 0
-    
-    for key, shop in shop_data.items():
-        # Filter: Only 3+ wins
-        if shop['wins'] < 3:
-            continue
-            
-        # CRITICAL: Exclude if POV exists
-        if shop['pov']:
-            excluded_count += 1
-            continue
+    for shop in shop_data.values():
+        if shop['wins'] < 3: continue
+        if shop['pov']: continue
         
-        # Construct target object
-        obj = {
+        all_targets.append({
             "name": shop['name'],
             "address": shop['address'],
             "wins": shop['wins'],
             "lat": shop['lat'],
             "lng": shop['lng']
-        }
+        })
+
+    # --- Priority Handling ---
+    priority_list = []
+    regular_list = []
+    
+    for t in all_targets:
+        is_paju_nodaji = '파주시 문산읍' in t['address'] and '노다지' in t['name']
+        is_osan_nodaji = '오산시 오산로' in t['address'] and '노다지' in t['name'] # Using new address
+        # Also check old address just in case
+        is_osan_nodaji_old = '오산동 394' in t['address'] and '노다지' in t['name']
         
-        # Classification
-        if "가판점" in shop['name'] and "구로구" in shop['address']:
-            gapan.append(obj)
-        elif "황금복권방" in shop['name'] and "부산" in shop['address']:
-            golden.append(obj)
-        elif "로또휴게실" in shop['name'] and "용인" in shop['address']:
-            rest.append(obj)
+        if is_paju_nodaji or is_osan_nodaji or is_osan_nodaji_old:
+            # t['name'] = f"★ {t['name']}" # User requested REMOVAL of stars
+            priority_list.append(t)
         else:
-            missing.append(obj)
+            regular_list.append(t)
             
-    # Sort missing by wins (descending), then group by same shop name
-    def sort_and_group_by_name(items):
-        if not items:
-            return []
-        sorted_items = sorted(items, key=lambda x: x.get('wins', 0), reverse=True)
-        result = []
-        processed = set()
-        for item in sorted_items:
-            if id(item) in processed: continue
-            result.append(item)
-            processed.add(id(item))
-            current_name = item['name']
-            for other in sorted_items:
-                if id(other) in processed: continue
-                if other['name'] == current_name:
-                    result.append(other)
-                    processed.add(id(other))
-        return result
+    # Sort Regular List by Wins
+    regular_list.sort(key=lambda x: x['wins'], reverse=True)
     
-    missing = sort_and_group_by_name(missing)
+    # Combine: Priority FIRST
+    combined_list = priority_list + regular_list
     
-    # Combine
-    final_list = gapan + golden + rest + missing
+    # Apply exclusion logic
+    EXCLUDE_ADDRS = ["세종로475번길 2"] # Yeoju Sky Lotto (Active but Roadview invisible - User requested removal from admin)
     
-    # Write JS
-    js_content = "const adminTargets = [\n"
-    for item in final_list:
-        js_content += f"    {json.dumps(item, ensure_ascii=False)},\n"
-    js_content += "];"
+    final_list = []
+    for shop in combined_list:
+        is_excluded = False
+        for ex_addr in EXCLUDE_ADDRS:
+            if ex_addr in shop['address']:
+                is_excluded = True
+                break
+        
+        if not is_excluded:
+            final_list.append(shop)
     
+    # Write to File
+    js_content = "const adminTargets = " + json.dumps(final_list, ensure_ascii=False, indent=2) + ";"
     with open('admin_targets.js', 'w', encoding='utf-8') as f:
         f.write(js_content)
         
-    print(f"Total Pending: {len(final_list)} (Gapan: {len(gapan)}, Golden: {len(golden)}, Rest: {len(rest)}, Missing: {len(missing)})")
-    print(f"Excluded (Already Completed): {excluded_count}")
+    print(f"Generated {len(final_list)} targets.")
+    print(f"Priority Targets: {len(priority_list)}")
+    for p in priority_list:
+        print(f" - {p['name']} ({p['address']})")
 
 if __name__ == "__main__":
     generate_final_admin_list()
