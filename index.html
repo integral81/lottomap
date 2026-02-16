@@ -362,15 +362,15 @@
             }
 
             .ai-modal-content {
-                width: 95%;
-                padding: 25px 20px;
-                /* iPhone 15 Fix: Use dvh for dynamic bars, fallback to vh */
-                max-height: 80vh;
-                max-height: 80dvh;
+                width: 90%;
+                padding: 20px;
+                /* iPhone 15 Fix (v3): Reduce height further to 70dvh */
+                max-height: 70dvh;
                 overflow-y: auto;
                 overscroll-behavior: contain;
-                padding-bottom: 80px;
-                /* Extra padding for bottom overlap */
+                padding-bottom: 100px;
+                /* Ample padding for scrolling */
+                border-radius: 20px;
             }
         }
 
@@ -2585,7 +2585,8 @@
             { name: "노다지복권방", addr: "경기 용인시 처인구 마평동 735-1", panoId: 1198953144, pov: { pan: 126.6, tilt: 2.2, zoom: 2 } },
             { name: "GS25(계산동경점)", addr: "인천 계양구 계산동", panoid: 1199151424, pov: { pan: 353.80, tilt: -2.31, zoom: -2 } },
             { name: "창원병원앞매표소", addr: "경남 창원시 성산구", panoid: 1204481691, pov: { pan: 36.51, tilt: 4.43, zoom: 2 } },
-            { name: "역전광장상회", addr: "경기 파주시 금촌1동 329-19", panoId: 1203271882, pov: { pan: 332.7, tilt: 5.0, zoom: 0 } },
+            { name: "역전광장상회", addr: "경기 파주시 금촌1동 329-19", panoid: 1203271929, pov: { pan: 158.43, tilt: 1.88, zoom: 1 } },
+            { name: "복권방", addr: "부산 부산진구 당감동", panoid: 1202678221, pov: { pan: 228.64, tilt: 1.60, zoom: -2 } },
             { name: "대광복권방", addr: "전남 화순군 화순읍 대리 97-3", panoId: 1192902741, pov: { pan: 339.4, tilt: 4.4, zoom: 0 } },
             { name: "명당골복권방", addr: "경기 수원시 권선구", panoId: 1199751659, pov: { pan: 187.22, tilt: 5.79, zoom: -3 } },
             { name: "다터져복권방", addr: "경기 평택시 합정동", panoid: 1197642715, pov: { pan: 284.10, tilt: 1.67, zoom: -3 } },
