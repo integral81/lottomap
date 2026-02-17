@@ -3424,9 +3424,10 @@
 
             try {
                 const [lottoData, historyData] = await Promise.all([
-                    fetch('https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/lotto_data.json' + cacheBuster).then(res => {
-                        if (!res.ok) throw new Error('lotto_data.json 404');
-                        return res.json();
+                    // Use global lottoData loaded from script tag
+                    Promise.resolve(typeof lottoData !== 'undefined' ? lottoData : []).then(data => {
+                        if (!data || data.length === 0) throw new Error('lottoData is empty');
+                        return data;
                     }),
                     fetch('https://integral81.github.io/lottomap/lotto_history.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('lotto_history.json 404');
