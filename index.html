@@ -5267,6 +5267,15 @@
                 actionType = arg5;
                 actionData = arg6;
                 shop = { lat, lng, n: shopName, a: address }; // Mock shop object
+
+                // Fallback: If roadview_msg is missing, try to find the full shop object from global lottoData
+                if (!shop.roadview_msg && typeof lottoData !== 'undefined') {
+                    const found = lottoData.find(s => s.n === shopName && s.a === address);
+                    if (found) {
+                        shop = found;
+                    }
+                }
+
             }
 
             if (shop.roadview_msg) {
