@@ -5,10 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LottoMap Admin v2.5 (Fix Crash)</title>
-    <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,clusterer"
-        onerror="log('Kakao Map Script Load Failed!', 'error')"></script>
+    <title>LottoMap Mobile Admin (v3.0)</title>
     <style>
         body,
         html {
@@ -19,6 +16,30 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             overflow: hidden;
             background-color: #f0f2f5;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #error-msg {
+            color: red;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+            padding: 0 20px;
         }
 
         #map-view {
@@ -293,10 +314,36 @@
         .log-warn {
             color: #feca57;
         }
+
+        .addr-copy-btn {
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+            padding: 2px 6px;
+            font-size: 11px;
+            border-radius: 4px;
+            margin-left: 6px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .copy-msg {
+            color: #27ae60;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="loading-overlay">
+        <div>⏳ 로딩중...</div>
+        <div id="error-msg"></div>
+        <button onclick="document.getElementById('loading-overlay').style.display='none'"
+            style="margin-top:20px; padding:10px; border:1px solid #ccc; background:white;">강제 화면 보기</button>
+    </div>
 
     <div id="toast">Message</div>
 
@@ -317,7 +364,7 @@
         <div class="list-header">
             <div>
                 <span id="list-title">매장 목록</span>
-                <span style="font-size:12px; color:#ff0000; font-weight:bold;">(DEBUG v2.5)</span>
+                <span style="font-size:12px; color:#ff0000; font-weight:bold;">(DEBUG v3.0)</span>
             </div>
             <button onclick="window.location.reload()"
                 style="padding:6px 10px; font-size:12px; border:1px solid #ddd; background:white; border-radius:6px;">🔄
@@ -331,7 +378,7 @@
 
         <!-- Debug Console -->
         <div id="debug-console">
-            <div>=== DEBUG LOG STARTED ===</div>
+            <div>=== DEBUG LOG STARTED (v3.0) ===</div>
         </div>
     </div>
 
@@ -356,6 +403,7 @@
         </div>
     </div>
 
+    <!-- Load Scripts at the end to prevent blocking -->
     <script>
         // --- Debug Logger ---
         function log(msg, type = 'info') {
@@ -372,9 +420,24 @@
 
         window.onerror = function (msg, url, line) {
             log(`Global Error: ${msg} (L${line})`, 'error');
+            document.getElementById('error-msg').innerText = `Error: ${msg}`;
             return false;
         };
 
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        function showLoadingError(msg) {
+            document.getElementById('error-msg').innerText = msg;
+        }
+    </script>
+
+    <script type="text/javascript"
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,clusterer,roadview"
+        onerror="log('Kakao Map Script Load Failed!', 'error'); showLoadingError('Kakao Map API Load Failed. Check Domain Settings.');"></script>
+
+    <script>
         // --- State ---
         let map, rv, rvClient;
         let isKakaoLoaded = false;
@@ -386,6 +449,7 @@
         let filterMode = '3WINS'; // Default start mode
 
         // --- Init ---
+        // Wait for script to load
         window.onload = async function () {
             log("Window Loaded. Starting Init...");
 
@@ -398,9 +462,11 @@
                     log("Kakao Map Loaded Successfully.");
                 } else {
                     log("Kakao Object Missing! Map features disabled.", 'error');
+                    showLoadingError("Kakao Map API Disabled (Domain Incorrect?)");
                 }
             } catch (e) {
                 log("Map Init Failed: " + e.message, 'error');
+                showLoadingError("Map Init Failed: " + e.message);
             }
 
             // 2. Load Data (MUST RUN regardless of Map)
@@ -408,6 +474,12 @@
                 await loadData(true);
             } catch (e) {
                 log("Data Load Failed: " + e.message, 'error');
+                showLoadingError("Data Load Failed: " + e.message);
+            }
+
+            // Hide Loading if data loaded (even if map failed)
+            if (groupedShops.length > 0) {
+                hideLoading();
             }
 
             // Events
@@ -457,12 +529,13 @@
                     if (!mapObj[item.n]) {
                         mapObj[item.n] = {
                             n: item.n, a: item.a || "", lat: Number(item.lat), lng: Number(item.lng),
-                            count: 0, pov: item.pov || null, isHidden: !!item.hidden
+                            count: 0, pov: item.pov || null, isHidden: !!item.hidden, isClosed: !!item.closed
                         };
                     }
                     mapObj[item.n].count++;
                     if (item.pov && !mapObj[item.n].pov) mapObj[item.n].pov = item.pov;
-                    if (item.hidden) mapObj[item.n].isHidden = true; // Sync hidden status
+                    if (item.hidden) mapObj[item.n].isHidden = true;
+                    if (item.closed) mapObj[item.n].isClosed = true;
                 });
 
                 groupedShops = Object.values(mapObj);
@@ -483,7 +556,8 @@
             } catch (e) {
                 statusEl.innerText = "데이터 로드 실패";
                 log("LoadData Error: " + e.message, 'error');
-                alert("Load Fail: " + e.message);
+                // alert("Load Fail: " + e.message);
+                throw e;
             }
         }
 
@@ -506,7 +580,7 @@
         }
 
         function getFilteredList() {
-            let list = groupedShops.filter(s => !s.isHidden);
+            let list = groupedShops.filter(s => !s.isHidden && !s.isClosed);
             // log(`Base list: ${list.length}`);
 
             if (filterMode === 'UNFINISHED') {
@@ -589,7 +663,11 @@
                             ${shop.n}
                             <span class="shop-wins">${shop.count}회</span>
                         </div>
-                        <div class="shop-addr">${shop.a}</div>
+                        <div class="shop-addr">
+                            ${shop.a}
+                            <button class="addr-copy-btn" onclick="event.stopPropagation(); copyAddr('${shop.a}', this)">복사</button>
+                            <span class="copy-msg">(복사 성공)</span>
+                        </div>
                     </div>
                     <div style="font-size:20px; color:#ccc;">›</div>
                 `;
@@ -737,6 +815,50 @@
 
         function deg2rad(deg) {
             return deg * (Math.PI / 180)
+        }
+
+        function copyAddr(addr, btn) {
+            // Success Callback
+            const onSuccess = () => {
+                const msg = btn.nextElementSibling;
+                if (msg) {
+                    msg.style.display = 'inline';
+                    setTimeout(() => { msg.style.display = 'none'; }, 1500);
+                }
+            };
+
+            // 1. Try Modern API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(addr).then(onSuccess).catch(err => {
+                    fallbackCopy(addr, onSuccess);
+                });
+            } else {
+                // 2. Fallback
+                fallbackCopy(addr, onSuccess);
+            }
+        }
+
+        function fallbackCopy(text, onSuccess) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+
+            // Avoid scrolling to bottom
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) onSuccess();
+                else alert("복사 실패: 브라우저 보안 제한");
+            } catch (err) {
+                alert("복사 에러: " + err);
+            }
+            document.body.removeChild(textArea);
         }
     </script>
 </body>
