@@ -3760,9 +3760,11 @@
                         lng: d.lng,
                         totalWins: d.totalWins, // This is the total wins for the shop
                         closed: d.closed, // Store closed status
+                        pov: d.pov || null, // Capture POV if exists
                         rounds: [] // To store individual round details for infowindow
                     };
                 }
+                if (d.pov && !uniqueShops[key].pov) uniqueShops[key].pov = d.pov; // Sync POV
                 uniqueShops[key].rounds.push({ r: d.r, m: d.m });
             });
 
@@ -3829,7 +3831,7 @@
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
-                            <button class="btn-iw btn-navi" style="width:100%;" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}')">
+                            <button class="btn-iw btn-navi" style="width:100%;" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}', ${shop.pov ? JSON.stringify(shop.pov) : 'null'})">
                                 로드뷰(ROAD VIEW) 보기
                             </button>
                         </div>
@@ -5200,7 +5202,8 @@
             // Let's define it here based on the shopName and address.
             // Assuming ROADVIEW_PRESETS is a global array.
             const foundPreset = ROADVIEW_PRESETS.find(p => p.name === shopName || (p.addr && address.includes(p.addr)));
-            const activePreset = foundPreset || null;
+            // Prioritize shop.pov (dynamic from DB) over hardcoded ROADVIEW_PRESETS
+            const activePreset = shop.pov ? { panoId: shop.pov.id, pov: shop.pov } : (foundPreset || null);
 
             // Custom Message Sync
             const msgOverlay = document.getElementById('roadview-message-overlay');
@@ -5301,12 +5304,12 @@
             openRoadview(lat, lng, shopName, address, 'copy', address);
         }
 
-        function openRoadviewWithNavi(lat, lng, shopName, address) {
+        function openRoadviewWithNavi(lat, lng, shopName, address, pov = null) {
             if (shopName.includes('인터넷 복권판매사이트')) {
                 window.open('https://www.dhlottery.co.kr/userGuide', '_blank');
                 return;
             }
-            openRoadview(lat, lng, shopName, address, 'navi', { lat, lng, name: shopName });
+            openRoadview(lat, lng, shopName, address, 'navi', { lat, lng, name: shopName, pov: pov });
         }
 
         function openKakaoMap(lat, lng, shopName, address) {
