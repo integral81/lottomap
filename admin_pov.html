@@ -293,27 +293,39 @@
 
             // Aggregate wins
             const mapObj = {};
+            const HOT_TARGETS = ['옥좌로또점', 'Goodday복권전문점', '완월로또', '채널큐', '해피복권', '도소매복권방'];
+
             lottoData.forEach(item => {
                 if (!item.n) return;
                 if (!mapObj[item.n]) {
                     mapObj[item.n] = {
                         name: item.n, address: item.a || "",
                         lat: Number(item.lat), lng: Number(item.lng),
-                        wins: 0, pov: item.pov, hidden: item.hidden // Add hidden flag
+                        wins: 0, pov: item.pov, hidden: item.hidden, closed: item.closed // Track closed status
                     };
                 }
                 mapObj[item.n].wins++;
+                if (item.closed) mapObj[item.n].closed = true; // Ensure aggregated shop is marked closed if any entry is
             });
 
             // Filter 3 Wins + Sort by distance (desc)
-            // Filter 3 Wins + Sort by distance (desc)
             const list = Object.values(mapObj)
-                .filter(s => s.wins === 3 && !s.hidden && !(s.pov && s.pov.id)) // Filter hidden & registered
+                .filter(s => {
+                    const isHot = HOT_TARGETS.some(ht => s.name.includes(ht));
+                    // For HOT_TARGETS, show them even if registered (to allow re-POV work)
+                    if (isHot) return true;
+                    return s.wins === 3 && !s.hidden && !s.closed && !(s.pov && (s.pov.id || s.pov.panoid));
+                })
                 .map(s => {
+                    s.isHot = HOT_TARGETS.some(ht => s.name.includes(ht));
                     s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);
                     return s;
                 })
-                .sort((a, b) => b.dist - a.dist);
+                .sort((a, b) => {
+                    if (a.isHot && !b.isHot) return -1;
+                    if (!a.isHot && b.isHot) return 1;
+                    return b.dist - a.dist;
+                });
 
             allMissingShops = list;
             renderShopList();
