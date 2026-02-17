@@ -3932,7 +3932,7 @@
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
-                            <button class="btn-iw btn-navi" style="width:100%;" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}', ${shop.pov ? JSON.stringify(shop.pov) : 'null'})">
+                            <button class="btn-iw btn-navi" style="width:100%;" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}', ${shop.pov ? JSON.stringify(shop.pov).replace(/"/g, '&quot;') : 'null'})">
                                 로드뷰(ROAD VIEW) 보기
                             </button>
                         </div>
