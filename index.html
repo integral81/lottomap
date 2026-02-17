@@ -3424,7 +3424,7 @@
 
             try {
                 const [lottoData, historyData] = await Promise.all([
-                    fetch('./lotto_data.json' + cacheBuster).then(res => {
+                    fetch('https://integral81.github.io/lotto_kakaomap/lotto_data.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('lotto_data.json 404');
                         return res.json();
                     }),
