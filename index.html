@@ -3424,11 +3424,23 @@
 
             try {
                 const [shops, history] = await Promise.all([
-                    // Use global lottoData loaded from script tag
-                    Promise.resolve(typeof window.lottoData !== 'undefined' ? window.lottoData : []).then(data => {
-                        if (!data || data.length === 0) throw new Error('lottoData is empty');
-                        return data;
-                    }),
+                    // Triple Fallback: Global Var -> Raw Fetch -> Relative Fetch
+                    (async () => {
+                        if (typeof window.lottoData !== 'undefined' && window.lottoData.length > 0) {
+                            return window.lottoData;
+                        }
+                        console.warn('Global lottoData missing, attempting Raw Fetch...');
+                        try {
+                            const res = await fetch('https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/lotto_data.json' + cacheBuster);
+                            if (!res.ok) throw new Error('Raw fetch failed');
+                            return await res.json();
+                        } catch (e) {
+                            console.warn('Raw fetch failed, attempting Relative Fetch...', e);
+                            const res2 = await fetch('./lotto_data.json' + cacheBuster);
+                            if (!res2.ok) throw new Error('All data load methods failed');
+                            return await res2.json();
+                        }
+                    })(),
                     fetch('https://integral81.github.io/lottomap/lotto_history.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('lotto_history.json 404');
                         return res.json();
