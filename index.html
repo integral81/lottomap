@@ -3441,14 +3441,14 @@
                             return await res2.json();
                         }
                     })(),
-                    fetch('https://integral81.github.io/lottomap/lotto_history.json' + cacheBuster).then(res => {
+                    fetch('https://raw.githubusercontent.com/integral81/lotto_kakaomap/main/lotto_history.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('lotto_history.json 404');
                         return res.json();
                     })
                 ]);
 
-                window.lottoHistory = historyData;
-                processLoadedData(lottoData);
+                window.lottoHistory = history;
+                processLoadedData(shops);
 
             } catch (err) {
                 console.error('Data load failed:', err);
