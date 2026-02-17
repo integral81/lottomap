@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>KINOV 로또 명당 지도</title>
+    <script src="lotto_data.js?v=20260217"></script>
     <!-- Library for QR Code Scanning -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -3423,7 +3424,7 @@
 
             try {
                 const [lottoData, historyData] = await Promise.all([
-                    fetch('https://integral81.github.io/lottomap/lotto_data.json' + cacheBuster).then(res => {
+                    fetch('./lotto_data.json' + cacheBuster).then(res => {
                         if (!res.ok) throw new Error('lotto_data.json 404');
                         return res.json();
                     }),
