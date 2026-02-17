@@ -3423,9 +3423,9 @@
             const cacheBuster = '?v=' + Date.now();
 
             try {
-                const [lottoData, historyData] = await Promise.all([
+                const [shops, history] = await Promise.all([
                     // Use global lottoData loaded from script tag
-                    Promise.resolve(typeof lottoData !== 'undefined' ? lottoData : []).then(data => {
+                    Promise.resolve(typeof window.lottoData !== 'undefined' ? window.lottoData : []).then(data => {
                         if (!data || data.length === 0) throw new Error('lottoData is empty');
                         return data;
                     }),
