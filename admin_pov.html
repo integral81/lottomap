@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto POV Admin - 수기 등록 도구</title>
+    <title>Lotto POV Admin - 3 Wins (Local/Dist Sort)</title>
+    <!-- Use the original API Key which likely supports file:// or user's domain -->
     <script type="text/javascript"
         src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
-    <script src="admin_targets.js"></script>
+    <!-- Load data as JS variable 'lottoData' to avoid CORS on file:// -->
+    <script src="lotto_data.js"></script>
     <style>
         :root {
             --primary: #d32f2f;
@@ -183,7 +185,7 @@
 
 <body>
     <header>
-        <h1>🎰 POV 관리 (Simple Mode)</h1>
+        <h1>🎰 POV 관리 (Local File Mode)</h1>
     </header>
     <main>
         <div id="sidebar">
@@ -238,25 +240,25 @@
         let accumulatedCodes = JSON.parse(localStorage.getItem('pov_accumulated_codes') || '[]');
         let registeredKeys = JSON.parse(localStorage.getItem('pov_registered_shops') || '[]');
         let allMissingShops = [];
+        const SEOUL = { lat: 37.5665, lng: 126.9780 };
 
         document.addEventListener('DOMContentLoaded', init);
 
         async function init() {
             try {
+                // Map Init
                 const mapContainer = document.getElementById('map');
                 const mapOption = {
                     center: new kakao.maps.LatLng(37.4815, 127.0145),
                     level: 3,
                     draggable: true,
-                    scrollwheel: true // Enabled
+                    scrollwheel: true
                 };
 
                 map = new kakao.maps.Map(mapContainer, mapOption);
-
-                // Add Zoom Control
+                // Zoom Control
                 var zoomControl = new kakao.maps.ZoomControl();
                 map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
-                map.setZoomable(true);
 
                 rv = new kakao.maps.Roadview(document.getElementById('roadview'));
                 rvClient = new kakao.maps.RoadviewClient();
@@ -266,7 +268,6 @@
                 kakao.maps.event.addListener(rv, 'viewpoint_changed', updatePOVUI);
                 kakao.maps.event.addListener(marker, 'dragend', () => loadRoadview(marker.getPosition().getLat(), marker.getPosition().getLng()));
 
-                // Map click to move roadview
                 kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
                     const latlng = mouseEvent.latLng;
                     marker.setPosition(latlng);
@@ -274,38 +275,77 @@
                     loadRoadview(latlng.getLat(), latlng.getLng());
                 });
 
-                if (typeof adminTargets !== 'undefined') {
-                    allMissingShops = adminTargets;
-                } else if (window.allMissingShops && window.allMissingShops.length > 0) {
-                    allMissingShops = window.allMissingShops;
-                } else {
-                    console.error("No data found in adminTargets or window.allMissingShops");
-                }
-
-                renderShopList();
+                // Load Data from JS variable
+                processLottoData();
                 updateCodeOutput();
+
             } catch (e) {
                 console.error(e);
                 alert('초기화 중 에러 발생: ' + e.message);
             }
         }
 
+        function processLottoData() {
+            if (typeof lottoData === 'undefined') {
+                alert("lotto_data.js 로드 실패! 데이터가 없습니다.");
+                return;
+            }
+
+            // Aggregate wins
+            const mapObj = {};
+            lottoData.forEach(item => {
+                if (!item.n) return;
+                if (!mapObj[item.n]) {
+                    mapObj[item.n] = {
+                        name: item.n, address: item.a || "",
+                        lat: Number(item.lat), lng: Number(item.lng),
+                        wins: 0, pov: item.pov, hidden: item.hidden // Add hidden flag
+                    };
+                }
+                mapObj[item.n].wins++;
+            });
+
+            // Filter 3 Wins + Sort by distance (desc)
+            const list = Object.values(mapObj)
+                .filter(s => s.wins === 3 && !s.hidden) // Filter hidden
+                .map(s => {
+                    s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);
+                    return s;
+                })
+                .sort((a, b) => b.dist - a.dist);
+
+            allMissingShops = list;
+            renderShopList();
+        }
+
         function renderShopList() {
-            const filteredList = allMissingShops.filter(s => !registeredKeys.includes(`${s.name}|${s.address}`));
-            document.getElementById('missing-count').innerText = filteredList.length;
             const container = document.getElementById('shop-list');
+            document.getElementById('missing-count').innerText = allMissingShops.length;
             container.innerHTML = '';
-            filteredList.forEach(shop => {
+
+            allMissingShops.forEach(shop => {
                 const div = document.createElement('div');
-                div.className = 'shop-item' + (currentShop?.name === shop.name && currentShop?.address === shop.address ? ' active' : '');
+                div.className = 'shop-item' + (currentShop?.name === shop.name ? ' active' : '');
                 div.onclick = () => selectShop(shop, div);
+
+                const hasPov = !!(shop.pov && shop.pov.id);
+                // Check local storage stack
+                const isStacked = accumulatedCodes.some(c => c.includes(`name: "${shop.name}"`));
+
+                let icon = '🔴';
+                if (hasPov) icon = '✅';
+                else if (isStacked) icon = '💾';
+
                 div.innerHTML = `
-                    <div class="shop-name">${shop.name}</div>
+                    <div class="shop-name">${icon} ${shop.name}</div>
                     <div class="shop-addr">
-                        <span>${shop.address}</span>
+                        <span style="font-size:11px;">${shop.address}</span>
                         <button class="addr-copy-btn" onclick="event.stopPropagation(); copyToClipboard('${shop.address}')">복사</button>
                     </div>
-                    <div class="win-count">${shop.wins}회 당첨</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="win-count">${shop.wins}회</span>
+                        <span style="font-size:10px; color:#888;">${shop.dist.toFixed(1)}km</span>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -319,19 +359,17 @@
             map.setCenter(pos);
             marker.setPosition(pos);
 
-            if (shop.panoId) {
-                rv.setPanoId(shop.panoId, pos);
-                if (shop.pov) {
-                    rv.setViewpoint(shop.pov);
-                }
+            if (shop.pov && shop.pov.id) {
+                rv.setPanoId(shop.pov.id, pos);
+                rv.setViewpoint({ pan: shop.pov.pan, tilt: shop.pov.tilt, zoom: shop.pov.zoom });
             } else {
                 loadRoadview(shop.lat, shop.lng);
             }
-            // Focus for keyboard access - increased delay and force click
+
             setTimeout(() => {
                 const rvDiv = document.getElementById('roadview');
                 rvDiv.focus();
-                rvDiv.click(); // Force interaction to enable keyboard
+                rvDiv.click();
             }, 500);
         }
 
@@ -339,7 +377,9 @@
             const pos = new kakao.maps.LatLng(lat, lng);
             rvClient.getNearestPanoId(pos, 500, (id) => {
                 if (id) rv.setPanoId(id, pos);
-                else alert('로드뷰 불가');
+                else {
+                    // No need to alert, just stays blank or old view
+                }
             });
         }
 
@@ -348,7 +388,7 @@
         function updateCodeOutput() {
             if (currentShop && rv.getPanoId()) {
                 const vp = rv.getViewpoint();
-                const code = `{ name: "${currentShop.name}", addr: "${currentShop.address.split(' ').slice(0, 3).join(' ')}", panoid: ${rv.getPanoId()}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${Math.floor(vp.zoom)} } },`;
+                const code = `{ name: "${currentShop.name}", addr: "${currentShop.address}", panoid: ${rv.getPanoId()}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${Math.floor(vp.zoom)} } },`;
                 document.getElementById('current-code-text').textContent = code;
             }
             document.getElementById('stack-output').textContent = accumulatedCodes.join('\n');
@@ -362,12 +402,10 @@
             const code = document.getElementById('current-code-text').textContent;
             if (!accumulatedCodes.includes(code)) accumulatedCodes.push(code);
             localStorage.setItem('pov_accumulated_codes', JSON.stringify(accumulatedCodes));
-            const key = `${currentShop.name}|${currentShop.address}`;
-            if (!registeredKeys.includes(key)) registeredKeys.push(key);
-            localStorage.setItem('pov_registered_shops', JSON.stringify(registeredKeys));
-            showToast('추가되었습니다');
+
             renderShopList();
             updateCodeOutput();
+            showToast('리스트에 추가됨');
         }
 
         function copyStack() {
@@ -382,14 +420,6 @@
             }
         }
 
-        function resetRegistered() {
-            if (confirm('초기화하시겠습니까?')) {
-                localStorage.removeItem('pov_registered_shops');
-                registeredKeys = [];
-                renderShopList();
-            }
-        }
-
         function copyToClipboard(t) {
             navigator.clipboard.writeText(t).then(() => showToast('복사됨'));
         }
@@ -400,6 +430,23 @@
             t.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 8px 16px; border-radius: 20px; font-size: 13px; z-index: 9999;';
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 1500);
+        }
+
+        function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+            var R = 6371;
+            var dLat = deg2rad(lat2 - lat1);
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            return d;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180)
         }
     </script>
 </body>
