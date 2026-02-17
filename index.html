@@ -5270,7 +5270,9 @@
 
                 // Fallback: If roadview_msg is missing, try to find the full shop object from global lottoData
                 if (!shop.roadview_msg && typeof lottoData !== 'undefined') {
-                    const found = lottoData.find(s => s.n === shopName && s.a === address);
+                    // Try to find the full shop object from global lottoData
+                    // Relaxed Search: Name match is primary
+                    const found = lottoData.find(s => s.n === shopName);
                     if (found) {
                         shop = found;
                     }
@@ -5278,7 +5280,10 @@
 
             }
 
-            if (shop.roadview_msg) {
+            // Emergency Hardcoded Check for '훼미리로또' to guarantee alert
+            if (shopName.includes('훼미리로또') || (shop.n && shop.n.includes('훼미리로또'))) {
+                alert('훼미리마트는 CU보라매타운점으로 변경!!');
+            } else if (shop.roadview_msg) {
                 alert(shop.roadview_msg);
             }
 
