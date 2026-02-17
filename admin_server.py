@@ -131,12 +131,24 @@ class MobileAdminHandler(http.server.SimpleHTTPRequestHandler):
 
     def generate_js_file(self, data):
         try:
+            # 1. Update lotto_data.js
             js_content = f"const lottoData = {json.dumps(data, ensure_ascii=False)};"
             with open('lotto_data.js', 'w', encoding='utf-8') as f:
                 f.write(js_content)
             print(f"[Sync] lotto_data.js updated with {len(data)} records.")
+            
+            # 2. Daily Rolling Backup (To catch mobile mishaps)
+            import shutil
+            import time
+            timestamp = time.strftime("%Y%m%d_%H") # Hourly backup should suffice to limit file count
+            backup_path = f"lotto_data_backup_mobile_{timestamp}.json"
+            if not os.path.exists(backup_path):
+                with open(backup_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False)
+                print(f"[Backup] Saved to {backup_path}")
+                
         except Exception as e:
-            print(f"[Sync Error] Failed to update JS file: {e}")
+            print(f"[Sync Error] Failed to update JS/Backup: {e}")
 
     def send_json_response(self, data, status=200):
         self.send_response(status)
