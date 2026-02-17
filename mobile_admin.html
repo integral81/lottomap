@@ -512,7 +512,7 @@
             if (filterMode === 'UNFINISHED') {
                 list = list.filter(s => !s.pov || !s.pov.id);
             } else if (filterMode === '3WINS') {
-                const exact3 = list.filter(s => s.count === 3);
+                const exact3 = list.filter(s => s.count === 3 && (!s.pov || !s.pov.id));
 
                 // Sort by Distance from Seoul (Desc) - Farthest first
                 const SEOUL = { lat: 37.5665, lng: 126.9780 };

@@ -308,7 +308,7 @@
             // Filter 3 Wins + Sort by distance (desc)
             // Filter 3 Wins + Sort by distance (desc)
             const list = Object.values(mapObj)
-                .filter(s => s.wins === 3 && !s.hidden) // Filter hidden
+                .filter(s => s.wins === 3 && !s.hidden && !(s.pov && s.pov.id)) // Filter hidden & registered
                 .map(s => {
                     s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);
                     return s;
@@ -391,6 +391,8 @@
                 const vp = rv.getViewpoint();
                 const code = `{ name: "${currentShop.name}", addr: "${currentShop.address}", panoid: ${rv.getPanoId()}, pov: { pan: ${vp.pan.toFixed(2)}, tilt: ${vp.tilt.toFixed(2)}, zoom: ${Math.floor(vp.zoom)} } },`;
                 document.getElementById('current-code-text').textContent = code;
+            } else {
+                document.getElementById('current-code-text').textContent = '{ ... }';
             }
             document.getElementById('stack-output').textContent = accumulatedCodes.join('\n');
             document.getElementById('stack-count').innerText = accumulatedCodes.length;
@@ -403,6 +405,11 @@
             const code = document.getElementById('current-code-text').textContent;
             if (!accumulatedCodes.includes(code)) accumulatedCodes.push(code);
             localStorage.setItem('pov_accumulated_codes', JSON.stringify(accumulatedCodes));
+
+            // Auto-Remove from Target List
+            currentShop.hidden = true;
+            allMissingShops = allMissingShops.filter(s => s.name !== currentShop.name);
+            currentShop = null;
 
             renderShopList();
             updateCodeOutput();
