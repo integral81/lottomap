@@ -311,21 +311,15 @@
             // Filter 3 Wins + Sort by distance (desc)
             const list = Object.values(mapObj)
                 .filter(s => {
-                    const isHot = HOT_TARGETS.some(ht => s.name.includes(ht));
-                    // For HOT_TARGETS, show them even if registered (to allow re-POV work)
-                    if (isHot) return true;
+                    // Show only if NOT registered (no POV)
+                    // We remove the special logic that showed HOT_TARGETS even if registered
                     return s.wins === 3 && !s.hidden && !s.closed && !(s.pov && (s.pov.id || s.pov.panoid));
                 })
                 .map(s => {
-                    s.isHot = HOT_TARGETS.some(ht => s.name.includes(ht));
                     s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);
                     return s;
                 })
-                .sort((a, b) => {
-                    if (a.isHot && !b.isHot) return -1;
-                    if (!a.isHot && b.isHot) return 1;
-                    return b.dist - a.dist;
-                });
+                .sort((a, b) => b.dist - a.dist);
 
             allMissingShops = list;
             renderShopList();
