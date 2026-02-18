@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto POV Admin - 3 Wins (Local/Dist Sort)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lotto Map - POV Admin (v2.1)</title>
     <!-- Use the original API Key which likely supports file:// or user's domain -->
     <script type="text/javascript"
         src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=services,roadview"></script>
@@ -291,35 +291,53 @@
                 return;
             }
 
-            // Aggregate wins
             const mapObj = {};
-            const HOT_TARGETS = ['옥좌로또점', 'Goodday복권전문점', '완월로또', '채널큐', '해피복권', '도소매복권방'];
+            const HOT_TARGETS = ['로또마트', '농협중앙회 앞 가판', '이름미상(화명동)', '농협 앞 가판점', '청화빌딩', '로또 명당 가판점', '153로또판매점', '119복권방'];
 
             lottoData.forEach(item => {
                 if (!item.n) return;
-                if (!mapObj[item.n]) {
-                    mapObj[item.n] = {
+                // 이름과 주소 앞부분을 조합하여 같은 이름의 다른 매장을 구분합니다.
+                const key = item.n + (item.a || "").substring(0, 10);
+                if (!mapObj[key]) {
+                    mapObj[key] = {
                         name: item.n, address: item.a || "",
                         lat: Number(item.lat), lng: Number(item.lng),
-                        wins: 0, pov: item.pov, hidden: item.hidden, closed: item.closed // Track closed status
+                        wins: 0, pov: item.pov, hidden: item.hidden, closed: item.closed
                     };
                 }
-                mapObj[item.n].wins++;
-                if (item.closed) mapObj[item.n].closed = true; // Ensure aggregated shop is marked closed if any entry is
+
+                // 통합된 데이터의 경우 'count' 속성을 사용하고, 아니면 1을 더합니다.
+                const addWins = item.count ? Number(item.count) : 1;
+                mapObj[key].wins += addWins;
+
+                if (item.closed) mapObj[key].closed = true;
+                if (item.hidden) mapObj[key].hidden = true;
+                if (item.pov && (item.pov.id || item.pov.panoid)) mapObj[key].pov = item.pov;
             });
 
-            // Filter 3 Wins + Sort by distance (desc)
             const list = Object.values(mapObj)
                 .filter(s => {
-                    // Show only if NOT registered (no POV)
-                    // We remove the special logic that showed HOT_TARGETS even if registered
-                    return s.wins === 3 && !s.hidden && !s.closed && !(s.pov && (s.pov.id || s.pov.panoid));
+                    const isHot = HOT_TARGETS.includes(s.name);
+                    const is3WinOrMore = s.wins >= 3;
+                    const noPov = !(s.pov && (s.pov.id || s.pov.panoid));
+                    return (isHot || is3WinOrMore) && !s.hidden && !s.closed && noPov;
                 })
                 .map(s => {
                     s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);
+                    s.isPriority = HOT_TARGETS.includes(s.name);
                     return s;
                 })
-                .sort((a, b) => b.dist - a.dist);
+                .sort((a, b) => {
+                    if (a.isPriority && !b.isPriority) return -1;
+                    if (!a.isPriority && b.isPriority) return 1;
+
+                    // High win shops (4+) prioritized
+                    if (a.wins >= 4 && b.wins < 4) return -1;
+                    if (a.wins < 4 && b.wins >= 4) return 1;
+
+                    if (a.wins !== b.wins) return b.wins - a.wins;
+                    return a.dist - b.dist;
+                });
 
             allMissingShops = list;
             renderShopList();
