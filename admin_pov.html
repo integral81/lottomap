@@ -328,14 +328,14 @@
                     return s;
                 })
                 .sort((a, b) => {
+                    // Priority 1: Win count descending
+                    if (b.wins !== a.wins) return b.wins - a.wins;
+
+                    // Priority 2: Hot targets
                     if (a.isPriority && !b.isPriority) return -1;
                     if (!a.isPriority && b.isPriority) return 1;
 
-                    // High win shops (4+) prioritized
-                    if (a.wins >= 4 && b.wins < 4) return -1;
-                    if (a.wins < 4 && b.wins >= 4) return 1;
-
-                    if (a.wins !== b.wins) return b.wins - a.wins;
+                    // Priority 3: Distance (closest first)
                     return a.dist - b.dist;
                 });
 
