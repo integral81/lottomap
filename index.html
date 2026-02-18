@@ -1275,13 +1275,13 @@
 
         /* Mini Ball for Recent Rounds */
         .mini-ball {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: white;
             box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.2);
@@ -1323,10 +1323,10 @@
             font-size: 11px;
             font-weight: bold;
             color: #555;
-            width: 55px;
+            width: 48px;
             white-space: nowrap;
             flex-shrink: 0;
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
         /* Highlight style for the absolute latest round */
@@ -1341,7 +1341,7 @@
         /* NEW badge moved to inline element in JavaScript for better mobile layout */
 
         .latest-round-glow .mini-ball {
-            transform: scale(1.1);
+            transform: scale(1.05);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
@@ -1377,9 +1377,9 @@
             }
 
             .mini-ball {
-                width: 20px !important;
-                height: 20px !important;
-                font-size: 10px !important;
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 13px !important;
                 margin-right: 1px !important;
             }
 
@@ -3762,7 +3762,7 @@
                     const ballsDiv = document.createElement('div');
                     ballsDiv.style.display = 'flex';
                     ballsDiv.style.alignItems = 'center'; // Vertically center items
-                    ballsDiv.style.gap = '4px';
+                    ballsDiv.style.gap = '3px';
 
                     // Get Winning Numbers
                     // lottoHistory key is string "1210"
