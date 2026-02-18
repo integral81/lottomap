@@ -2719,9 +2719,7 @@
                     <button class="btn-roadview btn-copy" id="roadviewCopyBtn" style="display:none;">
                         📋 주소 복사하기
                     </button>
-                    <button class="btn-roadview btn-navi" id="roadviewNaviBtn" style="display:none;">
-                        🚗 길찾기
-                    </button>
+
                     <button class="btn-roadview btn-kakaomap" id="roadviewKakaoMapBtn">
                         🗺️ 카카오맵에서 보기
                     </button>
@@ -5336,14 +5334,7 @@
 
                     // Action buttons setup for Image mode
                     copyBtn.style.display = 'none';
-                    naviBtn.style.display = 'none';
-                    if (actionType === 'copy') {
-                        copyBtn.style.display = 'inline-block';
-                        copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
-                    } else if (actionType === 'navi') {
-                        naviBtn.style.display = 'inline-block';
-                        naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
-                    }
+
                     document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
                     return; // End here for image mode
                 }
@@ -5365,14 +5356,7 @@
 
                     // Action buttons setup
                     copyBtn.style.display = 'none';
-                    naviBtn.style.display = 'none';
-                    if (actionType === 'copy') {
-                        copyBtn.style.display = 'inline-block';
-                        copyBtn.onclick = () => { copyToClipboard(actionData); closeRoadview(); };
-                    } else if (actionType === 'navi') {
-                        naviBtn.style.display = 'inline-block';
-                        naviBtn.onclick = () => { openDirections(actionData.lat, actionData.lng, actionData.name); closeRoadview(); };
-                    }
+
                     document.getElementById('roadviewKakaoMapBtn').onclick = () => openKakaoMap(lat, lng, shopName, address);
                 };
 
