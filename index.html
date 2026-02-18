@@ -2750,6 +2750,8 @@
             let currentInfoWindow = null; // Track the currently open InfoWindow
             let roadview = null; // Roadview instance
             let roadviewClient = null; // RoadviewClient instance
+            let userCurrentLat = null; // Store user's current latitude
+            let userCurrentLng = null; // Store user's current longitude
 
             // Premium Roadview POV Presets (User Verified 260210)
             const ROADVIEW_PRESETS = [
@@ -3968,6 +3970,8 @@
                         if (gpsBtn) gpsBtn.classList.remove('loading');
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
+                        userCurrentLat = lat; // Update global GPS cache
+                        userCurrentLng = lng; // Update global GPS cache
                         const center = new kakao.maps.LatLng(lat, lng);
 
                         map.setCenter(center);
@@ -5085,7 +5089,12 @@
             }
 
             function openDirections(lat, lng, name) {
-                const url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+                let url;
+                if (userCurrentLat && userCurrentLng) {
+                    url = `https://map.kakao.com/link/from/내 위치,${userCurrentLat},${userCurrentLng}/to/${encodeURIComponent(name)},${lat},${lng}`;
+                } else {
+                    url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`;
+                }
                 window.open(url, '_blank');
             }
 
@@ -5400,7 +5409,15 @@
             }
 
             function openKakaoMap(lat, lng, shopName, address) {
-                window.open(`https://map.kakao.com/?q=${encodeURIComponent(address + ' 복권')}`, '_blank');
+                let url;
+                if (userCurrentLat && userCurrentLng) {
+                    // When GPS is available, use route search with sName/eName
+                    url = `https://map.kakao.com/?sName=내%20위치&sX=${userCurrentLng}&sY=${userCurrentLat}&eName=${encodeURIComponent(shopName)}&eX=${lng}&eY=${lat}`;
+                } else {
+                    // Fallback to simple query search
+                    url = `https://map.kakao.com/?q=${encodeURIComponent(address + ' 복권')}`;
+                }
+                window.open(url, '_blank');
             }
 
             function getDistance(lat1, lon1, lat2, lon2) {
