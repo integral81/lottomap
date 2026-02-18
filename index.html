@@ -1,148 +1,507 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KINOV 로또 명당 정밀 지도</title>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b29ba13a6dceba9dda144cda55359e59&libraries=services,clusterer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KINOV 로또 명당 지도 | Premium v2.0</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Kakao Maps API -->
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b29ba13a6dceba9dda144cda55359e59&libraries=services,clusterer"></script>
+
+    <!-- Lotto Data -->
+    <script src="lotto_data.js"></script>
+
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Malgun Gothic', sans-serif; overflow: hidden; }
-        #container { display: flex; flex-direction: column; height: 100vh; }
-        #header { padding: 15px; background: #1a1a1a; color: #fff; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); z-index: 100; }
-        #controls { display: flex; gap: 15px; align-items: center; font-size: 13px; }
-        #map { flex: 1; }
-        .filter-group { background: #333; padding: 6px 12px; border-radius: 4px; border: 1px solid #444; }
-        button { cursor: pointer; padding: 7px 18px; background: #ffcc00; border: none; color: #000; border-radius: 4px; font-weight: bold; transition: 0.2s; }
-        button:hover { background: #e6b800; }
-        .info-card { padding: 10px; min-width: 180px; font-size: 12px; line-height: 1.6; }
-        .win-tag { display: inline-block; padding: 2px 5px; margin: 2px; font-size: 10px; border-radius: 3px; color: white; }
-        .tag-자동 { background: #27ae60; } .tag-수동 { background: #2980b9; } .tag-반자동 { background: #f39c12; }
-        #status { font-size: 11px; color: #aaa; margin-left: 10px; }
-    </style>
-</head>
-<body>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.85);
+            --accent-color: #fbbf24;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --win-10: #fbbf24;
+            --win-5: #f87171;
+            --win-1: #60a5fa;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
 
-<div id="container">
-    <div id="header">
-        <div><strong>KINOV LOTTO MAP</strong><span id="status">파일 로딩 대기 중...</span></div>
-        <div id="controls">
-            <div class="filter-group">
-                방식: 
-                <label><input type="checkbox" class="type-chk" value="자동" checked> 자동</label>
-                <label><input type="checkbox" class="type-chk" value="수동" checked> 수동</label>
-                <label><input type="checkbox" class="type-chk" value="반자동" checked> 반자동</label>
-            </div>
-            <div class="filter-group">
-                회차: <input type="number" id="startRev" value="1000" style="width:55px;"> ~ 
-                <input type="number" id="endRev" value="1209" style="width:55px;">
-            </div>
-            <button onclick="applyFilter()">필터 적용</button>
-        </div>
-    </div>
-    <div id="map"></div>
-</div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-<script>
-    let map, clusterer, geocoder;
-    let allData = [];
-    let coordCache = new Map(); // 좌표 캐싱
+        body,
+        html {
+            height: 100%;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+        }
 
-    // 1. 지도 초기화
-    map = new kakao.maps.Map(document.getElementById('map'), {
-        center: new kakao.maps.LatLng(36.2683, 127.6358),
-        level: 12
-    });
-    geocoder = new kakao.maps.services.Geocoder();
-    clusterer = new kakao.maps.MarkerClusterer({
-        map: map,
-        averageCenter: true,
-        minLevel: 8
-    });
+        #app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
 
-    // 2. CSV 파일 읽기 (동일 폴더 내 lotto.csv)
-    function loadCSV() {
-        document.getElementById('status').innerText = "데이터 읽는 중...";
-        Papa.parse("lotto.csv", {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                allData = results.data;
-                document.getElementById('status').innerText = `총 ${allData.length}건 로드 완료`;
-                applyFilter();
-            },
-            error: function() {
-                document.getElementById('status').innerText = "lotto.csv 파일을 찾을 수 없습니다.";
+        /* Map Container */
+        #map {
+            flex: 1;
+            z-index: 1;
+            background: #1e293b;
+        }
+
+        /* Header (Glassmorphism) */
+        #header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            padding: 12px 24px;
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #header h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--accent-color);
+        }
+
+        #status {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* Controls Area */
+        #controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-chip input {
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        .range-input {
+            background: none;
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 55px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .btn-apply {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-apply:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+        }
+
+        /* Details Sidebar */
+        #sidebar {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 400px;
+            height: 100%;
+            z-index: 1000;
+            background: var(--bg-color);
+            border-left: 1px solid var(--glass-border);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 30px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header .addr {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        #roadview-container {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            position: relative;
+        }
+
+        .no-pov-msg {
+            color: var(--text-dim);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .win-stats {
+            padding: 30px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* Marker Labels */
+        .marker-label {
+            background: rgba(15, 23, 42, 0.9);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-color);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transform: translateY(-45px);
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            #header {
+                top: 0;
+                left: 0;
+                width: 100%;
+                border-radius: 0;
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
             }
-        });
-    }
 
-    // 3. 필터 적용 및 마커 표시
-    async function applyFilter() {
-        clusterer.clear();
-        const start = parseInt(document.getElementById('startRev').value);
-        const end = parseInt(document.getElementById('endRev').value);
-        const types = Array.from(document.querySelectorAll('.type-chk:checked')).map(el => el.value);
-
-        // 필터링 및 그룹화
-        const groups = {};
-        allData.forEach(d => {
-            const rev = parseInt(d['회차']);
-            const type = d['당첨방식'];
-            if (rev >= start && rev <= end && types.includes(type)) {
-                const addr = d['소재지'];
-                if(!groups[addr]) groups[addr] = { name: d['상호명'], addr: addr, wins: [] };
-                groups[addr].wins.push(d);
-            }
-        });
-
-        document.getElementById('status').innerText = `필터링 결과: ${Object.keys(groups).length}개 지점 표시 중...`;
-
-        const markers = [];
-        for (const addr in groups) {
-            const coords = await getCoords(addr);
-            if (coords) {
-                const marker = new kakao.maps.Marker({
-                    position: new kakao.maps.LatLng(coords.lat, coords.lng)
-                });
-
-                const winHtml = groups[addr].wins.map(w => 
-                    `<span class="win-tag tag-${w['당첨방식']}">${w['회차']}회</span>`
-                ).join('');
-
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: `<div class="info-card"><strong>${groups[addr].name}</strong><br><small>${addr}</small><hr>${winHtml}</div>`,
-                    removable: true
-                });
-
-                kakao.maps.event.addListener(marker, 'click', () => infowindow.open(map, marker));
-                markers.push(marker);
+            #sidebar {
+                width: 100%;
             }
         }
-        clusterer.addMarkers(markers);
-    }
+    </style>
+</head>
 
-    // 4. 지오코딩 (Promise + Cache)
-    function getCoords(address) {
-        if (coordCache.has(address)) return Promise.resolve(coordCache.get(address));
-        
-        return new Promise((resolve) => {
-            geocoder.addressSearch(address, (result, status) => {
-                if (status === kakao.maps.services.Status.OK) {
-                    const res = { lat: result[0].y, lng: result[0].x };
-                    coordCache.set(address, res);
-                    resolve(res);
-                } else {
-                    resolve(null);
+<body>
+
+    <div id="app">
+        <div id="header">
+            <h1>KINOV LOTTO MAP</h1>
+            <div id="controls">
+                <div class="filter-chip">
+                    <input type="checkbox" class="type-chk" value="자동" id="chkAuto" checked>
+                    <label for="chkAuto">자동</label>
+                </div>
+                <div class="filter-chip">
+                    <input type="checkbox" class="type-chk" value="수동" id="chkManual" checked>
+                    <label for="chkManual">수동</label>
+                </div>
+                <div style="color: var(--text-dim); font-size: 13px;">
+                    <input type="number" id="startRev" class="range-input" value="1000"> ~
+                    <input type="number" id="endRev" class="range-input" value="1211">
+                </div>
+                <button class="btn-apply" onclick="applyFilter()">조회</button>
+            </div>
+            <span id="status">로딩 중...</span>
+        </div>
+
+        <div id="map"></div>
+
+        <div id="sidebar">
+            <div class="close-sidebar" onclick="closeSidebar()">✕</div>
+            <div id="roadview-container"></div>
+            <div class="sidebar-header">
+                <h2 id="side-name">-</h2>
+                <div class="addr" id="side-addr">-</div>
+            </div>
+            <div class="win-stats">
+                <div class="stat-item">
+                    <div class="stat-val" id="side-total">-회</div>
+                    <div class="stat-label">총 당첨 횟수</div>
+                </div>
+                <div id="side-rounds" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let map, clusterer, rv, rvClient;
+        let markers = [];
+        let currentData = [];
+
+        function init() {
+            // 1. Map Init
+            const mapContainer = document.getElementById('map');
+            const mapOption = {
+                center: new kakao.maps.LatLng(36.5, 127.8),
+                level: 11
+            };
+            map = new kakao.maps.Map(mapContainer, mapOption);
+
+            // Dark Mode for Map (Using styling or overlays if supported, but simple is best)
+            // Note: Kakao doesn't have native dark mode but we can dim it with CSS if needed.
+
+            clusterer = new kakao.maps.MarkerClusterer({
+                map: map,
+                averageCenter: true,
+                minLevel: 8,
+                styles: [{
+                    width: '40px', height: '40px',
+                    background: 'rgba(251, 191, 36, 0.8)',
+                    borderRadius: '20px',
+                    color: '#000',
+                    textAlign: 'center',
+                    lineHeight: '40px',
+                    fontWeight: '700'
+                }]
+            });
+
+            // 2. Roadview Init
+            const rvContainer = document.getElementById('roadview-container');
+            rv = new kakao.maps.Roadview(rvContainer);
+            rvClient = new kakao.maps.RoadviewClient();
+
+            // 3. Process Initial Data
+            if (typeof lottoData !== 'undefined') {
+                document.getElementById('status').innerText = "데이터 처리 중...";
+                processInitialData(lottoData);
+            } else {
+                document.getElementById('status').innerText = "데이터 로드 실패";
+            }
+        }
+
+        function processInitialData(data) {
+            // Grouping to ensure unique locations and correct win counts
+            const mapObj = {};
+            data.forEach(item => {
+                if (item.hidden || item.closed) return;
+
+                // Name + Address Front as Key
+                const key = item.n + (item.a || "").substring(0, 12);
+                if (!mapObj[key]) {
+                    mapObj[key] = {
+                        name: item.n,
+                        addr: item.a,
+                        lat: Number(item.lat),
+                        lng: Number(item.lng),
+                        wins: [],
+                        pov: item.pov,
+                        totalWins: item.count || 0
+                    };
+                }
+
+                // Collect win info
+                const winInfo = { r: item.r, m: item.m };
+                // Avoid duplicates in win list
+                if (!mapObj[key].wins.some(w => w.r === item.r)) {
+                    mapObj[key].wins.push(winInfo);
+                }
+
+                // If the item had a r_list (merged data), add those too
+                if (item.r_list) {
+                    item.r_list.forEach(r => {
+                        if (!mapObj[key].wins.some(w => w.r === r)) {
+                            mapObj[key].wins.push({ r: r, m: '알수없음' });
+                        }
+                    });
                 }
             });
-        });
-    }
 
-    // 시작
-    window.onload = loadCSV;
-</script>
+            // Update totalWins based on collection size if count was missing
+            Object.values(mapObj).forEach(s => {
+                if (!s.totalWins) s.totalWins = s.wins.length;
+            });
+
+            currentData = Object.values(mapObj);
+            document.getElementById('status').innerText = `${currentData.length}개 명당 분석 완료`;
+            applyFilter();
+        }
+
+        function applyFilter() {
+            if (!map) return;
+
+            clusterer.clear();
+            markers.forEach(m => m.setMap(null));
+            markers = [];
+
+            const start = parseInt(document.getElementById('startRev').value) || 0;
+            const end = parseInt(document.getElementById('endRev').value) || 9999;
+            const allowedTypes = Array.from(document.querySelectorAll('.type-chk:checked')).map(el => el.value);
+
+            currentData.forEach(shop => {
+                // Check if any win in this shop matches the filter
+                const filteredWins = shop.wins.filter(w => w.r >= start && w.r <= end && (allowedTypes.includes(w.m) || w.m === '알수없음'));
+
+                if (filteredWins.length > 0 || (start <= 1 && end >= 1211)) { // Logic for showing consolidated items
+                    createMarker(shop);
+                }
+            });
+
+            clusterer.addMarkers(markers);
+            document.getElementById('status').innerText = `${markers.length}개 지점 표시 중`;
+        }
+
+        function createMarker(shop) {
+            const pos = new kakao.maps.LatLng(shop.lat, shop.lng);
+
+            // Define marker image based on win count
+            let color = '--win-1';
+            if (shop.totalWins >= 10) color = 'var(--win-10)';
+            else if (shop.totalWins >= 5) color = 'var(--win-5)';
+            else color = 'var(--win-1)';
+
+            // Simplified icon - Circle
+            const content = `<div style="width: 15px; height: 15px; background: ${color}; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px ${color}"></div>`;
+
+            const marker = new kakao.maps.CustomOverlay({
+                position: pos,
+                content: content,
+                clickable: true
+            });
+
+            // Click wrapper for CustomOverlay (since it doesn't have native 'click' event like Marker)
+            const dummyMarker = new kakao.maps.Marker({ position: pos, opacity: 0 });
+            kakao.maps.event.addListener(dummyMarker, 'click', () => showDetails(shop));
+
+            markers.push(dummyMarker);
+
+            // Custom label on hover if needed, but for now just click
+        }
+
+        function showDetails(shop) {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('side-name').innerText = shop.name;
+            document.getElementById('side-addr').innerText = shop.addr;
+            document.getElementById('side-total').innerText = `${shop.totalWins}회`;
+
+            const roundsDiv = document.getElementById('side-rounds');
+            roundsDiv.innerHTML = '';
+            shop.wins.sort((a, b) => b.r - a.r).forEach(w => {
+                const span = document.createElement('span');
+                span.style.cssText = "padding: 4px 8px; background: rgba(255,255,255,0.1); border-radius: 4px; font-size: 11px;";
+                span.innerText = `${w.r}회 (${w.m})`;
+                roundsDiv.appendChild(span);
+            });
+
+            // Load Roadview
+            if (shop.pov && shop.pov.id) {
+                document.getElementById('roadview-container').innerHTML = ''; // Reset
+                rv = new kakao.maps.Roadview(document.getElementById('roadview-container'));
+                rv.setPanoId(shop.pov.id, new kakao.maps.LatLng(shop.lat, shop.lng));
+                rv.setPov({
+                    pan: shop.pov.pan,
+                    tilt: shop.pov.tilt,
+                    zoom: shop.pov.zoom
+                });
+            } else {
+                // Search nearby
+                rvClient.getNearestPanoId(new kakao.maps.LatLng(shop.lat, shop.lng), 50, (panoId) => {
+                    if (panoId) {
+                        rv.setPanoId(panoId, new kakao.maps.LatLng(shop.lat, shop.lng));
+                    } else {
+                        document.getElementById('roadview-container').innerHTML = '<div class="no-pov-msg">로드뷰 정보가 없습니다.</div>';
+                    }
+                });
+            }
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        window.onload = init;
+    </script>
 
 </body>
+
 </html>
