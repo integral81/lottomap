@@ -285,16 +285,30 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #f9f9f9;
-            padding: 5px 8px;
-            border-radius: 4px;
+            background: #f1f3f4;
+            padding: 6px 10px;
+            border-radius: 6px;
             margin-bottom: 8px;
             cursor: pointer;
+            border: 1px solid #e0e0e0;
+            transition: all 0.2s ease;
         }
 
         .iw-addr-box:hover {
-            background: #f0f0f0;
-            border-color: var(--secondary);
+            background: #e8eaed;
+            border-color: #dadce0;
+        }
+
+        .btn-copy-label {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         /* GPS Pulse Animation */
@@ -1286,7 +1300,7 @@
         .recent-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-start;
             background: white;
             padding: 5px 8px;
             border-radius: 4px;
@@ -1297,7 +1311,10 @@
             font-size: 11px;
             font-weight: bold;
             color: #555;
-            width: 45px;
+            width: 52px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-right: 5px;
         }
 
         /* Highlight style for the absolute latest round */
@@ -3917,7 +3934,7 @@
                         <div class="iw-title">${shop.n} ${shop.totalWins >= 10 ? '🚩' : (shop.totalWins >= 5 ? '⭐' : (shop.totalWins >= 3 ? '🟠' : ''))} ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}</div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사하기">
                             <span class="iw-addr">${displayAddr}</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 3h12 c-1.1 0-2 .9-2 2v14c0 1.1.9 2 1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                            <span class="btn-copy-label">복사</span>
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px; font-size:13px;">총 ${shop.totalWins}회 당첨</div>
                         <div class="iw-details">${roundTagsHtml}</div>
@@ -5082,7 +5099,7 @@
             textarea.select();
             try {
                 document.execCommand('copy');
-                showToast("📋 주소가 클립보드에 복사되었습니다.", "success");
+                showToast("복사완료", "success");
             } catch (err) {
                 showToast("복사 실패", "error");
             }
