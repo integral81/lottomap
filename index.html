@@ -2213,7 +2213,8 @@
             <div class="section">
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group">
-                    <label class="checkbox-item"><input type="checkbox" id="freq5" checked> 🌟 5회 이상</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq10" checked> 🚩 10회 이상</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq5" checked> ⭐ 5~9회</label>
                     <label class="checkbox-item"><input type="checkbox" id="freq3" checked> 🔴 3~4회</label>
                     <label class="checkbox-item"><input type="checkbox" id="freq1" checked> 🔵 2회 이하</label>
                 </div>
@@ -3616,6 +3617,7 @@
             const semi = document.getElementById('methodSemi').checked;
 
             // Frequency Filters
+            const f10 = document.getElementById('freq10').checked;
             const f5 = document.getElementById('freq5').checked;
             const f3 = document.getElementById('freq3').checked;
             const f1 = document.getElementById('freq1').checked;
@@ -3653,7 +3655,8 @@
             // ===== 3단계: Frequency 필터 적용 (선택 범위 내 횟수 기준) =====
             const filtered = roundFiltered.filter(d => {
                 let fMatch = false;
-                if (f5 && d.winsInRange >= 5) fMatch = true;
+                if (f10 && d.winsInRange >= 10) fMatch = true;
+                if (f5 && d.winsInRange >= 5 && d.winsInRange <= 9) fMatch = true;
                 if (f3 && d.winsInRange >= 3 && d.winsInRange <= 4) fMatch = true;
                 if (f1 && d.winsInRange <= 2) fMatch = true;
 
@@ -3858,16 +3861,29 @@
             Object.values(uniqueShops).forEach(shop => {
                 let markerImg = null;
                 // Tiered Styles
-                if (shop.totalWins >= 5) {
-                    // Legendary Gold Star
+                if (shop.totalWins >= 10) {
+                    // Legendary Red Flag
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+                        new kakao.maps.Size(31, 35)
+                    );
+                } else if (shop.totalWins >= 5) {
+                    // Premium Gold Star
                     markerImg = new kakao.maps.MarkerImage(
                         'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
                         new kakao.maps.Size(24, 35)
                     );
                 } else if (shop.totalWins >= 3) {
-                    // Professional Red
+                    // Stable Red Spot
                     markerImg = new kakao.maps.MarkerImage(
                         'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png',
+                        new kakao.maps.Size(24, 35),
+                        { offset: new kakao.maps.Point(12, 35) }
+                    );
+                } else {
+                    // Active Blue Spot (Default)
+                    markerImg = new kakao.maps.MarkerImage(
+                        'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_aspt.png',
                         new kakao.maps.Size(24, 35),
                         { offset: new kakao.maps.Point(12, 35) }
                     );
@@ -3907,7 +3923,7 @@
 
                 const content = `
                     <div class="infowindow">
-                        <div class="iw-title">${shop.n} ${shop.totalWins >= 5 ? '🌟' : ''} ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}</div>
+                        <div class="iw-title">${shop.n} ${shop.totalWins >= 10 ? '🚩' : (shop.totalWins >= 5 ? '⭐' : '')} ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}</div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사하기">
                             <span class="iw-addr">${displayAddr}</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M16 1H4c-1.11 0-2 .9-2 3h12 c-1.1 0-2 .9-2 2v14c0 1.1.9 2 1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
