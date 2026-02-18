@@ -320,91 +320,96 @@
         let currentData = [];
 
         function init() {
-            // 1. Map Init
-            const mapContainer = document.getElementById('map');
-            const mapOption = {
-                center: new kakao.maps.LatLng(36.5, 127.8),
-                level: 11
-            };
-            map = new kakao.maps.Map(mapContainer, mapOption);
+            try {
+                document.getElementById('status').innerText = "지도 서비스 연결 중...";
 
-            // Dark Mode for Map (Using styling or overlays if supported, but simple is best)
-            // Note: Kakao doesn't have native dark mode but we can dim it with CSS if needed.
+                // 1. Map Init
+                const mapContainer = document.getElementById('map');
+                const mapOption = {
+                    center: new kakao.maps.LatLng(36.5, 127.8),
+                    level: 11
+                };
+                map = new kakao.maps.Map(mapContainer, mapOption);
 
-            clusterer = new kakao.maps.MarkerClusterer({
-                map: map,
-                averageCenter: true,
-                minLevel: 8,
-                styles: [{
-                    width: '40px', height: '40px',
-                    background: 'rgba(251, 191, 36, 0.8)',
-                    borderRadius: '20px',
-                    color: '#000',
-                    textAlign: 'center',
-                    lineHeight: '40px',
-                    fontWeight: '700'
-                }]
-            });
+                clusterer = new kakao.maps.MarkerClusterer({
+                    map: map,
+                    averageCenter: true,
+                    minLevel: 8,
+                    styles: [{
+                        width: '40px', height: '40px',
+                        background: 'rgba(251, 191, 36, 0.8)',
+                        borderRadius: '20px',
+                        color: '#000',
+                        textAlign: 'center',
+                        lineHeight: '40px',
+                        fontWeight: '700'
+                    }]
+                });
 
-            // 2. Roadview Init
-            const rvContainer = document.getElementById('roadview-container');
-            rv = new kakao.maps.Roadview(rvContainer);
-            rvClient = new kakao.maps.RoadviewClient();
+                // 2. Roadview Init
+                const rvContainer = document.getElementById('roadview-container');
+                rv = new kakao.maps.Roadview(rvContainer);
+                rvClient = new kakao.maps.RoadviewClient();
 
-            // 3. Process Initial Data
-            if (typeof lottoData !== 'undefined') {
-                document.getElementById('status').innerText = "데이터 처리 중...";
-                processInitialData(lottoData);
-            } else {
-                document.getElementById('status').innerText = "데이터 로드 실패";
+                // 3. Process Initial Data
+                const dataToUse = window.lottoData || (typeof lottoData !== 'undefined' ? lottoData : null);
+
+                if (dataToUse) {
+                    document.getElementById('status').innerText = "전국 명당 데이터 분석 중...";
+                    processInitialData(dataToUse);
+                } else {
+                    document.getElementById('status').innerText = "데이터 파일 로드 실패 (파일 없음)";
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('status').innerText = "오류 발생: " + e.message;
             }
         }
 
         function processInitialData(data) {
-            // Grouping to ensure unique locations and correct win counts
-            const mapObj = {};
-            data.forEach(item => {
-                if (item.hidden || item.closed) return;
+            try {
+                const mapObj = {};
+                data.forEach(item => {
+                    if (item.hidden || item.closed) return;
 
-                // Name + Address Front as Key
-                const key = item.n + (item.a || "").substring(0, 12);
-                if (!mapObj[key]) {
-                    mapObj[key] = {
-                        name: item.n,
-                        addr: item.a,
-                        lat: Number(item.lat),
-                        lng: Number(item.lng),
-                        wins: [],
-                        pov: item.pov,
-                        totalWins: item.count || 0
-                    };
-                }
+                    const key = (item.n || "이름미상") + (item.a || "").substring(0, 12);
+                    if (!mapObj[key]) {
+                        mapObj[key] = {
+                            name: item.n,
+                            addr: item.a,
+                            lat: Number(item.lat),
+                            lng: Number(item.lng),
+                            wins: [],
+                            pov: item.pov,
+                            totalWins: item.count || 0
+                        };
+                    }
 
-                // Collect win info
-                const winInfo = { r: item.r, m: item.m };
-                // Avoid duplicates in win list
-                if (!mapObj[key].wins.some(w => w.r === item.r)) {
-                    mapObj[key].wins.push(winInfo);
-                }
+                    const winInfo = { r: item.r, m: item.m || '자동' };
+                    if (!mapObj[key].wins.some(w => w.r === item.r)) {
+                        mapObj[key].wins.push(winInfo);
+                    }
 
-                // If the item had a r_list (merged data), add those too
-                if (item.r_list) {
-                    item.r_list.forEach(r => {
-                        if (!mapObj[key].wins.some(w => w.r === r)) {
-                            mapObj[key].wins.push({ r: r, m: '알수없음' });
-                        }
-                    });
-                }
-            });
+                    if (item.r_list) {
+                        item.r_list.forEach(r => {
+                            if (!mapObj[key].wins.some(w => w.r === r)) {
+                                mapObj[key].wins.push({ r: r, m: '알수없음' });
+                            }
+                        });
+                    }
+                });
 
-            // Update totalWins based on collection size if count was missing
-            Object.values(mapObj).forEach(s => {
-                if (!s.totalWins) s.totalWins = s.wins.length;
-            });
+                Object.values(mapObj).forEach(s => {
+                    if (!s.totalWins) s.totalWins = s.wins.length;
+                });
 
-            currentData = Object.values(mapObj);
-            document.getElementById('status').innerText = `${currentData.length}개 명당 분석 완료`;
-            applyFilter();
+                currentData = Object.values(mapObj);
+                applyFilter();
+                document.getElementById('status').innerText = `${currentData.length}개 명당 로드 완료`;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('status').innerText = "가공 오류: " + e.message;
+            }
         }
 
         function applyFilter() {
