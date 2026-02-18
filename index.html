@@ -824,6 +824,29 @@
             border-top: 1px solid #eee;
         }
 
+        /* InfoWindow Badge Grid Optimization (Updated: 5 items per row) */
+        .iw-details {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin: 8px 0 12px 0;
+            width: 100%;
+        }
+
+        .iw-tag {
+            margin: 0;
+            padding: 4px 2px;
+            font-size: 10px;
+            text-align: center;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border-radius: 4px;
+        }
+
         /* Hide mobile line breaks on desktop */
         .mobile-br {
             display: none;
@@ -839,25 +862,9 @@
                 display: inline;
             }
 
-            /* InfoWindow Badge Grid Optimization */
+            /* InfoWindow Badge Grid Optimization (Mobile: 3 items per row for readability) */
             .iw-details {
-                display: grid !important;
                 grid-template-columns: repeat(3, 1fr) !important;
-                gap: 5px !important;
-                margin: 8px 0 12px 0 !important;
-            }
-
-            .iw-tag {
-                margin: 0 !important;
-                padding: 5px 2px !important;
-                font-size: 10px !important;
-                text-align: center !important;
-                background: #f8f9fa !important;
-                border: 1px solid #e0e0e0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                white-space: nowrap !important;
             }
         }
 
@@ -1754,13 +1761,14 @@
             cursor: pointer;
         }
 
+        /* Scalable Magnifying Glass */
         .magnifying-glass-container {
             position: fixed;
             pointer-events: none;
             z-index: 10001;
             transition: opacity 0.3s;
-            width: 90px;
-            height: 90px;
+            width: var(--glass-size, 90px);
+            height: var(--glass-size, 90px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1768,8 +1776,8 @@
 
         .magnifying-glass {
             position: relative;
-            width: 63px;
-            height: 63px;
+            width: 70%;
+            height: 70%;
         }
 
         .glass-circle {
@@ -1783,7 +1791,7 @@
             justify-content: center;
             font-weight: 800;
             color: #007bff;
-            font-size: 13px;
+            font-size: var(--glass-font, 13px);
             box-shadow: 0 6px 24px rgba(0, 123, 255, 0.4);
             animation: pulse-guide 1.5s infinite ease-in-out;
             position: relative;
@@ -1792,11 +1800,11 @@
 
         .glass-handle {
             position: absolute;
-            width: 9px;
-            height: 38px;
+            width: 14%;
+            height: 60%;
             background: #007bff;
-            bottom: -19px;
-            right: -11px;
+            bottom: -30%;
+            right: -17%;
             transform: rotate(-45deg);
             border-radius: 5px;
             z-index: 1;
@@ -3864,19 +3872,23 @@
             document.body.appendChild(overlay);
 
             // Helper to create individual magnifying glass
-            const createGlass = (anchor, text, id) => {
+            const createGlass = (anchor, text, id, sizeScale = 1.0) => {
                 if (!anchor) return;
                 const rect = anchor.getBoundingClientRect();
                 const container = document.createElement('div');
                 container.id = id;
                 container.className = 'magnifying-glass-container';
 
-                // Centered positioning with new 90x90 container size
+                const baseSize = 90;
+                const scaledSize = baseSize * sizeScale;
+                container.style.setProperty('--glass-size', `${scaledSize}px`);
+                container.style.setProperty('--glass-font', `${13 * sizeScale}px`);
+
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
 
-                container.style.top = (centerY - 45) + 'px';
-                container.style.left = (centerX - 45) + 'px';
+                container.style.top = (centerY - (scaledSize / 2)) + 'px';
+                container.style.left = (centerX - (scaledSize / 2)) + 'px';
 
                 container.innerHTML = `
                     <div class="magnifying-glass">
@@ -3887,9 +3899,9 @@
                 document.body.appendChild(container);
             };
 
-            // Show guides for both sections
-            createGlass(anchor1, "전체", "magnifyingGlass1");
-            createGlass(anchor2, "🔍", "magnifyingGlass2");
+            // Show guides: 1.0 size for filter anchor, 0.5 size for Legend
+            createGlass(anchor1, "전체", "magnifyingGlass1", 1.0);
+            createGlass(anchor2, "🔍", "magnifyingGlass2", 0.5);
 
             window.addEventListener('scroll', removeFilterGuide, { once: true });
             setTimeout(removeFilterGuide, 8000);
