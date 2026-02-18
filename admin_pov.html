@@ -317,10 +317,8 @@
 
             const list = Object.values(mapObj)
                 .filter(s => {
-                    const isHot = HOT_TARGETS.includes(s.name);
-                    const is3WinOrMore = s.wins >= 3;
-                    const noPov = !(s.pov && (s.pov.id || s.pov.panoid));
-                    return (isHot || is3WinOrMore) && !s.hidden && !s.closed && noPov;
+                    const isLegendary = s.wins >= 10;
+                    return isLegendary && !s.hidden && !s.closed;
                 })
                 .map(s => {
                     s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);

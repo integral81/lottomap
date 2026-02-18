@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>실제 로드뷰 검증: 굿모닝 & 풍향동</title>
+    <style>
+        body {
+            font-family: 'Unbounded', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .monitor {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            width: 48%;
+            min-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #444;
+        }
+
+        .monitor-header {
+            background: #222;
+            color: #fff;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            border-bottom: 1px solid #444;
+        }
+
+        .status {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .rv-screen {
+            width: 100%;
+            height: 400px;
+            background: #333;
+            /* Loading placeholder */
+        }
+
+        .data-panel {
+            background: #111;
+            color: #ccc;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8em;
+        }
+    </style>
+    <!-- Use the key that was provided: 84b62e85ed3ec32fca558717eda26006 -->
+    <script type="text/javascript"
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=84b62e85ed3ec32fca558717eda26006"></script>
+</head>
+
+<body>
+    <h1>🛰️ POV Visual Verification</h1>
+
+    <div class="container">
+        <!-- Good Morning -->
+        <div class="monitor">
+            <div class="monitor-header">
+                <span>굿모닝 (순천)</span>
+                <span class="status">● LIVE</span>
+            </div>
+            <div id="roadview1" class="rv-screen"></div>
+            <div class="data-panel">
+                ID: 1205033387 | Pan: 90.0 | Tilt: -3.0
+            </div>
+        </div>
+
+        <!-- Pungyang -->
+        <div class="monitor">
+            <div class="monitor-header">
+                <span>풍향동복권나라 (광주)</span>
+                <span class="status">● LIVE</span>
+            </div>
+            <div id="roadview2" class="rv-screen"></div>
+            <div class="data-panel">
+                ID: 1204199726 | Pan: 28.5 | Tilt: -2.7
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Good Morning
+        var rvContainer1 = document.getElementById('roadview1');
+        var rv1 = new kakao.maps.Roadview(rvContainer1);
+        var rvClient1 = new kakao.maps.RoadviewClient();
+
+        // PanoID is a number
+        rv1.setPanoId(1205033387, new kakao.maps.LatLng(0, 0));
+
+        kakao.maps.event.addListener(rv1, 'init', function () {
+            rv1.setViewpoint({
+                pan: 90.0,
+                tilt: -3.0,
+                zoom: 0
+            });
+        });
+
+        // Pungyang
+        var rvContainer2 = document.getElementById('roadview2');
+        var rv2 = new kakao.maps.Roadview(rvContainer2);
+
+        rv2.setPanoId(1204199726, new kakao.maps.LatLng(0, 0));
+
+        kakao.maps.event.addListener(rv2, 'init', function () {
+            rv2.setViewpoint({
+                pan: 28.5,
+                tilt: -2.7,
+                zoom: 1
+            });
+        });
+    </script>
+</body>
+
+</html>

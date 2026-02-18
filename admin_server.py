@@ -77,20 +77,17 @@ class MobileAdminHandler(http.server.SimpleHTTPRequestHandler):
         with open(DB_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
-        updated = False
-        target_shop = None
+        updated_count = 0
         for shop in data:
              if shop.get('n') == name:
                  shop['pov'] = pov
-                 updated = True
-                 target_shop = shop
-                 break
+                 updated_count += 1
         
-        if updated:
+        if updated_count > 0:
             with open(DB_FILE, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
-            print("[DB] File saved successfully.")
-            self.generate_js_file(data) # AUTO SYNC
+            print(f"[DB] Updated POV for {name} ({updated_count} entries).")
+            self.generate_js_file(data)
         else:
             raise Exception("Shop not found")
 
@@ -106,7 +103,7 @@ class MobileAdminHandler(http.server.SimpleHTTPRequestHandler):
             with open(DB_FILE, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
             print(f"[DB] Deleted {name}. Count: {original_len} -> {new_len}")
-            self.generate_js_file(data) # AUTO SYNC
+            self.generate_js_file(data)
         else:
             raise Exception("Shop not found for deletion")
 
@@ -114,18 +111,17 @@ class MobileAdminHandler(http.server.SimpleHTTPRequestHandler):
         with open(DB_FILE, 'r', encoding='utf-8') as f:
             data = json.load(f)
             
-        updated = False
+        updated_count = 0
         for shop in data:
              if shop.get('n') == name:
-                 shop['hidden'] = True  # Set hidden flag
-                 updated = True
-                 break
+                 shop['hidden'] = True
+                 updated_count += 1
         
-        if updated:
+        if updated_count > 0:
             with open(DB_FILE, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
-            print("[DB] Shop hidden successfully.")
-            self.generate_js_file(data) # AUTO SYNC
+            print(f"[DB] Hid {name} ({updated_count} entries).")
+            self.generate_js_file(data)
         else:
             raise Exception("Shop not found")
 

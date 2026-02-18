@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>POV Phase 2: Visual Intelligence Scanner</title>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=84b62e85ed3ec32fca558717eda26006"></script>
+    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #222;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        #roadview {
+            width: 70%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 30%;
+            padding: 20px;
+            background: #333;
+            overflow-y: auto;
+            border-left: 1px solid #444;
+        }
+
+        h2 {
+            border-bottom: 2px solid #fae100;
+            padding-bottom: 10px;
+            color: #fae100;
+        }
+
+        .log-entry {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #444;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .log-entry.best {
+            border: 2px solid #0f0;
+            background: #2a2;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #fae100;
+        }
+
+        .keyword {
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        #status {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="status">🤖 OCR Scanner Ready</div>
+    <div class="container">
+        <div id="roadview"></div>
+        <div class="sidebar">
+            <h2>🧠 Visual Intelligence Log</h2>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const TARGET_NAME = "현진식품";
+        const START_PANO_ID = 1198607745; // Known good ID for Hyeonjin Food
+        const KEYWORDS = ["로또", "복권", "판매점", "1등", "2등", "Lotto", "LOTTO", "행운", "스피또", "연금"];
+        const STEP_ANGLE = 45; // 45 degree increments
+
+        const rv = new kakao.maps.Roadview(document.getElementById('roadview'));
+
+        let bestAngle = 0;
+        let maxScore = -1;
+        let scanHistory = [];
+
+        // Initialize
+        rv.setPanoId(START_PANO_ID, new kakao.maps.LatLng(37.500768, 126.863857));
+
+        kakao.maps.event.addListener(rv, 'init', function () {
+            setTimeout(startScan, 2000); // Wait for initial load
+        });
+
+        async function startScan() {
+            updateStatus("🚀 Scanning Process Started...");
+
+            for (let angle = 0; angle < 360; angle += STEP_ANGLE) {
+                await processAngle(angle);
+            }
+
+            finishScan();
+        }
+
+        async function processAngle(angle) {
+            updateStatus(`📸 Scanning Angle: ${angle}°...`);
+
+            // 1. Move View
+            rv.setViewpoint({ pan: angle, tilt: 0, zoom: 0 });
+
+            // 2. Wait for Render
+            await new Promise(r => setTimeout(r, 1500));
+
+            // 3. Capture Canvas
+            const canvas = document.querySelector('#roadview canvas');
+            if (!canvas) {
+                log(`[Error] No canvas found at ${angle}°`);
+                return;
+            }
+            const image = canvas.toDataURL('image/jpeg', 0.5);
+
+            // 4. Run OCR
+            try {
+                const result = await Tesseract.recognize(image, 'kor+eng', {
+                    logger: m => { } // console.log(m)
+                });
+
+                const text = result.data.text;
+                const score = calculateScore(text);
+
+                logResult(angle, score, text);
+
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestAngle = angle;
+                }
+
+            } catch (e) {
+                log(`[Error] OCR Failed at ${angle}°: ${e}`);
+            }
+        }
+
+        function calculateScore(text) {
+            let score = 0;
+            KEYWORDS.forEach(kw => {
+                if (text.includes(kw)) score += 10;
+            });
+            return score;
+        }
+
+        function logResult(angle, score, text) {
+            const cleanText = text.replace(/\s+/g, ' ').substring(0, 100) + "...";
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+
+            let highlightedText = cleanText;
+            KEYWORDS.forEach(kw => {
+                highlightedText = highlightedText.replace(new RegExp(kw, 'g'), `<span class="keyword">${kw}</span>`);
+            });
+
+            div.innerHTML = `
+                <div><strong>Angle: ${angle}°</strong></div>
+                <div>Score: <span class="score">${score}</span></div>
+                <div style="margin-top:5px; color:#aaa; font-size:0.8em;">"${highlightedText}"</div>
+            `;
+            document.getElementById('log').prepend(div);
+        }
+
+        function finishScan() {
+            updateStatus(`✅ Scan Complete! Best Angle: ${bestAngle}° (Score: ${maxScore})`);
+
+            // Move to best angle
+            rv.setViewpoint({ pan: bestAngle, tilt: 0, zoom: 0 });
+
+            const div = document.createElement('div');
+            div.className = 'log-entry best';
+            div.innerHTML = `
+                <h3>🏆 WINNER: ${bestAngle}°</h3>
+                <div>Score: ${maxScore}</div>
+                <div>The view has been rotated to the optimal angle.</div>
+            `;
+            document.getElementById('log').prepend(div);
+        }
+
+        function updateStatus(msg) {
+            document.getElementById('status').innerText = msg;
+        }
+
+        function log(msg) {
+            console.log(msg);
+            const div = document.createElement('div');
+            div.innerText = msg;
+            document.getElementById('log').prepend(div);
+        }
+    </script>
+</body>
+
+</html>

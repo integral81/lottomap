@@ -1,43 +1,40 @@
 import json
 import os
 
-f_json = r'c:\Users\이승민\OneDrive\Desktop\KINOV_Lotto_Map\lotto_data.json'
-f_js = r'c:\Users\이승민\OneDrive\Desktop\KINOV_Lotto_Map\lotto_data.js'
+db_path = r"c:\Users\이승민\OneDrive\Desktop\KINOV_Lotto_Map\lotto_data.json"
+js_path = r"c:\Users\이승민\OneDrive\Desktop\KINOV_Lotto_Map\lotto_data.js"
 
-with open(f_json, 'r', encoding='utf-8') as f:
+with open(db_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-# Batch 12 Data
-batch12 = [
-    # New Registrations
-    { "name": "CU노서점", "addr": "경북 경주시 금성로259번길 38 1층 CU 노서점 내", "panoid": 1187221443, "pov": { "pan": 45.67, "tilt": 3.22, "zoom": -1 } },
-    { "name": "로또복권 황성점", "addr": "경북 경주시 황성동 472-8", "panoid": 1187151971, "pov": { "pan": 316.37, "tilt": 6.20, "zoom": -3 } },
-    { "name": "영화유통", "addr": "경북 포항시 북구 양학천로 15", "panoid": 1187457532, "pov": { "pan": 30.96, "tilt": -3.64, "zoom": 1 } },
-    # Updates (Refined)
-    { "name": "해피복권방", "addr": "경기 고양시 일산동구 성석동 1246-80", "panoid": 1203594365, "pov": { "pan": 98.22, "tilt": 3.97, "zoom": 2 } },
-    { "name": "알뜰슈퍼", "addr": "경기 동두천시 평화로 2436-1", "panoid": 1192812778, "pov": { "pan": 99.76, "tilt": 2.31, "zoom": 2 } },
-    { "name": "다음정보텔레콤", "addr": "경남 진주시 평거동 200-1", "panoid": 1192979349, "pov": { "pan": 224.21, "tilt": 0.11, "zoom": 2 } }
+new_povs = [
+    { "name": "운수대통", "addr": "경기 군포시 군포로745번길 24", "panoid": "1175676242", "pov": { "pan": 321.44, "tilt": 4.25, "zoom": -3 } },
+    { "name": "인더라인 로또", "addr": "인천 부평구 십정동 577-6", "panoid": "1198797088", "pov": { "pan": 283.28, "tilt": -0.18, "zoom": 0 } },
+    { "name": "행운마트", "addr": "인천 동구 송림로 71-1", "panoid": "1199336752", "pov": { "pan": 338.98, "tilt": -1.36, "zoom": -2 } },
+    { "name": "영화유통(1등복권방)", "addr": "경북 포항시 북구 양학천로 15", "panoid": "1187457532", "pov": { "pan": 32.63, "tilt": -4.20, "zoom": 0 } }
 ]
 
-updated_count = 0
-for s in data:
-    for b in batch12:
-        # Match by name part
-        if b['name'] in s.get('n', ''):
-            s['panoid'] = b['panoid']
-            # Ensure POV has ID
-            pov_data = b['pov'].copy()
-            pov_data['id'] = b['panoid']
-            s['pov'] = pov_data
-            updated_count += 1
+modified_names = set()
+for pov in new_povs:
+    count = 0
+    for s in data:
+        if pov["name"] in s["n"] and (pov["addr"][:10] in s["a"] or s["a"][:10] in pov["addr"]):
+            s["pov"] = {
+                "id": str(pov["panoid"]),
+                "pan": pov["pov"]["pan"],
+                "tilt": pov["pov"]["tilt"],
+                "zoom": pov["pov"]["zoom"]
+            }
+            count += 1
+    if count > 0:
+        modified_names.add(pov["name"])
+    print(f"Updated {pov['name']}: {count} entries.")
 
-if updated_count > 0:
-    with open(f_json, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-    
-    with open(f_js, 'w', encoding='utf-8') as f:
-        f.write('const lottoData = ' + json.dumps(data, ensure_ascii=False) + ';')
-    
-    print(f"Updated {updated_count} records for Batch 12.")
-else:
-    print("No matches found for Batch 12.")
+with open(db_path, "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=0, separators=(",", ":"), ensure_ascii=False)
+
+js_content = "var lottoData = " + json.dumps(data, ensure_ascii=False, indent=0, separators=(",", ":")) + ";"
+with open(js_path, "w", encoding="utf-8") as f:
+    f.write(js_content)
+
+print(f"Total shops updated: {len(modified_names)}")

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>풍향동복권나라 POV 기술 검증 🕵️‍♂️</title>
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=84b62e85ed3ec32fca558717eda26006"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: sans-serif;
+            background: #eef2f3;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        #roadview {
+            width: 100%;
+            height: 450px;
+            border-radius: 10px;
+            margin: 20px 0;
+            background: #dfe6e9;
+            border: 1px solid #b2bec3;
+        }
+
+        .code-box {
+            background: #2d3436;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-kakao {
+            display: inline-block;
+            background: #fae100;
+            color: #3c1e1e;
+            padding: 14px 28px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn-kakao:hover {
+            transform: scale(1.05);
+        }
+
+        .tag {
+            background: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>🕵️‍♂️ 두 번째 미션 성공: '풍향동복권나라' <span class="tag">100% SUCCESS</span></h1>
+        <p>광주 북구 풍향동 581-19 - 사용자님이 직접 맞춰주신 <b>'ㄹㄸ/ㅌㅌ' 정면 각도</b>입니다.</p>
+
+        <div class="code-box">
+            // 수집된 풍향동 보물 데이터<br>
+            panoId: "1204199726",<br>
+            pan: 28.5, // 사용자님이 맞춘 'ㄹㄸ' 정면 각도!<br>
+            tilt: -2.7,<br>
+            zoom: 1
+        </div>
+
+        <div id="roadview"></div>
+
+        <div class="btn-group">
+            <a href="https://map.kakao.com/?map_type=TYPE_MAP&map_attribute=ROADVIEW&panoid=1204199726&pan=28.5&tilt=-2.7&zoom=1"
+                target="_blank" class="btn-kakao">
+                카카오맵 웹에서 각도 확인하기 ↗️
+            </a>
+        </div>
+
+        <p style="font-size: 13px; color: #636e72; margin-top: 25px; line-height: 1.6;">
+            💡 <b>비주얼 협업의 힘!</b><br>
+            터미널 소통보다 훨씬 직관적으로 'ㄹㄸ/ㅌㅌ' 사인을 찾아내셨습니다. <br>
+            이제 이 정밀한 각도가 데이터베이스에 저장되어, 모든 사용자가 이 명당의 정면을 보게 됩니다.
+        </p>
+    </div>
+
+    <script>
+        var rvContainer = document.getElementById('roadview');
+        var rv = new kakao.maps.Roadview(rvContainer);
+
+        // 사용자님이 공유해주신 링크에서 추출한 데이터 주입
+        rv.setPanoId("1204199726", {
+            lat: 35.1628241204059,
+            lng: 126.927856566903
+        });
+
+        rv.setPov({
+            pan: 28.5,
+            tilt: -2.7,
+            zoom: 1
+        });
+    </script>
+</body>
+
+</html>

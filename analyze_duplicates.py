@@ -1,98 +1,86 @@
 
 import json
-from collections import defaultdict
-from difflib import SequenceMatcher
+import math
 
-def similar(a, b):
-    """Calculate similarity ratio between two strings"""
-    return SequenceMatcher(None, a, b).ratio()
+def calculate_distance(lat1, lon1, lat2, lon2):
+    R = 6371000 # Meters
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2)**2
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 def analyze_duplicates():
-    """Deep analysis to find duplicate/scattered shop records"""
-    print("Loading lotto_data.json...")
     with open('lotto_data.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
     
-    print(f"Total records: {len(data)}")
-    
-    # Group by shop name
-    shop_groups = defaultdict(list)
+    # 1. Group records by unique "Record Identity" to see current unique entries
+    # Actually, let's group by name and see their spread
+    shops_by_name = {}
     for item in data:
         name = item['n']
-        shop_groups[name].append(item)
+        if name not in shops_by_name:
+            shops_by_name[name] = []
+        shops_by_name[name].append(item)
     
-    print(f"\nTotal unique shop names: {len(shop_groups)}")
+    potential_merges = [] # Same name, slightly different info
+    ambiguous_cases = [] # High risk cases
     
-    # Find shops with POV that still appear multiple times
-    pov_shops_with_multiple_records = []
-    
-    for name, records in shop_groups.items():
-        # Check if any record has POV
-        has_pov = any(r.get('pov') and r['pov'].get('id') != 'N/A' for r in records)
+    for name, records in shops_by_name.items():
+        if len(records) < 2: continue
         
-        if has_pov:
-            # Group by address to see if there are variations
-            addr_groups = defaultdict(list)
-            for r in records:
-                addr_groups[r['a']].append(r)
+        # Check coordinates and addresses within the same name
+        sub_groups = [] # Each sub-group is a potential unique shop
+        for r in records:
+            matched = False
+            r_lat, r_lng = float(r.get('lat', 0)), float(r.get('lng', 0))
             
-            if len(addr_groups) > 1:
-                # Multiple addresses for same shop name with POV
-                pov_shops_with_multiple_records.append({
-                    'name': name,
-                    'addresses': list(addr_groups.keys()),
-                    'total_records': len(records),
-                    'address_count': len(addr_groups)
+            for group in sub_groups:
+                ref = group[0]
+                ref_lat, ref_lng = float(ref.get('lat', 0)), float(ref.get('lng', 0))
+                
+                dist = calculate_distance(r_lat, r_lng, ref_lat, ref_lng)
+                # If name is same and distance < 50m, likely same shop but coords slightly off or addr format diff
+                if dist < 50:
+                    group.append(r)
+                    matched = True
+                    break
+            
+            if not matched:
+                sub_groups.append([r])
+        
+        if len(sub_groups) > 1:
+            # Same name but separate locations found!
+            ambiguous_cases.append({
+                "type": "Same Name / Different Location",
+                "name": name,
+                "locations": sub_groups
+            })
+        elif len(sub_groups) == 1 and len(records) > 1:
+            # Same name, same location, but multiple records
+            # Check if addresses or other fields vary
+            addrs = {r.get('a') for r in records}
+            if len(addrs) > 1:
+                potential_merges.append({
+                    "type": "Same Shop / Different Address Strings",
+                    "name": name,
+                    "addresses": list(addrs),
+                    "count": len(records)
                 })
-    
-    print(f"\n{'='*80}")
-    print(f"CRITICAL: Shops with POV but scattered across multiple addresses:")
-    print(f"{'='*80}")
-    
-    for shop in sorted(pov_shops_with_multiple_records, key=lambda x: x['total_records'], reverse=True):
-        print(f"\n{shop['name']} - {shop['total_records']} records across {shop['address_count']} addresses:")
-        for addr in shop['addresses']:
-            print(f"  - {addr}")
-    
-    # Find similar shop names (potential duplicates with typos or variations)
-    print(f"\n{'='*80}")
-    print(f"Analyzing similar shop names (potential duplicates)...")
-    print(f"{'='*80}")
-    
-    shop_names = list(shop_groups.keys())
-    similar_pairs = []
-    
-    for i, name1 in enumerate(shop_names):
-        for name2 in shop_names[i+1:]:
-            similarity = similar(name1, name2)
-            if 0.7 < similarity < 1.0:  # Similar but not identical
-                similar_pairs.append({
-                    'name1': name1,
-                    'name2': name2,
-                    'similarity': similarity,
-                    'records1': len(shop_groups[name1]),
-                    'records2': len(shop_groups[name2])
-                })
-    
-    for pair in sorted(similar_pairs, key=lambda x: x['similarity'], reverse=True)[:20]:
-        print(f"\n{pair['similarity']:.2%} similar:")
-        print(f"  1. {pair['name1']} ({pair['records1']} records)")
-        print(f"  2. {pair['name2']} ({pair['records2']} records)")
-    
-    # Save detailed report
-    report = {
-        'pov_shops_with_multiple_addresses': pov_shops_with_multiple_records,
-        'similar_name_pairs': similar_pairs[:50]
-    }
-    
-    with open('duplicate_analysis_report.json', 'w', encoding='utf-8') as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
-    
-    print(f"\n{'='*80}")
-    print(f"Report saved to: duplicate_analysis_report.json")
-    print(f"{'='*80}")
-    
-    return report
 
-if __name__ == "__main__":
-    analyze_duplicates()
+    # Let's also check for different names but same coordinates
+    # (Omitted mapping for brevity in first report, focusing on Name-based first)
+    
+    return potential_merges, ambiguous_cases
+
+p_merges, a_cases = analyze_duplicates()
+print(f"--- Analysis Result ---")
+print(f"Definite Duplicates (to merge): {len(p_merges)}")
+print(f"Ambiguous Cases (need review): {len(a_cases)}")
+print("\n[Preview: Potential Merges - Same Shop, Diff Addr Format]")
+for m in p_merges[:5]:
+    print(f"- {m['name']}: {m['addresses']}")
+
+print("\n[Preview: Ambiguous - Same Name, Diff Places]")
+for c in a_cases[:3]:
+    print(f"- {c['name']} has {len(c['locations'])} distinct locations.")
