@@ -1,6 +1,0 @@
-@echo off
-echo Starting POV Phase 2 (OCR Scanner) for Hyeonjin Food...
-echo.
-echo Launching Python Scanner Module...
-python run_phase2_scanner.py
-pause
