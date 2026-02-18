@@ -2316,8 +2316,8 @@
             <div class="section">
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq10"
-                            checked> 🚩 10회이상(전국1%)</label>
+                    <label id="tierLegend" class="checkbox-item" style="white-space: nowrap;"><input type="checkbox"
+                            id="freq10" checked> 🚩 10회이상(전국1%)</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq5" checked>
                         ⭐ 5~9회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq3" checked>
@@ -3428,7 +3428,8 @@
                 const targetMax = Math.max(maxR, 1211);
 
                 document.getElementById('maxRound').value = targetMax;
-                document.getElementById('minRound').value = Math.max(1, targetMax - 9);
+                // Default to 1 (Total) as per user request
+                document.getElementById('minRound').value = 1;
             }
 
             applyFilters();
@@ -3440,7 +3441,7 @@
             // --- Add Real-time Event Listeners ---
             const filterIds = [
                 'minRound', 'maxRound',
-                'freq5', 'freq3', 'freq1',
+                'freq10', 'freq5', 'freq3', 'freq1',
                 'methodAuto', 'methodManual', 'methodSemi',
                 'excludeClosed'
             ];
