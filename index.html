@@ -1356,8 +1356,8 @@
 
             #map {
                 order: 1 !important;
-                height: 60vh !important;
-                min-height: 400px !important;
+                height: calc(60vh + 10px) !important;
+                min-height: 410px !important;
             }
 
             h1 {
@@ -2324,9 +2324,11 @@
             <div class="section">
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <label id="tierLegend" class="checkbox-item" style="white-space: nowrap;"><input type="checkbox"
-                            id="freq10" checked> 🚩 10회이상(전국1%)</label>
-                    <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq5" checked>
+                    <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq10"
+                            checked> 🚩 10회이상(전국1%)</label>
+                    <label class="checkbox-item" style="white-space: nowrap;"><span id="tierLegendHelpAnchor"
+                            style="position:relative; top:8px; left:8px;"></span><input type="checkbox" id="freq5"
+                            checked>
                         ⭐ 5~9회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq3" checked>
                         🟠 3~4회</label>
@@ -3645,7 +3647,7 @@
         // ============ Filter Guide Logic ============
         function showFilterGuide() {
             const anchor1 = document.getElementById('filterGuideAnchor');
-            const anchor2 = document.getElementById('tierLegend');
+            const anchor2 = document.getElementById('tierLegendHelpAnchor');
 
             removeFilterGuide();
 
