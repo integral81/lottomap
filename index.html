@@ -482,9 +482,11 @@
             }
 
             .ai-modal-content {
-                width: 100%;
-                /* Full width for bottom sheet feel */
-                max-width: 100%;
+                width: 94%;
+                /* Reduced from 100% to avoid right cutoff on iPhone */
+                max-width: 94%;
+                margin: 0 auto;
+                /* Center it */
                 padding: 25px 20px;
                 /* iPhone 15 Fix (v4): Bottom Sheet Style */
                 max-height: 75dvh;
@@ -2212,13 +2214,11 @@
 
             <div class="section">
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
-                <div class="checkbox-group">
+                <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <label class="checkbox-item"><input type="checkbox" id="freq10" checked> 🚩 10회 이상(전국 1%)</label>
                     <label class="checkbox-item"><input type="checkbox" id="freq5" checked> ⭐ 5~9회</label>
-                    <div style="display: flex; gap: 10px; width: 100%;">
-                        <label class="checkbox-item"><input type="checkbox" id="freq3" checked> 🟠 3~4회</label>
-                        <label class="checkbox-item"><input type="checkbox" id="freq1" checked> 🔵 2회 이하</label>
-                    </div>
+                    <label class="checkbox-item"><input type="checkbox" id="freq3" checked> 🟠 3~4회</label>
+                    <label class="checkbox-item"><input type="checkbox" id="freq1" checked> 🔵 2회 이하</label>
                 </div>
             </div>
             <div class="section">
