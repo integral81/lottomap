@@ -467,11 +467,11 @@
             font-size: 13px;
             border-radius: 25px;
             /* Fully rounded */
-            margin: 0 auto 20px auto;
-            /* Centered with margin */
+            margin: 0 auto 20px 0;
+            /* Left aligned, 0 margin on left */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: 96%;
-            /* Fit within modal with slight padding */
+            width: calc(100% - 35px);
+            /* Shorter on right by 1cm */
             animation: pulse-soft 2s infinite;
         }
 
@@ -1456,8 +1456,13 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: 100%;
+            width: calc(100% - 35px);
+            /* Shorter on right by 1cm */
             margin-top: 10px;
+            margin-right: auto;
+            /* Push away from right */
+            margin-left: 0;
+        }
         }
 
         /* AI System Card Style */
