@@ -5258,37 +5258,7 @@
             }
         }
 
-        // Updated Clipboard function (Global)
-        // Note: Replaces/Overwrites the old one if names collide, or just exists as a better version
-        window.copyToClipboard = function (numbers) {
-            let text = "";
-            if (Array.isArray(numbers)) {
-                text = numbers.join(', ');
-            } else {
-                text = numbers;
-            }
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast(`📋 번호가 복사되었습니다: ${text} `);
-                }).catch(err => {
-                    showToast('복사 실패: ' + err);
-                });
-            } else {
-                // Fallback
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast("📋 번호가 복사되었습니다 (구형 브라우저)", "success");
-                } catch (err) {
-                    showToast("복사 실패", "error");
-                }
-                document.body.removeChild(textarea);
-            }
-        };
+        // Global reference removed to avoid duplication with the main copyToClipboard function above
 
         // ============ Roadview Functions ============
 
