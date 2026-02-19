@@ -5468,9 +5468,11 @@
                 const titleEl = document.getElementById('roadviewShopName');
                 if (titleEl) titleEl.textContent = shopName || '매장 로드뷰';
 
-                // Emergency Hardcoded Check for '훼미리로또' to guarantee alert
+                // Emergency Hardcoded Check for specific shops to guarantee alert
                 if (shopName.includes('훼미리로또') || (shop.n && shop.n.includes('훼미리로또'))) {
                     alert('훼미리마트는 CU보라매타운점으로 변경!!');
+                } else if (shopName.includes('오케이상사') || (shop.n && shop.n.includes('오케이상사'))) {
+                    alert('입구 바로 우측에 오케이상사(로또 판매점)이 있음');
                 } else if (shop.customMessage) {
                     // If it's a critical message that needs an alert, uncomment below. 
                     // Currently it shows in the roadview overlay.
