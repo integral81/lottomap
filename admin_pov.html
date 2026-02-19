@@ -315,10 +315,12 @@
                 if (item.pov && (item.pov.id || item.pov.panoid)) mapObj[key].pov = item.pov;
             });
 
+            const NEW_LEGENDS = ["다니엘사", "천하명당복권방", "행복충전소", "로또복권두정점", "알리바이", "올인 (all in)", "로또킹", "에스비 상사", "대박마트복권방", "썬마트", "명당골복권방", "오케이상사", "미나식품(로또판매점)", "버스표가판점", "복권백화점", "돈벼락맞는곳", "목화휴게소", "영화유통(1등복권방)", "중구-가로가판대-37", "일등복권편의점", "행운복권방 보생당건강원", "행운복권방", "잠실매점", "세진전자통신", "NG24", "대박천하마트", "종합복권슈퍼", "행복한사람들 (흥부네)", "묵동식품", "다모아복권", "천하명당복권", "한꿈복권방", "노다지복권방", "또또복권방", "제이복권방", "알리바이(나주점)", "종합가판점", "현대장미슈퍼", "버스표판매소", "행운의집제1호점", "복권명당(서부점)", "라이프마트", "갈렙분식한식", "버스판매소"];
+
             const list = Object.values(mapObj)
                 .filter(s => {
-                    const isLegendary = s.wins >= 10;
-                    return isLegendary && !s.hidden && !s.closed;
+                    const isNewLegend = NEW_LEGENDS.includes(s.name);
+                    return isNewLegend && !s.hidden && !s.closed;
                 })
                 .map(s => {
                     s.dist = getDistanceFromLatLonInKm(SEOUL.lat, SEOUL.lng, s.lat, s.lng);
