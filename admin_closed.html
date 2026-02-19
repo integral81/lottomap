@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lotto Admin - 폐점 관리 (Mobile)</title>
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --secondary: #1976d2;
+            --bg: #f5f5f5;
+            --card: #ffffff;
+            --text: #333333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            background: #fff;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .settings-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .search-container {
+            padding: 15px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        #searchInput:focus {
+            border-color: var(--secondary);
+        }
+
+        #shopList {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .shop-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shop-info {
+            flex: 1;
+            margin-right: 15px;
+        }
+
+        .shop-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .shop-addr {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .shop-status {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .status-closed {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .status-active {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .close-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .close-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Settings Modal */
+        #settingsModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 85%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #statusText {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🎰 폐점 매장 관리자</h1>
+        <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="상점명 또는 주소 검색..." oninput="filterShops()">
+    </div>
+
+    <div id="shopList">
+        <div style="text-align:center; padding:50px; color:#999;">데이터를 불러오는 중...</div>
+    </div>
+
+    <!-- Modal -->
+    <div id="settingsModal" onclick="closeSettings(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>⚙️ GitHub 설정</h2>
+            <p style="font-size:12px; color:#666;">데이터 저장을 위해 GitHub Personal Access Token(PAT)이 필요합니다.</p>
+            <input type="password" id="githubToken" placeholder="ghp_..." />
+            <button class="save-btn" onclick="saveSettings()">설정 저장</button>
+        </div>
+    </div>
+
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div id="statusText">처리 중...</div>
+    </div>
+
+    <script>
+        let allShops = [];
+        let githubConfig = {
+            token: localStorage.getItem('gh_admin_token') || '',
+            owner: 'integral81',
+            repo: 'lottomap',
+            jsonPath: 'lotto_data.json',
+            jsPath: 'lotto_data.js'
+        };
+
+        // Load baseline data from JS file (cached/bundled)
+        // We'll try to fetch the live JSON first for the absolute latest state.
+        window.onload = async () => {
+            if (!githubConfig.token) {
+                openSettings();
+            }
+            await fetchLatestData();
+        };
+
+        async function fetchLatestData() {
+            showLoading('최신 정보를 불러오는 중...');
+            try {
+                const url = `https://raw.githubusercontent.com/${githubConfig.owner}/${githubConfig.repo}/main/${githubConfig.jsonPath}?v=${Date.now()}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('데이터를 가져올 수 없습니다.');
+
+                allShops = await response.json();
+                renderShops(allShops);
+            } catch (err) {
+                console.error(err);
+                alert('데이터 로드 실패: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function renderShops(shops) {
+            const container = document.getElementById('shopList');
+            // Group by shop to show total wins in admin
+            const shopMap = {};
+            shops.forEach(s => {
+                const key = `${s.n}|${s.a}`;
+                if (!shopMap[key]) {
+                    shopMap[key] = { ...s, winCount: 0 };
+                }
+                shopMap[key].winCount++;
+            });
+
+            const uniqueShops = Object.values(shopMap).sort((a, b) => b.winCount - a.winCount);
+
+            if (uniqueShops.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:50px; color:#999;">검색 결과가 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = uniqueShops.map(shop => `
+            <div class="shop-card">
+                <div class="shop-info">
+                    <div class="shop-name">${shop.n} ${shop.winCount >= 5 ? '⭐' : ''}</div>
+                    <div class="shop-addr">${shop.a}</div>
+                    <div class="shop-status ${shop.closed ? 'status-closed' : 'status-active'}">
+                        ${shop.closed ? '폐업' : '영업 중'} (${shop.winCount}회 당첨)
+                    </div>
+                </div>
+                <button class="close-btn" 
+                        ${shop.closed ? 'disabled' : ''} 
+                        onclick="markAsClosed('${shop.n}', '${shop.a}')">
+                    ${shop.closed ? '완료' : '폐점 처리'}
+                </button>
+            </div>
+        `).join('');
+        }
+
+        function filterShops() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!query) {
+                renderShops(allShops);
+                return;
+            }
+
+            const filtered = allShops.filter(s =>
+                (s.n && s.n.toLowerCase().includes(query)) ||
+                (s.a && s.a.toLowerCase().includes(query))
+            );
+            renderShops(filtered);
+        }
+
+        async function markAsClosed(name, addr) {
+            if (!githubConfig.token) {
+                alert('GitHub 토큰이 설정되지 않았습니다. 설정(⚙️) 메뉴에서 먼저 설정해주세요.');
+                openSettings();
+                return;
+            }
+
+            if (!confirm(`'${name}' 매장을 폐점 처리하시겠습니까?\n이 작업은 GitHub에 즉시 커밋되어 사이트에 반영됩니다.`)) return;
+
+            showLoading('GitHub 데이터 업데이트 중...');
+            try {
+                // 1. Get SHA for both files from GitHub API
+                const [jsonMeta, jsMeta] = await Promise.all([
+                    getFileMeta(githubConfig.jsonPath),
+                    getFileMeta(githubConfig.jsPath)
+                ]);
+
+                // 2. Update Local Array
+                allShops.forEach(s => {
+                    if (s.n === name && s.a === addr) {
+                        s.closed = true;
+                    }
+                });
+
+                // 3. Prepare Payloads
+                const jsonContent = JSON.stringify(allShops, null, 2);
+                const jsContent = `var lottoData = ${JSON.stringify(allShops, null, 2)};`;
+
+                // 4. Push updates to GitHub
+                await Promise.all([
+                    updateFile(githubConfig.jsonPath, jsonContent, jsonMeta.sha, `Admin: Mark ${name} as closed (JSON)`),
+                    updateFile(githubConfig.jsPath, jsContent, jsMeta.sha, `Admin: Mark ${name} as closed (JS)`)
+                ]);
+
+                alert('성공적으로 업데이트되었습니다! 사이트 반영까지 1~2분 정도 소요될 수 있습니다.');
+                renderShops(allShops);
+            } catch (err) {
+                console.error(err);
+                alert('업데이트 실패: ' + err.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function getFileMeta(path) {
+            const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${path}`;
+            const res = await fetch(url, {
+                headers: { 'Authorization': `token ${githubConfig.token}` }
+            });
+            if (!res.ok) throw new Error(`${path} 정보를 가져오지 못했습니다.`);
+            return await res.json();
+        }
+
+        async function updateFile(path, content, sha, message) {
+            const url = `https://api.github.com/repos/${githubConfig.owner}/${githubConfig.repo}/contents/${path}`;
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${githubConfig.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    content: btoa(unescape(encodeURIComponent(content))),
+                    sha: sha
+                })
+            });
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(`${path} 업데이트 실패: ${error.message}`);
+            }
+        }
+
+        // UI Helpers
+        function openSettings() {
+            document.getElementById('githubToken').value = githubConfig.token;
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettings(e) {
+            if (e.target.id === 'settingsModal') {
+                document.getElementById('settingsModal').style.display = 'none';
+            }
+        }
+
+        function saveSettings() {
+            const token = document.getElementById('githubToken').value.trim();
+            if (!token) {
+                alert('토큰을 입력해주세요.');
+                return;
+            }
+            githubConfig.token = token;
+            localStorage.setItem('gh_admin_token', token);
+            document.getElementById('settingsModal').style.display = 'none';
+            alert('설정이 저장되었습니다.');
+            fetchLatestData(); // Refresh with token
+        }
+
+        function showLoading(text) {
+            document.getElementById('statusText').innerText = text;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
