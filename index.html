@@ -3901,7 +3901,7 @@
                         </button>
                         <div class="iw-actions">
                             ${shop.closed ? `
-                            <button class="btn-iw btn-navi" style="width:100%; background:#9e9e9e; cursor:not-allowed;" onclick="alert('해당 매장은 폐점되었습니다')">
+                            <button class="btn-iw btn-navi" style="width:100%; background:#9e9e9e !important; cursor:not-allowed;" onclick="alert('해당 매장은 폐점되었습니다')">
                                 ${shop.totalWins >= 10 ? '로드뷰(ROAD VIEW) 보기' : '🗺️ 카카오맵에서 보기'}
                             </button>
                             ` : (shop.totalWins >= 10 ? `
