@@ -3900,7 +3900,11 @@
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
-                            ${shop.totalWins >= 10 ? `
+                            ${shop.closed ? `
+                            <button class="btn-iw btn-navi" style="width:100%; background:#9e9e9e; cursor:not-allowed;" onclick="alert('해당 매장은 폐점되었습니다')">
+                                ${shop.totalWins >= 10 ? '로드뷰(ROAD VIEW) 보기' : '🗺️ 카카오맵에서 보기'}
+                            </button>
+                            ` : (shop.totalWins >= 10 ? `
                             <button class="btn-iw btn-navi" style="width:100%;" onclick="openRoadviewWithNavi(${shop.lat}, ${shop.lng}, '${safeName}', '${safeAddr}', ${shop.pov ? JSON.stringify(shop.pov).replace(/"/g, '&quot;') : 'null'}, '${(shop.customMessage || "").replace(/'/g, "\\'")}')">
                                 로드뷰(ROAD VIEW) 보기
                             </button>
@@ -3908,7 +3912,7 @@
                             <button class="btn-iw btn-navi" style="width:100%;" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
                                 🗺️ 카카오맵에서 보기
                             </button>
-                            `}
+                            `)}
                         </div>
                     </div>
                 `;
