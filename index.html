@@ -5495,8 +5495,12 @@
                 // Let's define it here based on the shopName and address.
                 // Assuming ROADVIEW_PRESETS is a global array.
                 const foundPreset = ROADVIEW_PRESETS.find(p => p.name === shopName || (p.addr && address.includes(p.addr)));
-                // Prioritize hardcoded ROADVIEW_PRESETS (User Overrides) over shop.pov (DB)
-                const activePreset = foundPreset ? { panoId: foundPreset.panoId, pov: foundPreset.pov, imageUrl: foundPreset.imageUrl } : (shop.pov ? { panoId: shop.pov.id, pov: shop.pov } : null);
+                // Prioritize hardcoded ROADVIEW_PRESETS (User Overrides) over shop.panoid/pov (DB)
+                const activePreset = foundPreset ?
+                    { panoId: foundPreset.panoId, pov: foundPreset.pov, imageUrl: foundPreset.imageUrl } :
+                    (shop.panoid || (shop.pov && shop.pov.id)) ?
+                        { panoId: shop.panoid || shop.pov.id, pov: shop.pov } :
+                        null;
 
                 // Custom Message Sync
                 const msgOverlay = document.getElementById('roadview-message-overlay');
