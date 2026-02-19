@@ -5679,8 +5679,6 @@
             }
             function admin_hideLoading() { document.getElementById('adminLoading').style.display = 'none'; }
 
-            // Initialize Admin Check
-            checkAdminMode();
         </script>
 
         <!-- Admin UI Elements -->
@@ -5702,6 +5700,10 @@
                 </div>
             </div>
         </div>
+        <script>
+            // Initialize Admin Check (After elements are loaded)
+            checkAdminMode();
+        </script>
     </div>
 </body>
 
