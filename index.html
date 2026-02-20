@@ -3345,30 +3345,37 @@
 
                 const cacheBuster = '?v=' + Date.now();
 
-                // 1. Detect current base path correctly (handle trailing slash desync)
-                let currentBase = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
-                if (!currentBase.endsWith('/')) currentBase += '/';
+                // 1. Intelligent Base Path Detection
+                let href = window.location.origin + window.location.pathname;
+                let normalizedBase = href;
+
+                // If URL is just .../lottomap, it should be .../lottomap/
+                if (!normalizedBase.endsWith('/') && !normalizedBase.toLowerCase().endsWith('.html')) {
+                    normalizedBase += '/';
+                } else {
+                    normalizedBase = normalizedBase.substring(0, normalizedBase.lastIndexOf("/") + 1);
+                }
 
                 const urls = [
-                    currentBase, // Precise current directory (e.g. .../lottomap/)
-                    './',        // Browser-relative current
-                    '/lottomap/', // Root-relative (for k-inov.com)
-                    'https://integral81.github.io/lottomap/' // External mirror
+                    normalizedBase,
+                    './',
+                    '/lottomap/',
+                    'https://integral81.github.io/lottomap/'
                 ];
 
-                // Remove duplicates and ensure unique list
                 const uniqueUrls = [...new Set(urls)];
+                const errorLog = [];
 
                 for (const baseUrl of uniqueUrls) {
                     try {
                         console.log(`[Data] Attempting to load from: ${baseUrl}`);
                         const [lottoData, historyData] = await Promise.all([
                             fetch(baseUrl + 'lotto_data.json' + cacheBuster).then(res => {
-                                if (!res.ok) throw new Error(`${baseUrl}lotto_data.json status: ${res.status}`);
+                                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                                 return res.json();
                             }),
                             fetch(baseUrl + 'lotto_history.json' + cacheBuster).then(res => {
-                                if (!res.ok) throw new Error(`${baseUrl}lotto_history.json status: ${res.status}`);
+                                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                                 return res.json();
                             })
                         ]);
@@ -3376,20 +3383,28 @@
                         window.lottoHistory = historyData;
                         processLoadedData(lottoData);
                         console.log(`[Data] Successfully loaded from: ${baseUrl}`);
-                        return; // Exit on success
+                        return; // Success!
 
                     } catch (err) {
                         console.warn(`[Data] Failed to load from ${baseUrl}:`, err.message);
+                        errorLog.push(`${baseUrl}: ${err.message}`);
                     }
                 }
 
-                // If all fail
-                console.error('[Data] All data sources failed.');
+                // Final Failure Display
+                console.error('[Data] All data sources failed.', errorLog);
                 countEl.innerHTML = `<span style="color:red; font-size:11px;">로드 실패</span>`;
                 const mapDiv = document.getElementById('map');
-                mapDiv.innerHTML = `<div style="padding:20px; color:red; font-weight:bold; background:white; position:absolute; top:100px; left:20px; z-index:9999; border:2px solid red;">
-                    데이터 로드 실패: 모든 소스에서 파일을 찾을 수 없습니다.<br>
-                    URL: ${window.location.href}
+                mapDiv.innerHTML = `
+                <div style="padding:20px; color:red; font-weight:bold; background:white; position:absolute; top:80px; left:20px; z-index:9999; border:2px solid red; max-width:90%; overflow:auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    데이터 로드 실패: 모든 소스에서 파일 접근이 거부되었거나 파일이 없습니다.<br><br>
+                    <div style="font-size:11px; font-weight:normal; color:#333; margin-bottom:10px;">
+                        <strong>접속 주소:</strong> ${window.location.href}<br>
+                        <strong>시도한 경로:</strong><br>
+                        ${errorLog.map(e => "• " + e).join("<br>")}
+                    </div>
+                    <button onclick="location.reload(true)" style="padding:5px 15px; background:#d32f2f; color:white; border:none; border-radius:4px; cursor:pointer;">다시 시도</button>
+                    <button onclick="document.getElementById('fileInput').click()" style="padding:5px 15px; background:#4CAF50; color:white; border:none; border-radius:4px; cursor:pointer; margin-left:5px;">파일 직접 선택</button>
                 </div>`;
             }
 
