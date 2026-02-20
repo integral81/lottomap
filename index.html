@@ -3306,6 +3306,14 @@
                 });
             }
 
+            function updateLegendIcons(baseUrl) {
+                const map = { "icon10": "tier1.png", "icon5": "tier2.png", "icon3": "tier3.png", "icon1": "tier4.png" };
+                for (let id in map) {
+                    const el = document.getElementById(id);
+                    if (el) el.src = baseUrl + 'assets/markers/' + map[id];
+                }
+            }
+
             window.onload = async function () {
                 try {
                     console.log("[Init] Kakao API check passed.");
