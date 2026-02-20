@@ -315,13 +315,13 @@
         }
 
         .iw-legend-icon {
-            width: 22px;
-            height: 22px;
+            width: 32px;
+            height: 32px;
             vertical-align: middle;
-            margin-left: 2px;
+            margin-left: 4px;
             object-fit: contain;
             position: relative;
-            top: -1px;
+            top: -2px;
         }
 
         .iw-addr-box {
@@ -3941,16 +3941,34 @@
                             a: d.a,
                             lat: d.lat,
                             lng: d.lng,
-                            totalWins: d.totalWins, // This is the total wins for the shop
-                            closed: d.closed, // Store closed status
-                            pov: d.pov || null, // Capture POV if exists
-                            customMessage: d.customMessage || null, // Capture Custom Message if exists
-                            rounds: [] // To store individual round details for infowindow
+                            totalWins: d.totalWins || d.w || 0,
+                            closed: d.closed || false,
+                            pov: d.pov || null,
+                            customMessage: d.customMessage || null,
+                            rounds: []
                         };
                     }
-                    if (d.pov && !uniqueShops[key].pov) uniqueShops[key].pov = d.pov; // Sync POV
-                    if (d.customMessage && !uniqueShops[key].customMessage) uniqueShops[key].customMessage = d.customMessage; // Sync message
-                    uniqueShops[key].rounds.push({ r: d.r, m: d.m });
+                    if (d.pov && !uniqueShops[key].pov) uniqueShops[key].pov = d.pov;
+                    if (d.customMessage && !uniqueShops[key].customMessage) uniqueShops[key].customMessage = d.customMessage;
+
+                    // IF the data item already has a detailed 'rounds' array (from Tiers 1-4 sync), use it!
+                    if (d.rounds && Array.isArray(d.rounds) && d.rounds.length > 0) {
+                        d.rounds.forEach(rnd => {
+                            if (!uniqueShops[key].rounds.some(existing => existing.r === rnd.r)) {
+                                uniqueShops[key].rounds.push(rnd);
+                            }
+                        });
+                    } else if (d.r) {
+                        // Fallback for flat legacy data
+                        if (!uniqueShops[key].rounds.some(existing => existing.r === d.r)) {
+                            uniqueShops[key].rounds.push({ r: d.r, m: d.m || "정보없음" });
+                        }
+                    }
+
+                    // Final safety for totalWins
+                    if (uniqueShops[key].rounds.length > uniqueShops[key].totalWins) {
+                        uniqueShops[key].totalWins = uniqueShops[key].rounds.length;
+                    }
                 });
 
                 // Sort data by Tier to ensure Tier 1 is processed/rendered with priority if needed,
