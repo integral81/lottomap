@@ -3344,21 +3344,31 @@
                 console.log('[Data] Starting loadData...');
 
                 const cacheBuster = '?v=' + Date.now();
+
+                // 1. Detect current base path correctly (handle trailing slash desync)
+                let currentBase = window.location.href.substring(0, window.location.href.lastIndexOf("/") + 1);
+                if (!currentBase.endsWith('/')) currentBase += '/';
+
                 const urls = [
-                    './',
-                    'https://integral81.github.io/lottomap/'
+                    currentBase, // Precise current directory (e.g. .../lottomap/)
+                    './',        // Browser-relative current
+                    '/lottomap/', // Root-relative (for k-inov.com)
+                    'https://integral81.github.io/lottomap/' // External mirror
                 ];
 
-                for (const baseUrl of urls) {
+                // Remove duplicates and ensure unique list
+                const uniqueUrls = [...new Set(urls)];
+
+                for (const baseUrl of uniqueUrls) {
                     try {
                         console.log(`[Data] Attempting to load from: ${baseUrl}`);
                         const [lottoData, historyData] = await Promise.all([
                             fetch(baseUrl + 'lotto_data.json' + cacheBuster).then(res => {
-                                if (!res.ok) throw new Error('lotto_data.json 404');
+                                if (!res.ok) throw new Error(`${baseUrl}lotto_data.json status: ${res.status}`);
                                 return res.json();
                             }),
                             fetch(baseUrl + 'lotto_history.json' + cacheBuster).then(res => {
-                                if (!res.ok) throw new Error('lotto_history.json 404');
+                                if (!res.ok) throw new Error(`${baseUrl}lotto_history.json status: ${res.status}`);
                                 return res.json();
                             })
                         ]);
@@ -3378,7 +3388,8 @@
                 countEl.innerHTML = `<span style="color:red; font-size:11px;">로드 실패</span>`;
                 const mapDiv = document.getElementById('map');
                 mapDiv.innerHTML = `<div style="padding:20px; color:red; font-weight:bold; background:white; position:absolute; top:100px; left:20px; z-index:9999; border:2px solid red;">
-                    데이터 로드 실패: 모든 소스에서 파일을 찾을 수 없습니다.
+                    데이터 로드 실패: 모든 소스에서 파일을 찾을 수 없습니다.<br>
+                    URL: ${window.location.href}
                 </div>`;
             }
 
