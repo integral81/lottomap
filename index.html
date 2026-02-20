@@ -309,9 +309,17 @@
             vertical-align: middle;
             object-fit: contain;
             margin-right: -4px;
-            /* Pull text closer */
             margin-left: -2px;
-            /* Pull away from checkbox slightly */
+            position: relative;
+            top: -1px;
+        }
+
+        .iw-legend-icon {
+            width: 22px;
+            height: 22px;
+            vertical-align: middle;
+            margin-left: 2px;
+            object-fit: contain;
             position: relative;
             top: -1px;
         }
@@ -4019,9 +4027,20 @@
                     const safeAddr = (shop.a || "").replace(/'/g, "\\'").replace(/\n/g, " ");
                     const safeName = (shop.n || "").replace(/'/g, "\\'").replace(/\n/g, " ");
 
+                    const getLegendIcon = (wins) => {
+                        if (wins >= 10) return ICON_TIER1;
+                        if (wins >= 5) return ICON_TIER2;
+                        if (wins >= 3) return ICON_TIER3;
+                        return ICON_TIER4;
+                    };
+
                     const content = `
                     <div class="infowindow">
-                        <div class="iw-title">${shop.n} ${shop.totalWins >= 10 ? '🚩' : (shop.totalWins >= 5 ? '⭐' : (shop.totalWins >= 3 ? '🟠' : ''))} ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}</div>
+                        <div class="iw-title">
+                            ${shop.n} 
+                            <img src="${getLegendIcon(shop.totalWins)}" class="iw-legend-icon">
+                            ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}
+                        </div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사하기">
                             <span class="iw-addr">${displayAddr}</span>
                             <span class="btn-copy-label">복사</span>
