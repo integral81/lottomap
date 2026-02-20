@@ -303,6 +303,13 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
+        .legend-icon {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+            object-fit: contain;
+        }
+
         .iw-addr-box {
             display: flex;
             align-items: center;
@@ -2518,15 +2525,15 @@
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq10"
-                            checked> 💎 10회이상(전국1%)</label>
+                            checked> <img src="assets/markers/tier1.png" class="legend-icon" id="icon10">
+                        10회이상(전국1%)</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><span id="tierLegendHelpAnchor"
                             style="position:relative; top:8px; left:8px;"></span><input type="checkbox" id="freq5"
-                            checked>
-                        👑 5~9회</label>
+                            checked> <img src="assets/markers/tier2.png" class="legend-icon" id="icon5"> 5~9회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq3" checked>
-                        🟠 3~4회</label>
+                        <img src="assets/markers/tier3.png" class="legend-icon" id="icon3"> 3~4회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq1" checked>
-                        🌍 2회 이하</label>
+                        <img src="assets/markers/tier4.png" class="legend-icon" id="icon1"> 2회 이하</label>
                 </div>
             </div>
             <div class="section">
@@ -3242,6 +3249,13 @@
                     });
                 }
 
+                // Final Pass: Ensure every item has totalWins for filtering
+                data.forEach(item => {
+                    if (item.totalWins === undefined) {
+                        item.totalWins = item.w || item.totalWins || 1;
+                    }
+                });
+
                 // 2. Statistics & UI Updates
                 let highWinCount = 0;
                 data.forEach(item => {
@@ -3395,7 +3409,9 @@
                         ]);
 
                         window.lottoHistory = historyData;
+                        window.currentBaseUrl = baseUrl; // Store for markers
                         processLoadedData(lottoData);
+                        updateLegendIcons(baseUrl); // Update legend image paths
                         console.log(`[Data] Successfully loaded from: ${baseUrl}`);
                         return; // Success!
 
@@ -3408,6 +3424,10 @@
                 // Final Failure Display
                 console.error('[Data] All data sources failed.', errorLog);
                 countEl.innerHTML = `<span style="color:red; font-size:11px;">로드 실패</span>`;
+
+                // Fallback for legend anyway
+                updateLegendIcons('./');
+
                 const mapDiv = document.getElementById('map');
                 mapDiv.innerHTML = `
                 <div style="padding:20px; color:red; font-weight:bold; background:white; position:absolute; top:80px; left:20px; z-index:9999; border:2px solid red; max-width:90%; overflow:auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
@@ -3632,13 +3652,14 @@
                 });
 
 
-                // ===== 3단계: Frequency 필터 적용 (선택 범위 내 횟수 기준) =====
+                // ===== 3단계: Frequency 필터 적용 (pre-calculated totalWins 기준) =====
                 const filtered = roundFiltered.filter(d => {
                     let fMatch = false;
-                    if (f10 && d.winsInRange >= 10) fMatch = true;
-                    if (f5 && d.winsInRange >= 5 && d.winsInRange <= 9) fMatch = true;
-                    if (f3 && d.winsInRange >= 3 && d.winsInRange <= 4) fMatch = true;
-                    if (f1 && d.winsInRange <= 2) fMatch = true;
+                    const w = d.totalWins || 0;
+                    if (f10 && w >= 10) fMatch = true;
+                    if (f5 && w >= 5 && w <= 9) fMatch = true;
+                    if (f3 && w >= 3 && w <= 4) fMatch = true;
+                    if (f1 && w <= 2) fMatch = true;
 
                     return fMatch;
                 });
@@ -3924,13 +3945,13 @@
 
                 sortedShops.forEach(shop => {
                     let markerImg = null;
-                    const ICON_SIZE = 32;
+                    const baseUrl = window.currentBaseUrl || './';
 
                     // New Custom Tier Icons
-                    const ICON_TIER1 = 'assets/markers/tier1.png';
-                    const ICON_TIER2 = 'assets/markers/tier2.png';
-                    const ICON_TIER3 = 'assets/markers/tier3.png';
-                    const ICON_TIER4 = 'assets/markers/tier4.png';
+                    const ICON_TIER1 = baseUrl + 'assets/markers/tier1.png';
+                    const ICON_TIER2 = baseUrl + 'assets/markers/tier2.png';
+                    const ICON_TIER3 = baseUrl + 'assets/markers/tier3.png';
+                    const ICON_TIER4 = baseUrl + 'assets/markers/tier4.png';
                     const ICON_CLOSED = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%239e9e9e"/><path fill="white" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
 
                     if (shop.totalWins >= 10) {
