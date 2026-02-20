@@ -2518,15 +2518,15 @@
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq10"
-                            checked> 🚩 10회이상(전국1%)</label>
+                            checked> 💎 10회이상(전국1%)</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><span id="tierLegendHelpAnchor"
                             style="position:relative; top:8px; left:8px;"></span><input type="checkbox" id="freq5"
                             checked>
-                        ⭐ 5~9회</label>
+                        👑 5~9회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq3" checked>
                         🟠 3~4회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq1" checked>
-                        🔵 2회 이하</label>
+                        🌍 2회 이하</label>
                 </div>
             </div>
             <div class="section">
@@ -3913,20 +3913,20 @@
                     let markerImg = null;
                     // Tiered Styles
                     // Tiered Styles (SVG-based for reliability)
-                    const SVG_LEGENDARY = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="%23d32f2f" d="M12.45 4L11 2H4v18h2v-7h5h1.55l1.45 2h7V4z"/></svg>';
-                    const SVG_PREMIUM = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="%23fbc02d" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>';
-                    const SVG_STABLE = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23ff9800" stroke="white" stroke-width="2"/></svg>';
-                    const SVG_ACTIVE = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%231976d2" stroke="white" stroke-width="2"/></svg>';
+                    const SVG_DIAMOND = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="%2303a9f4" d="M12.1 3L5.89 9.1l6.21 11.9 6.21-11.9zM11 5.3L7.7 8.5h3.3zm2 0v3.2h3.3zM8.5 10l3.5 6.6 3.5-6.6z"/></svg>';
+                    const SVG_CROWN = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="%23fbc02d" d="M5 16h14a2 2 0 0 1 2 2v2H3v-2a2 2 0 0 1 2-2zm7-14l3 5 5-2-3 7H5l-3-7 5 2 3-5z"/></svg>';
+                    const SVG_ORANGE = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%23ff9800" stroke="white" stroke-width="2"/></svg>';
+                    const SVG_GLOBE = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%232196f3" stroke="white" stroke-width="2"/><path fill="%234caf50" d="M12 2a10 10 0 0 0-8 4c2 1 4 0 4 0s2 3 5 3 4-2 4-2 1 4 4 4a10 10 0 0 0-9-9z"/></svg>';
                     const SVG_CLOSED = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%239e9e9e"/><path fill="white" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
 
                     if (shop.totalWins >= 10) {
-                        markerImg = new kakao.maps.MarkerImage(SVG_LEGENDARY, new kakao.maps.Size(32, 32));
+                        markerImg = new kakao.maps.MarkerImage(SVG_DIAMOND, new kakao.maps.Size(32, 32));
                     } else if (shop.totalWins >= 5) {
-                        markerImg = new kakao.maps.MarkerImage(SVG_PREMIUM, new kakao.maps.Size(32, 32));
+                        markerImg = new kakao.maps.MarkerImage(SVG_CROWN, new kakao.maps.Size(32, 28));
                     } else if (shop.totalWins >= 3) {
-                        markerImg = new kakao.maps.MarkerImage(SVG_STABLE, new kakao.maps.Size(20, 20));
+                        markerImg = new kakao.maps.MarkerImage(SVG_ORANGE, new kakao.maps.Size(20, 20));
                     } else {
-                        markerImg = new kakao.maps.MarkerImage(SVG_ACTIVE, new kakao.maps.Size(20, 20));
+                        markerImg = new kakao.maps.MarkerImage(SVG_GLOBE, new kakao.maps.Size(20, 20));
                     }
 
                     if (shop.closed) {
