@@ -3217,33 +3217,47 @@
             function processLoadedData(data) {
                 allData = data;
 
-                // Calculate win count per shop (Name + Address)
-                const shopWins = {};
-                data.forEach(item => {
-                    const key = (item.n || '').trim() + '|' + (item.a || '').trim();
-                    shopWins[key] = (shopWins[key] || 0) + 1;
-                });
-                // Attach individual shop win count to each record
+                // 1. Detect Schema & Calculate win count per shop
+                const isSummarized = data.length > 0 && (data[0].w !== undefined || data[0].totalWins !== undefined);
+
+                if (isSummarized) {
+                    console.log("[Data] Schema detected: SHOP SUMMARY (Tier 1/Standardized)");
+                    data.forEach(item => {
+                        // Use existing 'w' or 'totalWins' if provided by Scheme B
+                        item.totalWins = item.w || item.totalWins || 1;
+                        if (item.r === undefined) item.r = 1211; // Default to newest if round missing
+                        if (item.m === undefined) item.m = "정보없음"; // Default method
+                    });
+                } else {
+                    console.log("[Data] Schema detected: INDIVIDUAL WINNINGS (Legacy/Detailed)");
+                    const shopWins = {};
+                    data.forEach(item => {
+                        const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                        shopWins[key] = (shopWins[key] || 0) + 1;
+                    });
+                    // Attach calculated totalWins to each winning record
+                    data.forEach(item => {
+                        const key = (item.n || '').trim() + '|' + (item.a || '').trim();
+                        item.totalWins = shopWins[key];
+                    });
+                }
+
+                // 2. Statistics & UI Updates
                 let highWinCount = 0;
                 data.forEach(item => {
-                    const key = (item.n || '').trim() + '|' + (item.a || '').trim();
-                    item.totalWins = shopWins[key];
                     if (item.totalWins >= 5) highWinCount++;
                 });
-                console.log('Grouped Shops:', Object.keys(shopWins).length);
+
+                console.log('Processed Records:', data.length);
                 console.log('Records with 5+ wins:', highWinCount);
 
                 document.getElementById('totalDataCount').innerText = data.length.toLocaleString();
                 if (data.length > 0) {
-                    const rounds = data.map(d => d.r);
-                    const maxR = Math.max(...rounds);
-                    const minR = Math.min(...rounds);
+                    const rounds = data.map(d => d.r || 0);
+                    const maxR = Math.max(...rounds, 1211);
+                    const minR = Math.min(...rounds, 1);
 
-                    // Force max round to 1211 as per user request (User Request: 1211)
-                    const targetMax = Math.max(maxR, 1211);
-
-                    document.getElementById('maxRound').value = targetMax;
-                    // Default to 1 (Total) as per user request
+                    document.getElementById('maxRound').value = maxR;
                     document.getElementById('minRound').value = 1;
                 }
 
@@ -3588,11 +3602,17 @@
                     // 폐업점 제외 체크 시 폐업 데이터 숨김
                     if (excludeClosed && d.closed) return false;
 
-                    const rMatch = d.r >= minR && d.r <= maxR;
+                    const rMatch = (d.r === undefined) || (d.r >= minR && d.r <= maxR);
                     let mMatch = false;
-                    if (auto && d.m.includes('자동')) mMatch = true;
-                    if (manual && d.m.includes('수동')) mMatch = true;
-                    if (semi && d.m.includes('반자동')) mMatch = true;
+
+                    // 만약 당첨 방식 정보가 없으면 필터 체크 여부와 상관없이 보여줌 (요약 데이터 대응)
+                    if (d.m === undefined || d.m === "정보없음") {
+                        mMatch = true;
+                    } else {
+                        if (auto && d.m.includes('자동')) mMatch = true;
+                        if (manual && d.m.includes('수동')) mMatch = true;
+                        if (semi && d.m.includes('반자동')) mMatch = true;
+                    }
 
                     return rMatch && mMatch;
                 });
