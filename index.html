@@ -308,7 +308,9 @@
             height: 32px;
             vertical-align: middle;
             object-fit: contain;
-            margin-right: 5px;
+            margin-right: -2px;
+            position: relative;
+            top: -1px;
         }
 
         .iw-addr-box {
@@ -2526,15 +2528,16 @@
                 <span class="section-title">🏆 당첨 횟수 필터 (Frequency)</span>
                 <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq10"
-                            checked> <img src="assets/markers/tier1.png" class="legend-icon" id="icon10">
+                            checked> <img src="assets/markers/legend_tier1.png" class="legend-icon" id="icon10">
                         10회이상(전국1%)</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><span id="tierLegendHelpAnchor"
                             style="position:relative; top:8px; left:8px;"></span><input type="checkbox" id="freq5"
-                            checked> <img src="assets/markers/tier2.png" class="legend-icon" id="icon5"> 5~9회</label>
+                            checked> <img src="assets/markers/legend_tier2.png" class="legend-icon" id="icon5">
+                        5~9회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq3" checked>
-                        <img src="assets/markers/tier3.png" class="legend-icon" id="icon3"> 3~4회</label>
+                        <img src="assets/markers/legend_tier3.png" class="legend-icon" id="icon3"> 3~4회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq1" checked>
-                        <img src="assets/markers/tier4.png" class="legend-icon" id="icon1"> 2회 이하</label>
+                        <img src="assets/markers/legend_tier4.png" class="legend-icon" id="icon1"> 2회 이하</label>
                 </div>
             </div>
             <div class="section">
@@ -3308,7 +3311,7 @@
             }
 
             function updateLegendIcons(baseUrl) {
-                const map = { "icon10": "tier1.png", "icon5": "tier2.png", "icon3": "tier3.png", "icon1": "tier4.png" };
+                const map = { "icon10": "legend_tier1.png", "icon5": "legend_tier2.png", "icon3": "legend_tier3.png", "icon1": "legend_tier4.png" };
                 for (let id in map) {
                     const el = document.getElementById(id);
                     if (el) el.src = baseUrl + 'assets/markers/' + map[id];
