@@ -3996,24 +3996,24 @@
                     const ICON_CLOSED = 'data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="%239e9e9e"/><path fill="white" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
 
                     if (shop.totalWins >= 10) {
-                        // Tier 1: Red Gem (Original ~244x275)
-                        markerImg = new kakao.maps.MarkerImage(ICON_TIER1, new kakao.maps.Size(58, 66), {
-                            offset: new kakao.maps.Point(29, 66)
+                        // Tier 1: Red Gem (64x72)
+                        markerImg = new kakao.maps.MarkerImage(ICON_TIER1, new kakao.maps.Size(64, 72), {
+                            offset: new kakao.maps.Point(32, 72)
                         });
                     } else if (shop.totalWins >= 5) {
-                        // Tier 2: Gold Shield (Original ~245x272)
-                        markerImg = new kakao.maps.MarkerImage(ICON_TIER2, new kakao.maps.Size(52, 58), {
-                            offset: new kakao.maps.Point(26, 58)
+                        // Tier 2: Gold Shield (58x64)
+                        markerImg = new kakao.maps.MarkerImage(ICON_TIER2, new kakao.maps.Size(58, 64), {
+                            offset: new kakao.maps.Point(29, 64)
                         });
                     } else if (shop.totalWins >= 3) {
-                        // Tier 3: Blue Gem (Original ~244x510)
-                        markerImg = new kakao.maps.MarkerImage(ICON_TIER3, new kakao.maps.Size(42, 72), {
-                            offset: new kakao.maps.Point(21, 72)
+                        // Tier 3: Blue Gem (52x64) - Widened from 42x72
+                        markerImg = new kakao.maps.MarkerImage(ICON_TIER3, new kakao.maps.Size(52, 64), {
+                            offset: new kakao.maps.Point(26, 64)
                         });
                     } else {
-                        // Tier 4: Silver Pin (Original ~245x511)
-                        markerImg = new kakao.maps.MarkerImage(ICON_TIER4, new kakao.maps.Size(42, 72), {
-                            offset: new kakao.maps.Point(21, 72)
+                        // Tier 4: Silver Pin (52x64) - Widened from 42x72
+                        markerImg = new kakao.maps.MarkerImage(ICON_TIER4, new kakao.maps.Size(52, 64), {
+                            offset: new kakao.maps.Point(26, 64)
                         });
                     }
 
