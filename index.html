@@ -23,6 +23,17 @@
     <!-- Library for QR Code Scanning -->
     <script src="https://unpkg.com/html5-qrcode"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Preload Critical Images -->
+    <link rel="preload" href="assets/markers/legend_tier1.png" as="image">
+    <link rel="preload" href="assets/markers/legend_tier2.png" as="image">
+    <link rel="preload" href="assets/markers/legend_tier3.png" as="image">
+    <link rel="preload" href="assets/markers/legend_tier4.png" as="image">
+    <link rel="preload" href="assets/markers/tier1.png" as="image">
+    <link rel="preload" href="assets/markers/tier2.png" as="image">
+    <link rel="preload" href="assets/markers/tier3.png" as="image">
+    <link rel="preload" href="assets/markers/tier4.png" as="image">
+
     <meta name="description" content="전국 로또 1등 당첨 판매점을 지도에서 한눈에 확인하세요. 내 주변 명당 찾기, 로또 번호 무료 추천 서비스 제공.">
     <meta name="keywords" content="로또, 로또명당, 로또지도, 로또1등, 로또당첨번호, 로또판매점, KINOV">
     <meta name="author" content="KINOV">
@@ -2578,10 +2589,9 @@
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq10"
                             checked> <img src="assets/markers/legend_tier1.png" class="legend-icon" id="icon10">
                         10회이상(전국1%)</label>
-                    <label class="checkbox-item" style="white-space: nowrap;"><span id="tierLegendHelpAnchor"
-                            style="position:relative; top:8px; left:8px;"></span><input type="checkbox" id="freq5"
-                            checked> <img src="assets/markers/legend_tier2.png" class="legend-icon" id="icon5">
-                        5~9회</label>
+                    <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq5" checked>
+                        <img src="assets/markers/legend_tier2.png" class="legend-icon" id="icon5"> 5~9회</label>
+
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq3" checked>
                         <img src="assets/markers/legend_tier3.png" class="legend-icon" id="icon3"> 3~4회</label>
                     <label class="checkbox-item" style="white-space: nowrap;"><input type="checkbox" id="freq1" checked>
