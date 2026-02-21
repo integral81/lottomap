@@ -1642,6 +1642,7 @@
             gap: 8px;
             justify-content: center;
             margin-bottom: 20px;
+            width: 100%;
         }
 
         .dream-tag {
@@ -1698,6 +1699,8 @@
         .input-container {
             display: none;
             width: 100%;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
         }
 
@@ -4245,7 +4248,7 @@
                     (<span id="paramRounds"></span> 등)`;
                 }
 
-                modeSelection.style.display = 'block';
+                modeSelection.style.display = 'flex';
                 if (analysisLoading) analysisLoading.style.display = 'none';
                 if (modeDreamInput) modeDreamInput.style.display = 'none';
                 if (modeHoroscopeSelect) modeHoroscopeSelect.style.display = 'none';
@@ -4275,7 +4278,7 @@
 
             function selectDreamMode() {
                 document.getElementById('modeSelection').style.display = 'none';
-                document.getElementById('modeDreamInput').style.display = 'block';
+                document.getElementById('modeDreamInput').style.display = 'flex';
             }
 
             function resetToModeSelection() {
@@ -4284,7 +4287,7 @@
                 if (document.getElementById('analysisLoading')) document.getElementById('analysisLoading').style.display = 'none';
                 document.getElementById('resultContent').style.display = 'none';
                 document.getElementById('adContent').style.display = 'flex';
-                document.getElementById('modeSelection').style.display = 'block';
+                document.getElementById('modeSelection').style.display = 'flex';
             }
 
             function handleDreamTag(keyword) {
@@ -4371,7 +4374,7 @@
 
             function selectHoroscopeMode() {
                 document.getElementById('modeSelection').style.display = 'none';
-                document.getElementById('modeHoroscopeSelect').style.display = 'block';
+                document.getElementById('modeHoroscopeSelect').style.display = 'flex';
             }
 
             function handleZodiacClick(zodiacName, icon) {
