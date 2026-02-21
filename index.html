@@ -510,10 +510,11 @@
             font-size: 13px;
             border-radius: 25px;
             /* Fully rounded */
-            margin: 0 auto 20px 0;
-            /* Left aligned, 0 margin on left */
+            margin: 0 auto 20px auto;
+            /* Centered */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: calc(100% - 35px);
+            width: calc(100% - 50px);
+            /* Match menu width and padding */
             /* Shorter on right by 1cm */
             animation: pulse-soft 2s infinite;
         }
@@ -1508,12 +1509,10 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: calc(100% - 35px);
+            width: calc(100% - 50px);
             /* Shorter on right by 1cm */
-            margin-top: 10px;
-            margin-right: auto;
-            /* Push away from right */
-            margin-left: 0;
+            margin: 10px auto 0 auto;
+            /* Centered to match Kakao button */
         }
 
         /* AI System Card Style */
