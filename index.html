@@ -484,8 +484,8 @@
             /* IE and Edge */
             scrollbar-gutter: stable;
             /* Prevent lateral shift when scrollbar appears */
-            padding: 0 20px 40px 20px;
-            /* Balanced 20px side padding */
+            padding: 0 20px 20px 20px;
+            /* Reduced bottom padding to save space */
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -2854,7 +2854,7 @@
 
             <!-- Result Content (Updated with similar container style for consistency) -->
             <div id="resultContent" onclick="event.stopPropagation()"
-                style="display:none; position:relative; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:40px 20px; max-height:80dvh; overflow-y:auto; width:90%; max-width:350px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+                style="display:none; position:relative; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:25px 20px; max-height:85dvh; overflow:hidden; width:90%; max-width:350px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
                 <span
                     style="position:absolute; top:15px; right:20px; color:white; font-size:28px; font-weight:bold; cursor:pointer; z-index:10;"
                     onclick="closeModal()">✕</span>
@@ -4537,7 +4537,7 @@
                 const colorIdx = Math.floor(seededRandom(seed + 3) * luckyColors.length);
 
                 const text = `
-                    <div style="text-align:left; margin: 0 auto; max-width:280px; line-height:1.8; font-size:14px;">
+                    <div style="text-align:left; margin: 0 auto; max-width:280px; line-height:1.5; font-size:12px; color:rgba(255,255,255,0.9);">
                         • <b>종합운</b> : ${genFortunes[genIdx]}<br>
                         • <b>애정운</b> : ${loveFortunes[loveIdx]}<br>
                         • <b>금전운</b> : ${moneyFortunes[moneyIdx]}<br>
