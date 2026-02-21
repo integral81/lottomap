@@ -634,22 +634,26 @@
         .omr-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 3px;
+            gap: 2px;
+            /* Narrower gap */
             margin: 10px 0;
+            width: 100%;
         }
 
         .omr-number {
-            aspect-ratio: 0.6;
-            /* Rectangular like OMR */
+            aspect-ratio: 0.8;
+            /* Shorter than 0.6 to save vertical space */
             border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            border-radius: 2px;
+            font-size: 11px;
+            /* Slightly larger font for better legibility at smaller size */
+            border-radius: 3px;
             background: #f9f9f9;
             color: #ccc;
             font-weight: bold;
+            padding: 2px;
         }
 
         .omr-number.marked {
