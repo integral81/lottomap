@@ -448,7 +448,7 @@
 
         .ai-modal-header {
             flex-shrink: 0;
-            padding: 30px 20px 10px 20px;
+            padding: 20px 20px 5px 20px;
             /* Balanced 20px side padding */
             text-align: center;
             background: transparent;
@@ -529,18 +529,15 @@
         .kakao-share-btn {
             background: #fae100;
             color: #3c1e1e;
-            padding: 12px 10px;
+            padding: 10px 10px;
             text-align: center;
             font-weight: bold;
             cursor: pointer;
             font-size: 13px;
             border-radius: 25px;
-            /* Fully rounded */
-            margin: 0 0 20px 0 !important;
-            /* Bottom margin only, sides handle by parent padding */
+            margin: 0 0 10px 0 !important;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             width: 100% !important;
-            /* Fill parent padded area */
             animation: pulse-soft 2s infinite;
             display: block;
         }
@@ -569,21 +566,14 @@
 
             .ai-modal-content {
                 width: 94%;
-                /* Reduced from 100% to avoid right cutoff on iPhone */
                 max-width: 94%;
                 margin: 0 auto;
-                /* Center it */
-                padding: 30px 0 25px 0;
-                /* Symmetric sides (0 padding, children handle margins) */
-                /* iPhone 15 Fix (v4): Bottom Sheet Style */
-                max-height: 75dvh;
-                /* Safe height */
+                padding: 15px 0 15px 0;
+                max-height: 85dvh;
                 border-radius: 25px 25px 0 0;
-                /* Rounded top only */
                 overflow-y: auto;
                 overscroll-behavior: contain;
-                padding-bottom: 40px;
-                /* Reset transform if any */
+                padding-bottom: 30px;
                 transform: none !important;
                 margin-bottom: 0;
                 scrollbar-width: none;
@@ -599,10 +589,10 @@
         .zodiac-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 3px;
+            gap: 6px;
             padding: 0px;
             width: 100%;
-            max-width: 280px;
+            max-width: 320px;
             margin: 0 auto;
         }
 
@@ -610,13 +600,17 @@
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
-            padding: 1px 2px;
+            padding: 6px 4px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 0px;
+            justify-content: center;
+            gap: 4px;
+            height: 42px;
+            /* Fixed height for rectangular look */
+            box-sizing: border-box;
         }
 
         .zodiac-item:hover {
@@ -625,7 +619,7 @@
         }
 
         .zodiac-icon {
-            font-size: 16px;
+            font-size: 20px;
         }
 
         .zodiac-name {
