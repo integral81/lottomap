@@ -241,7 +241,7 @@
         }
 
         .iw-addr {
-            font-size: 11px;
+            font-size: 12px;
             color: #1565c0;
             /* Blue for visibility (Kakao Blue style) */
             margin-bottom: 8px;
@@ -4148,7 +4148,7 @@
                             ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}
                         </div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사하기">
-                            <span class="iw-addr" style="${shop.n.includes('동행복권') ? 'color: #d32f2f !important; font-weight: bold; font-size: 13px;' : ''}">${displayAddr}</span>
+                            <span class="iw-addr">${displayAddr}</span>
                             <span class="btn-copy-label">복사</span>
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px; font-size:13px;">총 ${shop.totalWins}회 당첨</div>
