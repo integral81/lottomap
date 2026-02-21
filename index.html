@@ -1005,29 +1005,32 @@
         /* Responsive Design for Mobile (Phone only) */
         @media (max-width: 640px) {
             #app {
-                flex-direction: column;
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
+                flex-direction: column !important;
+                height: 100vh !important;
+                overflow: hidden !important;
+                /* Prevent overall page scroll */
             }
 
             #sidebar {
-                width: 100%;
-                height: auto;
-                flex: none;
-                order: 2;
-                /* Mobile: Sidebar Bottom */
+                width: 100% !important;
+                height: auto !important;
+                flex: 1 !important;
+                /* Take remaining space */
+                order: 2 !important;
+                overflow-y: auto !important;
+                /* Scroll only the list */
                 box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+                background: white;
             }
 
             #map {
-                width: 100%;
-                height: 400px;
-                flex: none;
-                order: 1;
-                /* Mobile: Map Top */
+                width: 100% !important;
+                height: 40vh !important;
+                /* Fixed height on top */
+                min-height: 300px !important;
+                flex: none !important;
+                order: 1 !important;
                 position: relative;
-                /* Anchor for absolute buttons */
             }
 
             /* Move floating buttons to bottom-right of map area on mobile */
@@ -3006,6 +3009,7 @@
             let roadviewClient = null; // RoadviewClient instance
             let userCurrentLat = null; // Store user's current latitude
             let userCurrentLng = null; // Store user's current longitude
+            let myLocationMarker = null; // Global marker for user's location
 
             // Premium Roadview POV Presets (User Verified 260210)
             const ROADVIEW_PRESETS = [
@@ -3423,7 +3427,10 @@
 
                     // Auto-reflect GPS location on initial load (User Request)
                     console.log('[Init] Initiating automatic GPS request on load...');
-                    requestMyLocation();
+                    setTimeout(() => {
+                        showToast("📍 현재 위치를 확인 중입니다...", "info");
+                        requestMyLocation();
+                    }, 1000); // 1.0s delay for better mobile compatibility
                 } catch (err) {
                     console.error("Critical Init Error:", err);
                     const mapDiv = document.getElementById('map');
@@ -4174,10 +4181,16 @@
                 });
                 clusterer.addMarkers(markers);
             }
-            function requestMyLocation() {
+            function requestMyLocation(isRetry = false) {
+                console.log(`[GPS] requestMyLocation called (isRetry: ${isRetry})`);
                 if (!navigator.onLine) {
                     showToast("🌐 인터넷 연결이 끊겨 있습니다. 네트워크를 확인해 주세요.", "error");
                     return;
+                }
+                const isSecure = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                if (!isSecure) {
+                    console.warn("[GPS] Insecure context detected. Geolocation might be blocked.");
+                    showToast("⚠️ 보안 연결(HTTPS)이 아니면 위치 서비스가 차단될 수 있습니다.", "warning");
                 }
                 if (!navigator.geolocation) {
                     showToast("🚫 이 브라우저에서는 위치 정보를 사용할 수 없습니다.", "error");
@@ -4186,62 +4199,82 @@
                 const gpsBtn = document.querySelector('.gps-button');
                 if (gpsBtn) gpsBtn.classList.add('loading');
 
+                const options = {
+                    enableHighAccuracy: !isRetry, // Use low accuracy on retry
+                    timeout: isRetry ? 15000 : 8000, // Faster timeout for first try
+                    maximumAge: 0
+                };
+
                 navigator.geolocation.getCurrentPosition((pos) => {
-                    if (gpsBtn) gpsBtn.classList.remove('loading');
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    userCurrentLat = lat; // Update global GPS cache
-                    userCurrentLng = lng; // Update global GPS cache
-                    const center = new kakao.maps.LatLng(lat, lng);
+                    try {
+                        console.log("[GPS] Position acquired successfully. Lat/Lng:", pos.coords.latitude, pos.coords.longitude);
+                        if (gpsBtn) gpsBtn.classList.remove('loading');
 
-                    map.setCenter(center);
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        userCurrentLat = lat;
+                        userCurrentLng = lng;
+                        const center = new kakao.maps.LatLng(lat, lng);
 
-                    // Close all infowindows to clear the view
-                    if (typeof clusterer !== 'undefined') {
-                        // There's no direct 'closeAll' on clusterer, but we can just let it be
-                    }
+                        // 1. Move map center first for immediate visual feedback
+                        map.setCenter(center);
+                        if (map.getLevel() > 7) map.setLevel(7);
 
-                    // Add/Update Blue Dot Marker
-                    if (!myLocationMarker) {
-                        myLocationMarker = new kakao.maps.CustomOverlay({
-                            position: center,
-                            content: `
-        <div style="position:relative;">
-            <div class="pulse"></div>
-            <div
-                style="width:16px; height:16px; background:#1976d2; border:2px solid #fff; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.5); position:relative; z-index:2; transform: translate(-50%, -50%);">
+                        // 2. Add/Update Blue Dot Marker
+                        if (!myLocationMarker) {
+                            myLocationMarker = new kakao.maps.CustomOverlay({
+                                position: center,
+                                content: `
+            <div style="position:relative;">
+                <div class="pulse"></div>
+                <div
+                    style="width:16px; height:16px; background:#1976d2; border:2px solid #fff; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.5); position:relative; z-index:2; transform: translate(-50%, -50%);">
+                </div>
             </div>
-        </div>
-        `,
-                            map: map,
-                            zIndex: 1001
-                        });
-                    } else {
-                        myLocationMarker.setPosition(center);
-                        myLocationMarker.setMap(map);
-                    }
+            `,
+                                map: map,
+                                zIndex: 1001
+                            });
+                        } else {
+                            myLocationMarker.setPosition(center);
+                            myLocationMarker.setMap(map);
+                        }
 
-                    findNearestShop(lat, lng);
+                        // 3. Find nearest shop (complex logic last)
+                        findNearestShop(lat, lng);
+
+                    } catch (e) {
+                        console.error("[GPS] Success Callback Error:", e);
+                        if (gpsBtn) gpsBtn.classList.remove('loading');
+                        showToast("📍 위치 표시에 오류가 발생했습니다. (오류: " + e.message + ")", "error");
+                    }
                 },
                     (err) => {
-                        console.error("GPS Error:", err);
+                        console.error(`[GPS] Error (Code ${err.code}):`, err.message);
                         if (gpsBtn) gpsBtn.classList.remove('loading');
+
+                        if (!isRetry && (err.code === 3 || err.code === 2)) {
+                            console.log("[GPS] Attempting retry with lower accuracy...");
+                            showToast("📍 정확도를 조정하여 다시 시도 중입니다...", "info");
+                            requestMyLocation(true);
+                            return;
+                        }
+
                         let msg = "위치 정보를 가져오는 데 실패했습니다.";
                         switch (err.code) {
                             case 1:
-                                msg = "위치 정보 권한이 거부되었습니다. 브라우저 설정에서 위치 권한을 허용해 주세요.";
+                                msg = "위치 정보 권한이 거부되었습니다. 설정에서 허용해 주세요.";
                                 break;
                             case 2:
-                                msg = "위치 정보를 사용할 수 없습니다. GPS가 켜져 있는지 확인해 주세요.";
+                                msg = "위치 정보를 사용할 수 없습니다. GPS(위치)가 켜져 있는지 확인해 주세요.";
                                 break;
                             case 3:
-                                msg = "위치 정보를 가져오는 데 시간이 초과되었습니다. 다시 시도해 보세요.";
+                                msg = "위치 정보를 가져오는 데 시간이 초과되었습니다. 탁 트인 곳에서 다시 시도해 주세요.";
                                 break;
                         }
                         showToast(msg, "error");
                     },
-                    // 정확도를 true로 변경하고 타임아웃을 조정하여 응답성을 높입니다.
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    options
                 );
             }
 
@@ -5155,71 +5188,68 @@
             }
 
             function findNearestShop(lat, lng, label = "내 위치", shouldPan = true) {
-                // Find nearest among ACTIVE markers (filtered ones on the map)
-                if (!markers || markers.length === 0) {
-                    // If it's a map drag, don't show toast if no markers.
-                    // Only show if it's a specific request or shouldn't pan.
-                    if (shouldPan) showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
-                    return;
-                }
-
-                // Sort all markers by distance
-                const sortedByDist = markers.map(m => {
-                    const p = m.getPosition();
-                    return {
-                        marker: m,
-                        distance: getDistance(lat, lng, p.getLat(), p.getLng())
-                    };
-                }).sort((a, b) => a.distance - b.distance);
-
-                // Take top 3 (top 2 on mobile to prevent overlap)
-                const isMobile = window.innerWidth <= 768;
-                const topCount = isMobile ? 2 : 3;
-                const topShops = sortedByDist.slice(0, topCount);
-                if (topShops.length > 0) {
-                    // Check if the nearest shop is within a reasonable range (e.g., 20km)
-                    const nearestDist = topShops[0].distance;
-                    if (nearestDist > 20) {
-                        if (shouldPan) {
-                            showToast(`현재 조건(회차)으로는<br>주변 20km 내에 1등 당첨점이 없습니다.<br><span
-                                                    style="font-size:12px; color:#ccc;">(가장 가까운 곳:
-                                                    ${topShops[0].marker.shopData.n}
-                                                    ${nearestDist.toFixed(1)}km)</span>`, "info", true,
-                                'nearby-shops-toast');
-
-                            // Pan to user location but don't zoom out to the distant shop
-                            const center = new kakao.maps.LatLng(lat, lng);
-                            map.panTo(center);
-                        }
+                let msg = "";
+                try {
+                    if (!markers || markers.length === 0) {
+                        if (shouldPan) showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
                         return;
                     }
 
-                    let msg = `📍 <strong style="white-space: nowrap;">${label} 주변
-                                                    1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
-                    topShops.forEach((item, index) => {
-                        const shop = item.marker.shopData;
-                        const distStr = item.distance < 1 ? Math.round(item.distance * 1000)
-                            + "m" : item.distance.toFixed(1) + "km"; // Add clickable span
-                        msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})"
+                    const sortedByDist = markers.map(m => {
+                        const p = m.getPosition();
+                        return {
+                            marker: m,
+                            distance: getDistance(lat, lng, p.getLat(), p.getLng())
+                        };
+                    }).sort((a, b) => a.distance - b.distance);
+
+                    const isMobile = window.innerWidth <= 768;
+                    const topCount = isMobile ? 2 : 3;
+                    const topShops = sortedByDist.slice(0, topCount);
+
+                    if (topShops.length > 0) {
+                        const nearestDist = topShops[0].distance;
+                        if (nearestDist > 20) {
+                            if (shouldPan) {
+                                showToast(`현재 조건(회차)으로는<br>주변 20km 내에 1등 당첨점이 없습니다.<br><span
+                                                        style="font-size:12px; color:#ccc;">(가장 가까운 곳:
+                                                        ${topShops[0].marker.shopData.n}
+                                                        ${nearestDist.toFixed(1)}km)</span>`, "info", true,
+                                    'nearby-shops-toast');
+
+                                const center = new kakao.maps.LatLng(lat, lng);
+                                map.panTo(center);
+                            }
+                            return;
+                        }
+
+                        msg = `📍 <strong style="white-space: nowrap;">${label} 주변
+                                                        1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
+                        topShops.forEach((item, index) => {
+                            const shop = item.marker.shopData;
+                            const distStr = item.distance < 1 ? Math.round(item.distance * 1000)
+                                + "m" : item.distance.toFixed(1) + "km";
+                            msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})"
                                                     style="cursor:pointer; padding:2px 0; text-decoration:underline;">
                                                     ${index + 1}. ${shop.n} (${distStr})</div>`;
-                    });
-
-                    if (shouldPan) {
-                        // Adaptive Zoom: Fit my location and top nearest shops
-                        const bounds = new kakao.maps.LatLngBounds();
-                        bounds.extend(new kakao.maps.LatLng(lat, lng));
-
-                        topShops.forEach(item => {
-                            if (item.distance < 10) { // Only include within 10km for bounds
-                                bounds.extend(item.marker.getPosition());
-                            }
                         });
-                        const bottomPad = isMobile ? 180 : 40;
-                        map.setBounds(bounds, 40, 40, bottomPad, 40);
+
+                        if (shouldPan) {
+                            const bounds = new kakao.maps.LatLngBounds();
+                            bounds.extend(new kakao.maps.LatLng(lat, lng));
+                            topShops.forEach(item => {
+                                if (item.distance < 10) {
+                                    bounds.extend(item.marker.getPosition());
+                                }
+                            });
+                            const bottomPad = isMobile ? 180 : 40;
+                            map.setBounds(bounds, 40, 40, bottomPad, 40);
+                        }
+                        if (msg) showToast(msg, "success", true, 'nearby-shops-toast');
                     }
+                } catch (e) {
+                    console.error("findNearestShop Error:", e);
                 }
-                showToast(msg, "success", true, 'nearby-shops-toast');
             }
 
             function showToast(message, type = "info", persistent = false, id = null) {
@@ -5655,6 +5685,7 @@
                 var radtheta = Math.PI * theta / 180;
                 var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
                 if (dist > 1) dist = 1;
+                if (dist < -1) dist = -1; // Added Guard to prevent NaN (260221)
                 dist = Math.acos(dist);
                 dist = dist * 180 / Math.PI;
                 dist = dist * 60 * 1.1515;
