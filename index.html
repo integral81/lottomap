@@ -492,15 +492,23 @@
 
         .ai-close-btn-fixed {
             position: absolute;
-            top: 15px;
+            top: 20px;
             right: 20px;
-            font-size: 28px;
+            font-size: 11px;
+            /* Further reduced size */
             color: white;
             cursor: pointer;
             z-index: 20;
             font-weight: bold;
             opacity: 0.8;
             transition: opacity 0.3s;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
         }
 
         .ai-close-btn-fixed:hover {
@@ -2698,11 +2706,12 @@
             <!-- AI Modal Content (Fixed Header + Scrollable Body) -->
             <div id="adContent" class="ai-modal-content" onclick="event.stopPropagation()">
                 <!-- Fixed Header -->
-                <div class="ai-modal-header">
+                <div class="ai-modal-header" style="padding-top: 110px;">
                     <span class="ai-close-btn-fixed" onclick="closeModal()">✕</span>
-                    <div class="ai-header-content" style="text-align: center; width: 100%; margin: 0;">
-                        <div class="ai-title" style="font-size:22px; margin-bottom:5px; text-align: center;">✨ AI 로또 분석
-                            시스템</div>
+                    <div class="ai-header-content" style="text-align: center; width: 100%; margin: 0 auto;">
+                        <div class="ai-title"
+                            style="font-size:22px; margin-bottom:10px; text-align: center; width: 100%; display: block;">
+                            ✨ AI 로또 분석 시스템</div>
                         <div class="ai-tags">
                             <div class="ai-tag">📈 실시간 분석</div>
                             <div class="ai-tag">🪄 AI 예측</div>
@@ -4094,7 +4103,7 @@
                             ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}
                         </div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사하기">
-                            <span class="iw-addr">${displayAddr}</span>
+                            <span class="iw-addr" style="${shop.n.includes('동행복권') ? 'color: #d32f2f; font-weight: bold; font-size: 13px;' : ''}">${displayAddr}</span>
                             <span class="btn-copy-label">복사</span>
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px; font-size:13px;">총 ${shop.totalWins}회 당첨</div>
@@ -4103,7 +4112,11 @@
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
                         <div class="iw-actions">
-                            ${shop.closed ? `
+                            ${shop.n.includes('동행복권') ? `
+                            <button class="btn-iw btn-navi" style="width:100%; background:#2c3e50 !important;" onclick="window.open('https://www.dhlottery.co.kr/hpns/noticeDetailView', '_blank')">
+                                싸이트 링크로 가기
+                            </button>
+                            ` : (shop.closed ? `
                             <button class="btn-iw btn-navi" style="width:100%; background:#9e9e9e !important; cursor:not-allowed;" onclick="alert('해당 매장은 폐점되었습니다')">
                                 ${shop.totalWins >= 10 ? '로드뷰(ROAD VIEW) 보기' : '🗺️ 카카오맵에서 보기'}
                             </button>
@@ -4115,7 +4128,7 @@
                             <button class="btn-iw btn-navi" style="width:100%;" onclick="openDirections(${shop.lat}, ${shop.lng}, '${safeName}')">
                                 🗺️ 카카오맵에서 보기
                             </button>
-                            `)}
+                            `))}
                         </div>
                     </div>
                 `;
