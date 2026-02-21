@@ -242,10 +242,12 @@
 
         .iw-addr {
             font-size: 11px;
-            color: #666;
+            color: #1565c0;
+            /* Blue for visibility (Kakao Blue style) */
             margin-bottom: 8px;
             line-height: 1.4;
             word-break: keep-all;
+            font-weight: 500;
         }
 
         .iw-tag {
@@ -903,8 +905,54 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 4px;
+            margin: 0;
+            width: 100%;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .iw-details-wrapper {
+            position: relative;
             margin: 8px 0 12px 0;
             width: 100%;
+        }
+
+        .iw-details.collapsed {
+            max-height: 80px;
+            /* Approximately 3 rows */
+            overflow: hidden;
+        }
+
+        /* Fade effect for collapsed state */
+        .iw-details.collapsed::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+            pointer-events: none;
+        }
+
+        .iw-more-btn {
+            width: 100%;
+            padding: 8px;
+            margin-top: -10px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1976d2;
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 -5px 15px rgba(255, 255, 255, 0.8);
+        }
+
+        .iw-more-btn:hover {
+            background: #f8f9fa;
         }
 
         .iw-tag {
@@ -1513,11 +1561,8 @@
                     top: 10px !important;
                 }
 
-                /* Lucky Number Result Mobile Layout */
+                /* Lucky Number Result Mobile Layout Removal - Keep items inline */
                 .result-row-wrapper {
-                    flex-wrap: wrap !important;
-                    justify-content: flex-start !important;
-                    gap: 5px !important;
                     padding: 5px 0;
                 }
 
@@ -2706,7 +2751,7 @@
             <!-- AI Modal Content (Fixed Header + Scrollable Body) -->
             <div id="adContent" class="ai-modal-content" onclick="event.stopPropagation()">
                 <!-- Fixed Header -->
-                <div class="ai-modal-header" style="padding-top: 110px;">
+                <div class="ai-modal-header" style="padding-top: 0px;">
                     <span class="ai-close-btn-fixed" onclick="closeModal()">✕</span>
                     <div class="ai-header-content" style="text-align: center; width: 100%; margin: 0 auto;">
                         <div class="ai-title"
@@ -4103,11 +4148,20 @@
                             ${shop.closed ? '<span style="font-size:12px; color:red;">(폐업)</span>' : ''}
                         </div>
                         <div class="iw-addr-box" onclick="copyToClipboard('${safeAddr}')" title="주소 복사하기">
-                            <span class="iw-addr" style="${shop.n.includes('동행복권') ? 'color: #d32f2f; font-weight: bold; font-size: 13px;' : ''}">${displayAddr}</span>
+                            <span class="iw-addr" style="${shop.n.includes('동행복권') ? 'color: #d32f2f !important; font-weight: bold; font-size: 13px;' : ''}">${displayAddr}</span>
                             <span class="btn-copy-label">복사</span>
                         </div>
                         <div style="font-weight:bold; color:red; margin-bottom:5px; font-size:13px;">총 ${shop.totalWins}회 당첨</div>
-                        <div class="iw-details">${roundTagsHtml}</div>
+                        <div class="iw-details-wrapper">
+                            <div class="iw-details ${shop.totalWins > 15 ? 'collapsed' : ''}" id="iw-details-${shop.lat}-${shop.lng}">
+                                ${roundTagsHtml}
+                            </div>
+                            ${shop.totalWins > 15 ? `
+                            <button class="iw-more-btn" onclick="const det = this.parentElement.querySelector('.iw-details'); det.classList.toggle('collapsed'); this.innerText = det.classList.contains('collapsed') ? '총 ${shop.totalWins}회 중 ${shop.totalWins - 15}개 회차 더보기 ▾' : '회차 정보 닫기 ▴'; event.stopPropagation();">
+                                총 ${shop.totalWins}회 중 ${shop.totalWins - 15}개 회차 더보기 ▾
+                            </button>
+                            ` : ''}
+                        </div>
                         <button class="btn-gold" style="width:100%; margin-top:8px;" onclick="openAdModal('${safeName}', '${safeAddr}', ${shop.lat}, ${shop.lng}, ${shop.totalWins}, ${shop.closed})">
                             ✨ 이번 주 1등 추천 번호 받기
                         </button>
@@ -4167,64 +4221,55 @@
                 });
                 clusterer.addMarkers(markers);
             }
-
-            /**
-             * GPS Location Service Module
-             * Handles user positioning, nearest shop calculation, and UI feedback (Toasts).
-             */
-            let myLocationMarker = null;
-
             function requestMyLocation() {
                 if (!navigator.onLine) {
                     showToast("🌐 인터넷 연결이 끊겨 있습니다. 네트워크를 확인해 주세요.", "error");
                     return;
                 }
-
                 if (!navigator.geolocation) {
                     showToast("🚫 이 브라우저에서는 위치 정보를 사용할 수 없습니다.", "error");
                     return;
                 }
-
                 const gpsBtn = document.querySelector('.gps-button');
                 if (gpsBtn) gpsBtn.classList.add('loading');
 
-                // GPS Permission & Fetch
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        if (gpsBtn) gpsBtn.classList.remove('loading');
-                        const lat = pos.coords.latitude;
-                        const lng = pos.coords.longitude;
-                        userCurrentLat = lat; // Update global GPS cache
-                        userCurrentLng = lng; // Update global GPS cache
-                        const center = new kakao.maps.LatLng(lat, lng);
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    if (gpsBtn) gpsBtn.classList.remove('loading');
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    userCurrentLat = lat; // Update global GPS cache
+                    userCurrentLng = lng; // Update global GPS cache
+                    const center = new kakao.maps.LatLng(lat, lng);
 
-                        map.setCenter(center);
+                    map.setCenter(center);
 
-                        // Close all infowindows to clear the view
-                        if (typeof clusterer !== 'undefined') {
-                            // There's no direct 'closeAll' on clusterer, but we can just let it be
-                        }
+                    // Close all infowindows to clear the view
+                    if (typeof clusterer !== 'undefined') {
+                        // There's no direct 'closeAll' on clusterer, but we can just let it be
+                    }
 
-                        // Add/Update Blue Dot Marker
-                        if (!myLocationMarker) {
-                            myLocationMarker = new kakao.maps.CustomOverlay({
-                                position: center,
-                                content: `
-                                <div style="position:relative;">
-                                    <div class="pulse"></div>
-                                    <div style="width:16px; height:16px; background:#1976d2; border:2px solid #fff; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.5); position:relative; z-index:2; transform: translate(-50%, -50%);"></div>
-                                </div>
-                            `,
-                                map: map,
-                                zIndex: 1001
-                            });
-                        } else {
-                            myLocationMarker.setPosition(center);
-                            myLocationMarker.setMap(map);
-                        }
+                    // Add/Update Blue Dot Marker
+                    if (!myLocationMarker) {
+                        myLocationMarker = new kakao.maps.CustomOverlay({
+                            position: center,
+                            content: `
+        <div style="position:relative;">
+            <div class="pulse"></div>
+            <div
+                style="width:16px; height:16px; background:#1976d2; border:2px solid #fff; border-radius:50%; box-shadow:0 0 10px rgba(0,0,0,0.5); position:relative; z-index:2; transform: translate(-50%, -50%);">
+            </div>
+        </div>
+        `,
+                            map: map,
+                            zIndex: 1001
+                        });
+                    } else {
+                        myLocationMarker.setPosition(center);
+                        myLocationMarker.setMap(map);
+                    }
 
-                        findNearestShop(lat, lng);
-                    },
+                    findNearestShop(lat, lng);
+                },
                     (err) => {
                         console.error("GPS Error:", err);
                         if (gpsBtn) gpsBtn.classList.remove('loading');
@@ -4283,7 +4328,7 @@
                 const resultInfo = document.getElementById('resultInfoText');
                 if (resultInfo) {
                     resultInfo.innerHTML = `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">0</strong>번의 1등을 배출했습니다.<br>
-                    (<span id="paramRounds"></span> 등)`;
+        (<span id="paramRounds"></span> 등)`;
                 }
 
                 modeSelection.style.display = 'flex';
@@ -4322,7 +4367,8 @@
             function resetToModeSelection() {
                 document.getElementById('modeDreamInput').style.display = 'none';
                 document.getElementById('modeHoroscopeSelect').style.display = 'none';
-                if (document.getElementById('analysisLoading')) document.getElementById('analysisLoading').style.display = 'none';
+                if (document.getElementById('analysisLoading')) document.getElementById('analysisLoading').style.display =
+                    'none';
                 document.getElementById('resultContent').style.display = 'none';
                 document.getElementById('adContent').style.display = 'flex';
                 document.getElementById('modeSelection').style.display = 'flex';
@@ -4401,7 +4447,6 @@
                     selected.add(n);
                     seed++;
                 }
-
                 return {
                     numbers: Array.from(selected).sort((a, b) => a - b),
                     historyCount: 0,
@@ -4504,13 +4549,13 @@
                 const colorIdx = Math.floor(seededRandom(seed + 3) * luckyColors.length);
 
                 const text = `
-                <div style="text-align:left; margin: 0 auto; max-width:280px; line-height:1.8; font-size:14px;">
-                    • <b>종합운</b> : ${genFortunes[genIdx]}<br>
-                    • <b>애정운</b> : ${loveFortunes[loveIdx]}<br>
-                    • <b>금전운</b> : ${moneyFortunes[moneyIdx]}<br>
-                    • <b>행운의 색상</b> : ${luckyColors[colorIdx]}
-                </div>
-            `;
+                    <div style="text-align:left; margin: 0 auto; max-width:280px; line-height:1.8; font-size:14px;">
+                        • <b>종합운</b> : ${genFortunes[genIdx]}<br>
+                        • <b>애정운</b> : ${loveFortunes[loveIdx]}<br>
+                        • <b>금전운</b> : ${moneyFortunes[moneyIdx]}<br>
+                        • <b>행운의 색상</b> : ${luckyColors[colorIdx]}
+                    </div>
+                    `;
 
                 // 2. Number Generation
                 const selected = new Set();
@@ -4575,11 +4620,12 @@
                         if (container) {
                             container.innerHTML =
                                 `<div class="horoscope-text-box">
-                                <div style="font-size:24px; margin-bottom:5px;">${customResult.icon}</div>
-                                <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">${customResult.zodiac}띠 오늘의 운세</div>
-                                ${customResult.text}
-                            </div>
-                            <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
+                            <div style="font-size:24px; margin-bottom:5px;">${customResult.icon}</div>
+                            <div style="font-weight:bold; font-size:16px; margin-bottom:10px; color:#fae100;">
+                                ${customResult.zodiac}띠 오늘의 운세</div>
+                            ${customResult.text}
+                        </div>
+                        <div style="font-size:13px; color:rgba(255,255,255,0.8);">위 운세에 기반한 행운의 번호입니다.</div>`;
                         }
                     }
 
@@ -4664,8 +4710,10 @@
                     const container = document.getElementById('resultInfoText');
                     if (container) {
                         container.innerHTML =
-                            `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${resultAuto.historyCount}</strong>번의 1등을 배출했습니다.<br>` +
-                            `(<span id="paramRounds">${resultAuto.relatedRounds.join(', ') + (resultAuto.historyCount > 5 ? '...' : '')}</span> 등)`;
+                            `이 명당은 과거 <strong id="paramHCount" style="color:#fae100;">${resultAuto.historyCount}</strong>번의
+                        1등을 배출했습니다.<br>` +
+                            `(<span id="paramRounds">${resultAuto.relatedRounds.join(', ') + (resultAuto.historyCount > 5 ?
+                                '...' : '')}</span> 등)`;
                     }
 
                     // Helper to create a unified row component
@@ -4683,15 +4731,16 @@
                         rowWrapper.style.display = 'flex';
                         rowWrapper.style.alignItems = 'center';
                         rowWrapper.style.justifyContent = 'center';
-                        rowWrapper.style.gap = '12px'; // Increased to ~0.3cm
-                        console.log("Horizontal Layout Updated: Gap 12px");
+                        rowWrapper.style.gap = '6px'; // Reduced from 12px for tighter layout
+                        console.log("Horizontal Layout Updated: Gap 6px");
                         rowWrapper.style.width = '100%';
                         rowWrapper.className = 'result-row-wrapper'; // Add class for mobile layout
 
                         // Label
                         const labelDiv = document.createElement('div');
                         labelDiv.className = 'result-label'; // Add class for mobile layout
-                        labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:6px;">${label}</span>`;
+                        labelDiv.innerHTML = `<span
+                            style="color:#fae100; font-weight:bold; font-size:13px; white-space:nowrap;">${label}</span>`;
                         // labelDiv.style.minWidth = '50px'; // Removed min-width to reduce gap
                         rowWrapper.appendChild(labelDiv);
 
@@ -4792,7 +4841,6 @@
                 const overlay = document.getElementById('sideNavOverlay');
                 const btn = document.getElementById('menuBtn');
                 const isOpen = nav.classList.contains('open');
-
                 if (isOpen) {
                     closeNav();
                 } else {
@@ -4877,9 +4925,7 @@
 
                 // 1. Calculate frequencies for the selected range (1-45)
                 const counts = {};
-                for (let i = 1; i <= 45; i++) counts[i] = 0;
-
-                targetRounds.forEach(r => {
+                for (let i = 1; i <= 45; i++) counts[i] = 0; targetRounds.forEach(r => {
                     const nums = window.lottoHistory[r.toString()];
                     nums.forEach(n => {
                         if (counts[n] !== undefined) counts[n]++;
@@ -4900,14 +4946,14 @@
                     const percentage = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
                     const paddedNum = item.num < 10 ? '0' + item.num : item.num;
                     html += `
-                    <div class="freq-row">
-                        <div class="freq-ball">${paddedNum}</div>
-                        <div class="freq-bar-container">
-                            <div class="freq-bar-fill" style="width: ${percentage}%"></div>
+                        <div class="freq-row">
+                            <div class="freq-ball">${paddedNum}</div>
+                            <div class="freq-bar-container">
+                                <div class="freq-bar-fill" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="freq-count">${item.count}</div>
                         </div>
-                        <div class="freq-count">${item.count}</div>
-                    </div>
-                `;
+                    `;
                 });
 
                 container.innerHTML = html;
@@ -4967,8 +5013,7 @@
 
             function restartQRScanner() {
                 // Simply call showQRScanner to reuse the initialization logic
-                // But we need to ensure previous instance is cleaned up if it exists in weird state?
-                // Usually onScanSuccess cleans it up.
+                // But we need to ensure previous instance is cleaned up if it exists in weird state
                 showQRScanner();
             }
 
@@ -5012,9 +5057,9 @@
 
                     if (!winNums) {
                         listContainer.innerHTML = `<div style="padding:20px; text-align:center;">
-                        ${round}회차 추첨 결과가 아직 없습니다.<br>
-                        (토요일 오후 8시 35분 이후 확인 가능)
-                    </div>`;
+                                        ${round}회차 추첨 결과가 아직 없습니다.<br>
+                                        (토요일 오후 8시 35분 이후 확인 가능)
+                                    </div>`;
                         return;
                     }
 
@@ -5027,7 +5072,7 @@
                     // rawNumbers string contains concatenated games.
                     // It 'usually' splits by 'n' or other delimiters in older formats?
                     // But the snippet saw `v.split('m')` logic.
-                    // Let's rely on fixed width 12 chars per game logic if possible, 
+                    // Let's rely on fixed width 12 chars per game logic if possible,
                     // but safeguard against delimiters.
                     // Removing non-digit characters is safer.
                     const cleanNums = rawNumbers.replace(/[^0-9]/g, '');
@@ -5035,16 +5080,13 @@
                     for (let i = 0; i < cleanNums.length; i += 12) {
                         const gameStr = cleanNums.substring(i, i + 12);
                         if (gameStr.length < 12) break;
-
                         const nums = [];
                         for (let j = 0; j < 12; j += 2) {
                             nums.push(parseInt(gameStr.substring(j, j + 2)));
                         }
                         games.push(nums);
                     }
-
                     const gameLabels = ['A', 'B', 'C', 'D', 'E'];
-
                     games.forEach((myNums, idx) => {
                         let matchCount = 0;
                         let bonusMatch = false;
@@ -5058,7 +5100,10 @@
                         let rankClass = "prize-none";
 
                         if (matchCount === 6) { rank = "1등 🥇"; rankClass = "prize-win"; }
-                        else if (matchCount === 5 && bonusMatch) { rank = "2등 🥈"; rankClass = "prize-win"; }
+                        else if (matchCount === 5 && bonusMatch) {
+                            rank = "2등 🥈"; rankClass =
+                                "prize-win";
+                        }
                         else if (matchCount === 5) { rank = "3등 🥉"; rankClass = "prize-win"; }
                         else if (matchCount === 4) { rank = "4등 💵"; rankClass = "prize-win"; }
                         else if (matchCount === 3) { rank = "5등 💰"; rankClass = "prize-win"; }
@@ -5082,12 +5127,14 @@
                         }).join('');
 
                         row.innerHTML = `
-                        <div style="font-weight:bold; color:#666; width:20px;">${gameLabels[idx] || '?'}</div>
-                        <div style="flex:1; display:flex; justify-content:center; gap:2px; font-size:13px;">
-                            ${ballsHtml}
-                        </div>
-                        <div class="qr-prize-badge ${rankClass}">${rank}</div>
-                    `;
+                                        <div style="font-weight:bold; color:#666; width:20px;">${gameLabels[idx] || '?'}
+                                        </div>
+                                        <div
+                                            style="flex:1; display:flex; justify-content:center; gap:2px; font-size:13px;">
+                                            ${ballsHtml}
+                                        </div>
+                                        <div class="qr-prize-badge ${rankClass}">${rank}</div>
+                                        `;
                         listContainer.appendChild(row);
                     });
 
@@ -5136,7 +5183,6 @@
                     const p = m.getPosition();
                     return Math.abs(p.getLat() - lat) < 0.0001 && Math.abs(p.getLng() - lng) < 0.0001;
                 });
-
                 if (target) {
                     // Zoom in to resolve clusters and ensure marker is visible
                     if (map.getLevel() > 5) {
@@ -5158,7 +5204,7 @@
             function findNearestShop(lat, lng, label = "내 위치", shouldPan = true) {
                 // Find nearest among ACTIVE markers (filtered ones on the map)
                 if (!markers || markers.length === 0) {
-                    // If it's a map drag, don't show toast if no markers. 
+                    // If it's a map drag, don't show toast if no markers.
                     // Only show if it's a specific request or shouldn't pan.
                     if (shouldPan) showToast("현재 필터 조건에 부합하는 판매점이 지도에 없습니다.", "info");
                     return;
@@ -5182,7 +5228,11 @@
                     const nearestDist = topShops[0].distance;
                     if (nearestDist > 20) {
                         if (shouldPan) {
-                            showToast(`현재 조건(회차)으로는<br>주변 20km 내에 1등 당첨점이 없습니다.<br><span style="font-size:12px; color:#ccc;">(가장 가까운 곳: ${topShops[0].marker.shopData.n} ${nearestDist.toFixed(1)}km)</span>`, "info", true, 'nearby-shops-toast');
+                            showToast(`현재 조건(회차)으로는<br>주변 20km 내에 1등 당첨점이 없습니다.<br><span
+                                                    style="font-size:12px; color:#ccc;">(가장 가까운 곳:
+                                                    ${topShops[0].marker.shopData.n}
+                                                    ${nearestDist.toFixed(1)}km)</span>`, "info", true,
+                                'nearby-shops-toast');
 
                             // Pan to user location but don't zoom out to the distant shop
                             const center = new kakao.maps.LatLng(lat, lng);
@@ -5191,12 +5241,15 @@
                         return;
                     }
 
-                    let msg = `📍 <strong style="white-space: nowrap;">${label} 주변 1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
+                    let msg = `📍 <strong style="white-space: nowrap;">${label} 주변
+                                                    1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
                     topShops.forEach((item, index) => {
                         const shop = item.marker.shopData;
-                        const distStr = item.distance < 1 ? Math.round(item.distance * 1000) + "m" : item.distance.toFixed(1) + "km";
-                        // Add clickable span
-                        msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:2px 0; text-decoration:underline;">${index + 1}. ${shop.n} (${distStr})</div>`;
+                        const distStr = item.distance < 1 ? Math.round(item.distance * 1000)
+                            + "m" : item.distance.toFixed(1) + "km"; // Add clickable span
+                        msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})"
+                                                    style="cursor:pointer; padding:2px 0; text-decoration:underline;">
+                                                    ${index + 1}. ${shop.n} (${distStr})</div>`;
                     });
 
                     if (shouldPan) {
@@ -5209,21 +5262,19 @@
                                 bounds.extend(item.marker.getPosition());
                             }
                         });
-
                         const bottomPad = isMobile ? 180 : 40;
                         map.setBounds(bounds, 40, 40, bottomPad, 40);
                     }
-
-                    showToast(msg, "success", true, 'nearby-shops-toast'); // Use ID to prevent duplicates
                 }
+                showToast(msg, "success", true, 'nearby-shops-toast');
             }
 
             function showToast(message, type = "info", persistent = false, id = null) {
                 const container = document.getElementById('toast-container');
+                if (!container) return;
 
                 // Check for existing toast with same ID
                 let toast = id ? document.getElementById(id) : null;
-
                 if (toast && toast.parentNode === container) {
                     // Update existing toast content
                     const content = toast.querySelector('.toast-content');
@@ -5237,9 +5288,8 @@
                 if (id) toast.id = id;
                 toast.className = `toast toast-${type}`;
 
-                // Contents
                 const content = document.createElement('div');
-                content.className = 'toast-content'; // Add class for update logic
+                content.className = 'toast-content';
                 content.innerHTML = message;
                 toast.appendChild(content);
 
@@ -5346,7 +5396,8 @@
                         console.log('[Kakao Share] Kakao SDK already initialized');
                     }
 
-                    // Prepare share data - NO IMAGE to ensure k-inov.co.kr link works
+                    // Prepare share data - NO IMAGE to ensure k-inov.co.kr link
+                    // works
                     const shareData = {
                         objectType: 'feed',
                         content: {
@@ -5389,7 +5440,8 @@
                     onmouseover="this.style.color='#333'" onmouseout="this.style.color='#999'">&times;</span>
 
                 <h3 style="margin:0; color:#333;">OMR 마킹 도우미</h3>
-                <p style="font-size:12px; color:#666; margin:5px 0;">화면을 보고 OMR 카드에 색칠하세요.</p>
+                <p style="font-size:12px; color:#666; margin:5px 0;">화면을
+                    보고 OMR 카드에 색칠하세요.</p>
                 <div id="omrGrid" class="omr-grid">
                     <!-- 1-45 generated here -->
                 </div>
@@ -5603,7 +5655,10 @@
                             targetPos = new kakao.maps.LatLng(target.y, target.x);
                         }
                         roadviewClient.getNearestPanoId(targetPos, 50, function (panoId) {
-                            if (panoId === null) { alert('해당 점포는 로드뷰 정보가 없습니다.'); return; }
+                            if (panoId === null) {
+                                alert('해당 점포는 로드뷰 정보가 없습니다.');
+                                return;
+                            }
                             displayRoadview(panoId, targetPos);
                         });
                     });
@@ -5650,7 +5705,8 @@
                 dist = Math.acos(dist);
                 dist = dist * 180 / Math.PI;
                 dist = dist * 60 * 1.1515;
-                dist = dist * 1.609344; // km
+                dist = dist * 1.609344;
+                // km
                 return dist;
             }
         </script>
@@ -5790,7 +5846,8 @@
                 </div>
                 <div id="adminShopList" class="admin-list"></div>
                 <div id="adminLoading" class="admin-loading-overlay">
-                    <div class="spinner" style="border-top-color:red;"></div>
+                    <div class="spinner" style="border-top-color:red;">
+                    </div>
                     <div id="adminLoadingText">처리 중...</div>
                 </div>
             </div>
