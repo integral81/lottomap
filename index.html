@@ -448,7 +448,7 @@
 
         .ai-modal-header {
             flex-shrink: 0;
-            padding: 80px 20px 10px 20px;
+            padding: 50px 20px 10px 20px;
             /* Balanced 20px side padding */
             text-align: center;
             background: transparent;
@@ -478,6 +478,10 @@
         .ai-modal-body {
             flex-grow: 1;
             overflow-y: auto;
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
             scrollbar-gutter: stable;
             /* Prevent lateral shift when scrollbar appears */
             padding: 0 20px 80px 20px;
@@ -490,6 +494,11 @@
             /* Combined properties */
             box-sizing: border-box;
             -webkit-overflow-scrolling: touch;
+        }
+
+        .ai-modal-body::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari, Opera */
         }
 
         .ai-close-btn-fixed {
@@ -564,7 +573,7 @@
                 max-width: 94%;
                 margin: 0 auto;
                 /* Center it */
-                padding: 80px 0 25px 0;
+                padding: 50px 0 25px 0;
                 /* Symmetric sides (0 padding, children handle margins) */
                 /* iPhone 15 Fix (v4): Bottom Sheet Style */
                 max-height: 75dvh;
@@ -577,6 +586,12 @@
                 /* Reset transform if any */
                 transform: none !important;
                 margin-bottom: 0;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .ai-modal-content::-webkit-scrollbar {
+                display: none;
             }
         }
 
@@ -584,10 +599,10 @@
         .zodiac-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 10px;
+            gap: 8px;
+            padding: 5px;
             width: 100%;
-            max-width: 320px;
+            max-width: 300px;
             margin: 0 auto;
         }
 
@@ -595,13 +610,13 @@
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
-            padding: 15px;
+            padding: 8px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .zodiac-item:hover {
@@ -610,11 +625,11 @@
         }
 
         .zodiac-icon {
-            font-size: 40px;
+            font-size: 30px;
         }
 
         .zodiac-name {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             color: white;
         }
