@@ -613,21 +613,26 @@
         @media (max-width: 768px) {
             .zodiac-grid {
                 grid-template-columns: repeat(3, 1fr) !important;
-                gap: 6px !important;
+                gap: 4px !important;
+                /* Reduced gap */
                 padding: 5px !important;
             }
 
             .zodiac-item {
-                padding: 8px !important;
-                gap: 4px !important;
+                padding: 5px !important;
+                /* Reduced padding */
+                gap: 2px !important;
+                /* Reduced gap */
             }
 
             .zodiac-icon {
-                font-size: 28px !important;
+                font-size: 24px !important;
+                /* Reduced icon size */
             }
 
             .zodiac-name {
-                font-size: 11px !important;
+                font-size: 10px !important;
+                /* Reduced text size */
             }
         }
 
@@ -2796,7 +2801,7 @@
                     <!-- Horoscope Select -->
                     <div id="modeHoroscopeSelect" class="input-container" style="display:none;">
                         <h2
-                            style="color:white; font-size:18px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
+                            style="color:white; font-size:18px; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
                             🐅 당신의 띠를 선택하세요
                         </h2>
                         <div class="zodiac-grid">
@@ -2825,7 +2830,7 @@
                             <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
                                     class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
                         </div>
-                        <div style="margin-top:20px;">
+                        <div style="margin-top:10px;">
                             <button class="btn-sm"
                                 style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:15px;"
                                 onclick="resetToModeSelection()">
@@ -4673,7 +4678,7 @@
                         // Label
                         const labelDiv = document.createElement('div');
                         labelDiv.className = 'result-label'; // Add class for mobile layout
-                        labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:16px;">[${label}]</span>`;
+                        labelDiv.innerHTML = `<span style="color:#fae100; font-weight:bold; font-size:6px;">${label}</span>`;
                         // labelDiv.style.minWidth = '50px'; // Removed min-width to reduce gap
                         rowWrapper.appendChild(labelDiv);
 
