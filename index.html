@@ -510,13 +510,21 @@
             font-size: 13px;
             border-radius: 25px;
             /* Fully rounded */
-            margin: 0 auto 20px auto;
-            /* Centered */
+            margin: 0 auto 20px auto !important;
+            /* Forced Centering */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: calc(100% - 50px);
-            /* Match menu width and padding */
-            /* Shorter on right by 1cm */
+            width: calc(100% - 70px) !important;
+            /* Exact match to cards and more inward */
             animation: pulse-soft 2s infinite;
+            display: block;
+        }
+
+        .ai-modal-body {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
 
         @keyframes pulse-soft {
@@ -1509,10 +1517,10 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: calc(100% - 50px);
-            /* Shorter on right by 1cm */
-            margin: 10px auto 0 auto;
-            /* Centered to match Kakao button */
+            width: calc(100% - 70px) !important;
+            /* Exact match to Kakao button */
+            margin: 10px auto 0 auto !important;
+            /* Centered */
         }
 
         /* AI System Card Style */
@@ -1697,7 +1705,9 @@
         /* Input Container for Dream/Zodiac */
         .input-container {
             display: none;
-            width: 100%;
+            width: calc(100% - 70px) !important;
+            /* Exact match */
+            margin: 0 auto !important;
             flex-direction: column;
             align-items: center;
             text-align: center;
@@ -2675,8 +2685,9 @@
                 <!-- Fixed Header -->
                 <div class="ai-modal-header">
                     <span class="ai-close-btn-fixed" onclick="closeModal()">✕</span>
-                    <div class="ai-header-content">
-                        <div class="ai-title" style="font-size:22px; margin-bottom:5px;">✨ AI 로또 분석 시스템</div>
+                    <div class="ai-header-content" style="text-align: center; width: 100%;">
+                        <div class="ai-title" style="font-size:22px; margin-bottom:5px; text-align: center;">✨ AI 로또 분석
+                            시스템</div>
                         <div class="ai-tags">
                             <div class="ai-tag">📈 실시간 분석</div>
                             <div class="ai-tag">🪄 AI 예측</div>
@@ -2775,7 +2786,7 @@
                     <!-- Horoscope Select -->
                     <div id="modeHoroscopeSelect" class="input-container" style="display:none;">
                         <h2
-                            style="color:white; font-size:18px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2);">
+                            style="color:white; font-size:18px; margin-bottom:15px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
                             🐅 당신의 띠를 선택하세요
                         </h2>
                         <div class="zodiac-grid">
