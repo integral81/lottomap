@@ -599,10 +599,10 @@
         .zodiac-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            padding: 5px;
+            gap: 5px;
+            padding: 2px;
             width: 100%;
-            max-width: 300px;
+            max-width: 290px;
             margin: 0 auto;
         }
 
@@ -610,13 +610,13 @@
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
-            padding: 8px;
+            padding: 4px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
         }
 
         .zodiac-item:hover {
@@ -625,11 +625,11 @@
         }
 
         .zodiac-icon {
-            font-size: 30px;
+            font-size: 22px;
         }
 
         .zodiac-name {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: white;
         }
@@ -2870,7 +2870,7 @@
                     <!-- Horoscope Select -->
                     <div id="modeHoroscopeSelect" class="input-container" style="display:none;">
                         <h2
-                            style="color:white; font-size:18px; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
+                            style="color:white; font-size:16px; margin-bottom:5px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
                             🐅 당신의 띠를 선택하세요
                         </h2>
                         <div class="zodiac-grid">
@@ -2899,7 +2899,7 @@
                             <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
                                     class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
                         </div>
-                        <div style="margin-top:10px;">
+                        <div style="margin-top:5px;">
                             <button class="btn-sm"
                                 style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:15px;"
                                 onclick="resetToModeSelection()">
