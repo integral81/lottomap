@@ -537,7 +537,8 @@
             border-radius: 25px;
             margin: 0 0 10px 0 !important;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: 100% !important;
+            width: calc(100% - 10px) !important;
+            /* Finely tuned for padding alignment */
             animation: pulse-soft 2s infinite;
             display: block;
         }
@@ -5231,7 +5232,7 @@
                             const distStr = item.distance < 1 ? Math.round(item.distance * 1000)
                                 + "m" : item.distance.toFixed(1) + "km";
                             msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})"
-                                                    style="cursor:pointer; padding:2px 0; text-decoration:underline;">
+                                                    style="cursor:pointer; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
                                                     ${index + 1}. ${shop.n} (${distStr})</div>`;
                         });
 
