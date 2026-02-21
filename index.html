@@ -446,7 +446,8 @@
 
         .ai-modal-header {
             flex-shrink: 0;
-            padding: 20px 20px 10px 20px;
+            padding: 20px 0 10px 0;
+            /* Sides to 0 */
             text-align: center;
             background: transparent;
             z-index: 10;
@@ -474,8 +475,8 @@
         .ai-modal-body {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 0 15px 80px 15px;
-            /* Bottom padding for scrolling */
+            padding: 0 0 80px 0;
+            /* Sides to 0 for absolute centering of children */
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -513,8 +514,8 @@
             margin: 0 auto 20px auto !important;
             /* Forced Centering */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: calc(100% - 40px) !important;
-            /* Symmetric 20px margins */
+            width: 90% !important;
+            /* Fixed percentage for reliable centering */
             animation: pulse-soft 2s infinite;
             display: block;
         }
@@ -1522,8 +1523,8 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: calc(100% - 40px) !important;
-            /* Symmetric 20px margins */
+            width: 90% !important;
+            /* Match all modal components */
             margin: 10px auto 0 auto !important;
             /* Centered */
         }
@@ -1710,8 +1711,8 @@
         /* Input Container for Dream/Zodiac */
         .input-container {
             display: none;
-            width: calc(100% - 40px) !important;
-            /* Symmetric 20px margins */
+            width: 90% !important;
+            /* Match all modal components */
             margin: 0 auto !important;
             flex-direction: column;
             align-items: center;
@@ -2690,7 +2691,7 @@
                 <!-- Fixed Header -->
                 <div class="ai-modal-header">
                     <span class="ai-close-btn-fixed" onclick="closeModal()">✕</span>
-                    <div class="ai-header-content" style="text-align: center; width: 100%;">
+                    <div class="ai-header-content" style="text-align: center; width: 90%; margin: 0 auto;">
                         <div class="ai-title" style="font-size:22px; margin-bottom:5px; text-align: center;">✨ AI 로또 분석
                             시스템</div>
                         <div class="ai-tags">
