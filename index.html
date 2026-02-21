@@ -5225,15 +5225,12 @@
                             return;
                         }
 
-                        msg = `📍 <strong style="white-space: nowrap;">${label} 주변
-                                                        1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
+                        msg = `📍 <strong style="white-space: nowrap;">${label} 주변 1등점</strong> <br class="mobile-br"> <strong>(가까운 순)</strong><br>`;
                         topShops.forEach((item, index) => {
                             const shop = item.marker.shopData;
                             const distStr = item.distance < 1 ? Math.round(item.distance * 1000)
                                 + "m" : item.distance.toFixed(1) + "km";
-                            msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})"
-                                                    style="cursor:pointer; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
-                                                    ${index + 1}. ${shop.n} (${distStr})</div>`;
+                            msg += `<div onclick="focusShop(${shop.lat}, ${shop.lng})" style="cursor:pointer; padding:6px 0; border-bottom:1px solid rgba(0,0,0,0.05);">${index + 1}. ${shop.n} (${distStr})</div>`;
                         });
 
                         if (shouldPan) {
