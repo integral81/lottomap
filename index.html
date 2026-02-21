@@ -513,8 +513,8 @@
             margin: 0 auto 20px auto !important;
             /* Forced Centering */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: calc(100% - 70px) !important;
-            /* Exact match to cards and more inward */
+            width: calc(100% - 40px) !important;
+            /* Symmetric 20px margins */
             animation: pulse-soft 2s infinite;
             display: block;
         }
@@ -553,7 +553,8 @@
                 max-width: 94%;
                 margin: 0 auto;
                 /* Center it */
-                padding: 25px 20px;
+                padding: 25px 0;
+                /* Symmetric sides (0 padding, children handle margins) */
                 /* iPhone 15 Fix (v4): Bottom Sheet Style */
                 max-height: 75dvh;
                 /* Safe height */
@@ -1482,7 +1483,8 @@
 
                 #adContent,
                 #resultContent {
-                    padding: 15px !important;
+                    padding: 15px 0 !important;
+                    /* Side padding to 0 for perfect symmetry */
                     width: 100% !important;
                     box-sizing: border-box !important;
                     /* Ensure padding doesn't add to width */
@@ -1520,8 +1522,8 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            width: calc(100% - 70px) !important;
-            /* Exact match to Kakao button */
+            width: calc(100% - 40px) !important;
+            /* Symmetric 20px margins */
             margin: 10px auto 0 auto !important;
             /* Centered */
         }
@@ -1708,8 +1710,8 @@
         /* Input Container for Dream/Zodiac */
         .input-container {
             display: none;
-            width: calc(100% - 70px) !important;
-            /* Exact match */
+            width: calc(100% - 40px) !important;
+            /* Symmetric 20px margins */
             margin: 0 auto !important;
             flex-direction: column;
             align-items: center;
