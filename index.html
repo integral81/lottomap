@@ -448,7 +448,7 @@
 
         .ai-modal-header {
             flex-shrink: 0;
-            padding: 50px 20px 10px 20px;
+            padding: 30px 20px 10px 20px;
             /* Balanced 20px side padding */
             text-align: center;
             background: transparent;
@@ -484,7 +484,7 @@
             /* IE and Edge */
             scrollbar-gutter: stable;
             /* Prevent lateral shift when scrollbar appears */
-            padding: 0 20px 80px 20px;
+            padding: 0 20px 40px 20px;
             /* Balanced 20px side padding */
             width: 100%;
             display: flex;
@@ -573,7 +573,7 @@
                 max-width: 94%;
                 margin: 0 auto;
                 /* Center it */
-                padding: 50px 0 25px 0;
+                padding: 30px 0 25px 0;
                 /* Symmetric sides (0 padding, children handle margins) */
                 /* iPhone 15 Fix (v4): Bottom Sheet Style */
                 max-height: 75dvh;
@@ -582,7 +582,7 @@
                 /* Rounded top only */
                 overflow-y: auto;
                 overscroll-behavior: contain;
-                padding-bottom: 80px;
+                padding-bottom: 40px;
                 /* Reset transform if any */
                 transform: none !important;
                 margin-bottom: 0;
@@ -599,10 +599,10 @@
         .zodiac-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            padding: 2px;
+            gap: 3px;
+            padding: 0px;
             width: 100%;
-            max-width: 290px;
+            max-width: 280px;
             margin: 0 auto;
         }
 
@@ -610,13 +610,13 @@
             background: rgba(255, 255, 255, 0.2);
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 12px;
-            padding: 4px;
+            padding: 1px 2px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 0px;
         }
 
         .zodiac-item:hover {
@@ -625,11 +625,11 @@
         }
 
         .zodiac-icon {
-            font-size: 22px;
+            font-size: 16px;
         }
 
         .zodiac-name {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: white;
         }
@@ -2870,7 +2870,7 @@
                     <!-- Horoscope Select -->
                     <div id="modeHoroscopeSelect" class="input-container" style="display:none;">
                         <h2
-                            style="color:white; font-size:16px; margin-bottom:5px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
+                            style="color:white; font-size:14px; margin-bottom:3px; text-shadow:0 1px 2px rgba(0,0,0,0.2); text-align: center; width: 100%;">
                             🐅 당신의 띠를 선택하세요
                         </h2>
                         <div class="zodiac-grid">
@@ -2899,9 +2899,9 @@
                             <div class="zodiac-item" onclick="handleZodiacClick('돼지', '🐷')"><span
                                     class="zodiac-icon">🐷</span><span class="zodiac-name">돼지띠</span></div>
                         </div>
-                        <div style="margin-top:5px;">
+                        <div style="margin-top:3px;">
                             <button class="btn-sm"
-                                style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:15px;"
+                                style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:5px 12px; border-radius:15px; font-size: 12px;"
                                 onclick="resetToModeSelection()">
                                 🔙 뒤로가기
                             </button>
