@@ -513,7 +513,7 @@
             margin: 0 auto 20px 0;
             /* Left aligned, 0 margin on left */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            width: calc(100% - 35px);
+            width: calc(100% - 40px);
             /* Shorter on right by 1cm */
             animation: pulse-soft 2s infinite;
         }
@@ -2700,7 +2700,8 @@
 
                         <div class="selection-menu">
                             <!-- 1. Data Analysis -->
-                            <div class="selection-card" onclick="selectAnalysisMode()">
+                            <div class="selection-card"
+                                onclick="gtag('event', 'click_mode', {'mode_type': 'analysis'}); selectAnalysisMode()">
                                 <div class="selection-icon">📊</div>
                                 <div class="selection-info">
                                     <span class="selection-title">데이터 정밀 분석</span>
@@ -2709,7 +2710,8 @@
                             </div>
 
                             <!-- 2. Dream -->
-                            <div class="selection-card" onclick="selectDreamMode()">
+                            <div class="selection-card"
+                                onclick="gtag('event', 'click_mode', {'mode_type': 'dream'}); selectDreamMode()">
                                 <div class="selection-icon">🌙</div>
                                 <div class="selection-info">
                                     <span class="selection-title">꿈 해몽 번호</span>
@@ -2718,7 +2720,8 @@
                             </div>
 
                             <!-- 3. Horoscope -->
-                            <div class="selection-card" onclick="selectHoroscopeMode()">
+                            <div class="selection-card"
+                                onclick="gtag('event', 'click_mode', {'mode_type': 'horoscope'}); selectHoroscopeMode()">
                                 <div class="selection-icon">🐅</div>
                                 <div class="selection-info">
                                     <span class="selection-title">오늘의 띠별 운세</span>
@@ -2746,6 +2749,7 @@
                             <button class="dream-tag" onclick="handleDreamTag('돼지')">🐷 돼지</button>
                             <button class="dream-tag" onclick="handleDreamTag('똥')">💩 똥</button>
                             <button class="dream-tag" onclick="handleDreamTag('조상')">👴 조상</button>
+                            <div style="flex-basis: 100%; height: 0;"></div> <!-- 줄바꿈 처리 -->
                             <button class="dream-tag" onclick="handleDreamTag('불')">🔥 불</button>
                             <button class="dream-tag" onclick="handleDreamTag('물')">💧 물</button>
                             <button class="dream-tag" onclick="handleDreamTag('뱀')">🐍 뱀</button>
@@ -2834,11 +2838,13 @@
                         🚗 지금 당장 사러 가기 (길찾기)
                     </button>
                 </div>
-                <button class="btn-sm"
-                    style="display:block; margin:20px auto 0; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); padding:8px 25px; border-radius:20px; color:white;"
-                    onclick="closeModal()">
-                    닫기
-                </button>
+                <div style="margin-top:20px; text-align:center;">
+                    <button class="btn-sm"
+                        style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 15px; border-radius:15px;"
+                        onclick="resetToModeSelection()">
+                        🔙 뒤로가기
+                    </button>
+                </div>
             </div>
         </div>
         <!-- end ad-content -->
@@ -4275,6 +4281,9 @@
             function resetToModeSelection() {
                 document.getElementById('modeDreamInput').style.display = 'none';
                 document.getElementById('modeHoroscopeSelect').style.display = 'none';
+                if (document.getElementById('analysisLoading')) document.getElementById('analysisLoading').style.display = 'none';
+                document.getElementById('resultContent').style.display = 'none';
+                document.getElementById('adContent').style.display = 'flex';
                 document.getElementById('modeSelection').style.display = 'block';
             }
 
