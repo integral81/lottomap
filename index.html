@@ -9892,21 +9892,18 @@
                     margin-top: 5px !important;
                 }
 
-                /* Step 6: Final AI Recommendation Optimization */
+                /* Step 6: AI Matrix is the HIGHLIGHT — maximize its space */
                 #naviStep6 h2 {
                     font-size: 14.04px !important;
-                    /* 60% of 23.4px */
                     margin-top: 5px !important;
                     margin-bottom: 5px !important;
                 }
 
                 .step6-status-bar {
                     width: 190px !important;
-                    /* 70% of approx 270px original */
                     padding: 6px 10px !important;
                     gap: 4px !important;
                     margin-bottom: 17px !important;
-                    /* 12px + 5px extra gap */
                 }
 
                 .step6-slot {
@@ -9919,52 +9916,64 @@
                     font-size: 12px !important;
                 }
 
+                /* Key: Matrix gets 75%, result panel gets 25% */
                 .step6-main-layout {
-                    gap: 5px !important;
+                    gap: 4px !important;
                     margin-top: 0 !important;
+                    align-items: center !important;
                 }
 
                 .step6-matrix-wrapper {
-                    flex: 0 0 60% !important;
-                    max-width: 60% !important;
-                    padding: 6px 4px !important;
+                    flex: 0 0 73% !important;
+                    max-width: 73% !important;
+                    padding: 8px 6px !important;
                 }
 
                 .step6-matrix {
+                    display: grid !important;
+                    grid-template-columns: repeat(7, 1fr) !important;
                     gap: 3px !important;
                 }
 
+                /* Cell size derived from container — let grid handle width */
                 .step6-cell {
-                    font-size: 9px !important;
-                    border-radius: 4px !important;
-                    height: 24px !important;
-                    /* Fixed height to ensure fit */
+                    font-size: 10px !important;
+                    border-radius: 5px !important;
+                    aspect-ratio: 1 !important;
+                    height: auto !important;
+                    min-width: 0 !important;
+                    width: 100% !important;
                 }
 
                 .step6-matrix-label {
-                    font-size: 8px !important;
-                    letter-spacing: 1px !important;
-                    margin-bottom: 6px !important;
+                    font-size: 7.5px !important;
+                    letter-spacing: 0.5px !important;
+                    margin-bottom: 5px !important;
                 }
 
+                /* Result panel: minimal, compact */
                 .step6-result-wrapper {
                     flex: 1 !important;
-                    gap: 5px !important;
+                    gap: 4px !important;
+                    min-width: 0 !important;
                 }
 
                 .step6-result-box {
-                    width: 70px !important;
-                    height: 70px !important;
-                    border-radius: 12px !important;
+                    width: 52px !important;
+                    height: 52px !important;
+                    border-radius: 10px !important;
                 }
 
                 .step6-result-box .result-number {
-                    font-size: 30px !important;
+                    font-size: 22px !important;
                 }
 
                 .step6-result-sublabel,
                 .step6-result-caption {
-                    font-size: 9px !important;
+                    font-size: 8px !important;
+                    letter-spacing: 1px !important;
+                    text-align: center !important;
+                    word-break: keep-all !important;
                 }
             }
 
