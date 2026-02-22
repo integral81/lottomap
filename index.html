@@ -6013,8 +6013,8 @@
                         <!-- Step 3: Balance (KINOV AI Precision) -->
                         <div class="navi-step-container" id="naviStep3">
                             <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23.4px; opacity:0.8;"><span
-                                    style="color:var(--secondary);">Step 3.</span> 조화의 저울 (홀수 : 짝수의 비율)</h2>
-                            <div class="battle-theme-text"
+                                    style="color:var(--secondary);">Step 3.</span> 조화의 저울(홀수:짝수)</h2>
+                            <div class="battle-theme-text" id="step3Subtitle"
                                 style="text-align: center; font-size:18px; margin: 19px 0 5px 0;">
                                 확률의 균형을 설계하라.
                             </div>
@@ -9525,8 +9525,8 @@
                 }
 
                 .admin-header {
-                    padding: 10.5px 20px !important;
-                    /* [요청] Header 길이(높이) 3px 연장 (기존 9px -> 10.5px 시 +3px 효과) */
+                    padding: 11px 20px !important;
+                    /* [요청] Header 길이(높이) 1px 추가 (기존 10.5px -> 11px 시 +1px 효과) */
                 }
 
                 /* 2. Global Scaling & Body Compression */
@@ -9701,6 +9701,63 @@
                     height: 24px !important;
                     /* 60% approx */
                     margin-bottom: 10px !important;
+                }
+
+                /* Step 3: Balance Scale (Odd/Even) Optimization */
+                #naviStep3 h2 {
+                    margin-top: 2px !important;
+                    margin-bottom: 8px !important;
+                    font-size: 15.2px !important;
+                    /* 65% of 23.4px */
+                    opacity: 0.9 !important;
+                    letter-spacing: -1px !important;
+                }
+
+                #step3Subtitle {
+                    display: none !important;
+                    /* 불필요문구 삭제 */
+                }
+
+                .balance-container {
+                    padding: 10px 20px !important;
+                    width: 85% !important;
+                }
+
+                .balance-container>div:first-child {
+                    font-size: 9px !important;
+                    /* 50% of 18px */
+                }
+
+                #balanceScoreText {
+                    font-size: 12px !important;
+                    /* 50% of 24px */
+                }
+
+                .neon-slider {
+                    height: 7.5px !important;
+                    /* 50% size */
+                    margin: 15px 0 !important;
+                }
+
+                .neon-slider::-webkit-slider-thumb {
+                    width: 19px !important;
+                    /* 50% of 38px */
+                    height: 19px !important;
+                    border-width: 1.5px !important;
+                }
+
+                #fingerPointerStep3 {
+                    font-size: 20px !important;
+                    /* 50% of 40px */
+                }
+
+                #fingerPointerWrapStep3 {
+                    height: 18px !important;
+                }
+
+                /* 2번째 검정박스 아래 손가락 삭제 */
+                #fingerPointerWrapStep3Balls {
+                    display: none !important;
                 }
 
                 .hologram-chart {
