@@ -9520,15 +9520,18 @@
                 }
 
                 .battle-side {
-                    padding: 12px 6px;
-                    /* Tighter padding for horizontal space */
+                    padding: 10px 4px;
+                    /* Minimal padding for maximum content space */
                     box-sizing: border-box;
                     /* Ensure padding doesn't push width beyond container */
+                    min-height: 200px;
+                    /* Reduced min-height for stacked layout */
                 }
 
                 /* Text Overrides: Hide PC text and inject concise mobile text */
                 .battle-theme-text {
-                    font-size: 18px !important;
+                    font-size: 16px !important;
+                    /* Slightly smaller for mobile comfort */
                     visibility: hidden;
                     height: 24px;
                     position: relative;
@@ -9545,11 +9548,16 @@
                 }
 
                 .battle-title {
-                    font-size: 12px;
-                    margin-bottom: 3px;
+                    font-size: 11px;
+                    /* Scaled down further */
+                    margin-bottom: 8px;
                     visibility: hidden;
                     position: relative;
-                    height: 18px;
+                    height: 28px;
+                    /* Increased height for 2 lines */
+                    white-space: pre;
+                    /* Enable newline support (\A) */
+                    line-height: 1.2;
                 }
 
                 .battle-title::before {
@@ -9561,11 +9569,11 @@
                 }
 
                 .side-left .battle-title::before {
-                    content: '지난주 이월수';
+                    content: '지난주\A이월수';
                 }
 
                 .side-right .battle-title::before {
-                    content: '지난주 이웃수';
+                    content: '지난주\A이웃수';
                 }
 
                 .battle-subtitle {
@@ -9573,9 +9581,20 @@
                     /* Hide redundant descriptive text */
                 }
 
+                /* Vertical Ball Stacking */
                 .battle-ball-grid {
-                    gap: 6px;
-                    /* Tighten ball spacing */
+                    flex-direction: column;
+                    /* Stack balls vertically */
+                    gap: 8px;
+                    z-index: 2;
+                }
+
+                /* Scale down ball size if they are still too large */
+                .battle-ball-grid .mini-ball {
+                    width: 38px;
+                    /* Slightly larger than PC mini-ball but smaller than default PC battle balls */
+                    height: 38px;
+                    font-size: 15px;
                 }
             }
 
