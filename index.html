@@ -9244,8 +9244,8 @@
 
             .step6-matrix {
                 display: grid;
-                grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: repeat(2, 1fr);
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: repeat(3, 1fr);
                 gap: 6px;
             }
 
@@ -9931,13 +9931,14 @@
 
                 .step6-matrix {
                     display: grid !important;
-                    grid-template-columns: repeat(7, 1fr) !important;
-                    gap: 3px !important;
+                    grid-template-columns: repeat(5, 1fr) !important;
+                    grid-template-rows: repeat(3, 1fr) !important;
+                    gap: 4px !important;
                 }
 
-                /* Cell size derived from container — let grid handle width */
+                /* Cell: 3x5 grid — cells are now wider, numbers fit nicely */
                 .step6-cell {
-                    font-size: 10px !important;
+                    font-size: 11px !important;
                     border-radius: 5px !important;
                     aspect-ratio: 1 !important;
                     height: auto !important;
