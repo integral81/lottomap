@@ -9512,28 +9512,35 @@
             /* ============================================================ */
             @media (max-width: 768px) {
 
+                /* General Step Layout Compression for Step 1 */
+                #naviStep1 h2 {
+                    margin-top: 5px !important;
+                    margin-bottom: 2px !important;
+                }
+
                 /* Step 1: Battle UI Optimization */
                 .battle-container {
                     gap: 8px;
                     /* Use narrow gap to fit two cards */
-                    margin-top: 15px;
+                    margin-top: 5px;
+                    /* Reduced from 15px */
                 }
 
                 .battle-side {
-                    padding: 10px 4px;
-                    /* Minimal padding for maximum content space */
+                    padding: 8px 4px;
+                    /* Even tighter padding to save space */
                     box-sizing: border-box;
                     /* Ensure padding doesn't push width beyond container */
-                    min-height: 200px;
-                    /* Reduced min-height for stacked layout */
+                    min-height: 180px;
+                    /* Reduced min-height to fit button in viewport */
                 }
 
                 /* Text Overrides: Hide PC text and inject concise mobile text */
                 .battle-theme-text {
                     font-size: 16px !important;
-                    /* Slightly smaller for mobile comfort */
+                    margin-bottom: 5px !important;
                     visibility: hidden;
-                    height: 24px;
+                    height: 20px;
                     position: relative;
                 }
 
@@ -9545,19 +9552,21 @@
                     right: 0;
                     font-weight: 900;
                     color: #d32f2f;
+                    text-align: center;
                 }
 
                 .battle-title {
                     font-size: 11px;
-                    /* Scaled down further */
                     margin-bottom: 8px;
                     visibility: hidden;
                     position: relative;
                     height: 28px;
-                    /* Increased height for 2 lines */
+                    /* Support 2 lines */
                     white-space: pre;
-                    /* Enable newline support (\A) */
                     line-height: 1.2;
+                    width: 100%;
+                    text-align: center;
+                    /* Ensure horizontal centering */
                 }
 
                 .battle-title::before {
@@ -9566,6 +9575,10 @@
                     left: 0;
                     right: 0;
                     font-weight: 900;
+                    display: block;
+                    width: 100%;
+                    text-align: center;
+                    /* Center the multi-line injected text */
                 }
 
                 .side-left .battle-title::before {
@@ -9578,23 +9591,23 @@
 
                 .battle-subtitle {
                     display: none;
-                    /* Hide redundant descriptive text */
+                    /* Hide for space */
                 }
 
                 /* Vertical Ball Stacking */
                 .battle-ball-grid {
                     flex-direction: column;
                     /* Stack balls vertically */
-                    gap: 8px;
+                    gap: 6px;
                     z-index: 2;
                 }
 
-                /* Scale down ball size if they are still too large */
+                /* Scale down ball size to save vertical space */
                 .battle-ball-grid .mini-ball {
-                    width: 38px;
-                    /* Slightly larger than PC mini-ball but smaller than default PC battle balls */
-                    height: 38px;
-                    font-size: 15px;
+                    width: 36px;
+                    /* Slightly smaller for vertical fit */
+                    height: 36px;
+                    font-size: 14px;
                 }
             }
 
