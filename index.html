@@ -6207,7 +6207,7 @@
                                 <!-- 왼쪽 방향 손가락 프롬프트 -->
                                 <div class="finger-prompt-step5" id="step5FingerPrompt">
                                     <span class="finger-prompt-text">번호를 골라주세요!</span>
-                                    <img src="left_finger.jpg" alt="point left">
+                                    <img src="left_finger.png" alt="point left">
                                 </div>
                             </div>
                         </div>
@@ -8848,7 +8848,8 @@
             .finger-prompt-step5 {
                 position: absolute;
                 bottom: -15px;
-                left: 17%;
+                left: 25%;
+                /* 우측으로 좀 더 이동 (17% -> 25%) */
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -8861,6 +8862,8 @@
                 width: 50px;
                 height: auto;
                 filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.5));
+                mix-blend-mode: multiply;
+                /* JPG 배경인 경우 대비 */
             }
 
             .finger-prompt-text {
