@@ -5924,7 +5924,22 @@
                             <h3 style="margin:0; font-size: 18px;">🧭 로또 Navi by Kinov Ai</h3>
                             <p style="margin: 2px 0 0 0; font-size: 12px; opacity: 0.8;">1~1211회차 데이터를 분석한 번호 추천</p>
                         </div>
-                        <span style="font-size:24px; cursor:pointer;" onclick="closeNaviModal()">&times;</span>
+                        <button onclick="closeNaviModal()" style="
+                            position:absolute; top:12px; right:14px;
+                            width:32px; height:32px;
+                            background: rgba(255,255,255,0.22);
+                            border: 2px solid rgba(255,255,255,0.55);
+                            border-radius: 50%;
+                            color: #ffffff;
+                            font-size: 18px;
+                            font-weight: 900;
+                            line-height: 1;
+                            cursor: pointer;
+                            display: flex; align-items: center; justify-content: center;
+                            transition: background 0.2s, transform 0.15s;
+                            "
+                            onmouseover="this.style.background='rgba(239,68,68,0.85)'; this.style.transform='scale(1.12)';"
+                            onmouseout="this.style.background='rgba(255,255,255,0.22)'; this.style.transform='scale(1)';">✕</button>
                     </div>
                 </div>
 
