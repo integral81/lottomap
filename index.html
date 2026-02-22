@@ -6071,8 +6071,8 @@
                                 <!-- 손가락 포인터 (공 선택시 이동) -->
                                 <div id="fingerPointerWrapStep3Balls"
                                     style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px; opacity:0; pointer-events:none; transition:opacity 0.3s;">
-                                    <img id="fingerPointerStep3Balls" src="up_finger.jpg" alt="select"
-                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%); mix-blend-mode: multiply;">
+                                    <img id="fingerPointerStep3Balls" src="left_finger.png" alt="select"
+                                        style="width:54px; height:54px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:-10px; left:50%; transform:translateX(-50%) rotate(90deg);">
                                 </div>
                                 <div class="result-footer" style="margin-top: 5px; font-size: 9px; opacity: 0.8;">
                                     사용자 선택(<span id="step3FixedCount">0</span>) + AI 추천(<span
@@ -6151,8 +6151,8 @@
                                 <!-- 손가락 포인터 (선택시 이동) -->
                                 <div id="fingerPointerWrap"
                                     style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px;">
-                                    <img id="fingerPointer" src="up_finger.jpg" alt="select"
-                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%); mix-blend-mode: multiply;">
+                                    <img id="fingerPointer" src="left_finger.png" alt="select"
+                                        style="width:54px; height:54px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:-10px; left:50%; transform:translateX(-50%) rotate(90deg);">
                                 </div>
 
                                 <!-- Candidate Grid -->
@@ -8848,8 +8848,7 @@
             .finger-prompt-step5 {
                 position: absolute;
                 bottom: -15px;
-                left: 25%;
-                /* 우측으로 좀 더 이동 (17% -> 25%) */
+                left: 30%;
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -8862,8 +8861,6 @@
                 width: 50px;
                 height: auto;
                 filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.5));
-                mix-blend-mode: multiply;
-                /* JPG 배경인 경우 대비 */
             }
 
             .finger-prompt-text {
