@@ -36,8 +36,9 @@
     <link rel="preload" href="assets/markers/tier4.png" as="image">
 
     <!-- Lotto Navi Data & Engine -->
-    <script src="lotto_history_data.js?v=20260222-2"></script>
-    <script src="lotto_navi.js?v=20260222-2"></script>
+    <script src="lotto_data.js?v=20260222-3"></script>
+    <script src="lotto_history_data.js?v=20260222-3"></script>
+    <script src="lotto_navi.js?v=20260222-3"></script>
 
     <meta name="description" content="전국 로또 1등 당첨 판매점을 지도에서 한눈에 확인하세요. 내 주변 명당 찾기, 로또 번호 무료 추천 서비스 제공.">
     <meta name="keywords" content="로또, 로또명당, 로또지도, 로또1등, 로또당첨번호, 로또판매점, KINOV">
@@ -105,7 +106,6 @@
         onerror="handleScriptError()"></script>
     <!-- Kakao SDK for Sharing -->
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" onload="initKakaoGlobal()"></script>
-    <script src="lotto_navi.js"></script>
     <style>
         :root {
             --primary: #d32f2f;
@@ -6341,10 +6341,13 @@
             async function toggleNaviMode() {
                 if (!naviEngine) {
                     try {
-                        if (typeof LOTTO_HISTORY !== 'undefined') {
-                            naviEngine = new LottoNaviEngine(LOTTO_HISTORY);
+                        // Support both static script load (LOTTO_HISTORY) and dynamic fetch loader (window.lottoHistory)
+                        const historyData = (typeof LOTTO_HISTORY !== 'undefined') ? LOTTO_HISTORY : window.lottoHistory;
+
+                        if (historyData) {
+                            naviEngine = new LottoNaviEngine(historyData);
                         } else {
-                            throw new Error('데이터가 정의되지 않았습니다');
+                            throw new Error('데이터 원본을 찾을 수 없습니다.');
                         }
                     } catch (err) {
                         alert('데이터 로드 실패: ' + err.message);
