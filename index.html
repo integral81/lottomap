@@ -9521,71 +9521,48 @@
                     padding: 10px 20px !important;
                 }
 
-                /* Reduce header height */
-
-                /* 2. Global Scaling (Content Below Header @ 90% then specific elements @ 80/70/60%) */
+                /* 2. Global Scaling (Content Below Header @ 90%) */
                 #naviStepsBody {
                     font-size: 90% !important;
-                    padding: 2px 15px !important;
-                    /* Reduced padding further */
+                    padding: 5px 15px !important;
                 }
 
-                /* 2. Combination Count (80%) */
+                /* [요청] 조합 수: 현재 대비 1.1배 (이전 80% -> 88%) */
                 #naviComboCounter {
-                    font-size: 80% !important;
+                    font-size: 17px !important;
                     margin-bottom: 2px !important;
                 }
 
-                /* 3. Step 1 Title (70%) */
+                /* [요청] Step 1 타이틀: 현재 대비 1.1배 (이전 70% -> 77%) */
                 #naviStep1 h2 {
-                    margin-top: 2px !important;
-                    margin-bottom: 2px !important;
-                    font-size: 15.5px !important;
-                    /* ~70% of original 22.2px */
+                    margin-top: 5px !important;
+                    margin-bottom: 5px !important;
+                    font-size: 17.5px !important;
                     opacity: 0.9 !important;
                 }
 
                 /* Step 1: Battle UI Optimization */
                 .battle-container {
-                    gap: 4px;
-                    margin-top: 2px;
+                    gap: 15px;
+                    margin-top: 10px;
+                    min-height: auto;
                 }
 
                 .battle-side {
-                    padding: 4px 2px;
+                    padding: 10px 2px;
                     box-sizing: border-box;
-                    min-height: 140px;
-                    /* Compress height to show button */
+                    min-height: 180px;
                 }
 
-                /* Text Overrides: Hide PC text and inject concise mobile text */
-                .battle-theme-text {
-                    font-size: 14px !important;
-                    margin-bottom: 2px !important;
-                    visibility: hidden;
-                    height: 18px;
-                    position: relative;
-                }
-
-                .battle-theme-text::before {
-                    content: '이월수 vs 이웃수';
-                    visibility: visible;
-                    position: absolute;
-                    left: 0;
-                    right: 0;
-                    font-weight: 900;
-                    color: #d32f2f;
-                    text-align: center;
-                }
-
+                /* [요청] 측면 타이틀: 90% 크기 조정 (줄바꿈 유지) */
                 .battle-title {
-                    font-size: 10px;
-                    margin-bottom: 4px;
+                    font-size: 12.5px !important;
+                    margin-bottom: 15px;
                     visibility: hidden;
                     position: relative;
-                    height: 24px;
+                    height: 32px;
                     white-space: pre;
-                    line-height: 1.1;
+                    line-height: 1.25;
                     width: 100%;
                     text-align: center;
                 }
@@ -9613,32 +9590,39 @@
                     display: none;
                 }
 
+                .battle-theme-text {
+                    font-size: 15px !important;
+                    margin-top: 5px !important;
+                    margin-bottom: 10px !important;
+                }
+
                 /* Vertical Ball Stacking */
                 .battle-ball-grid {
                     flex-direction: column;
-                    gap: 3px;
+                    gap: 10px;
                     z-index: 2;
                 }
 
-                /* 4. Original Balls (70%) */
-                /* Current mobile 32px * 0.7 = ~22px */
-                .battle-ball-grid .mini-ball {
-                    width: 22px !important;
-                    height: 22px !important;
-                    font-size: 11px !important;
+                /* [요청/수정] 추천번호 공 크기: 70% (42px) 로 정확히 타겟팅 */
+                .navi-ball-btn.battle-ball {
+                    width: 42px !important;
+                    height: 42px !important;
+                    font-size: 18px !important;
+                    border-width: 2px !important;
                 }
 
-                /* 5. Next Step Button (60%) */
+                /* [요청] 다음 단계 버튼: 현재 대비 1.2배 (이전 60% -> 72%) */
                 #naviNextBtn {
-                    font-size: 60% !important;
-                    padding: 6px 18px !important;
+                    font-size: 13.5px !important;
+                    padding: 12px 28px !important;
                     height: auto !important;
-                    border-radius: 6px !important;
+                    border-radius: 10px !important;
+                    font-weight: 900 !important;
                 }
 
                 #naviPrevBtn {
-                    font-size: 60% !important;
-                    padding: 6px 12px !important;
+                    font-size: 12px !important;
+                    padding: 10px 15px !important;
                 }
             }
 
