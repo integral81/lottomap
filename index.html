@@ -9506,6 +9506,50 @@
                     opacity: 1;
                 }
             }
+
+            /* ============================================================ */
+            /* MOBILE ONLY START (Optimizing for iPhone 15 & Small Screens) */
+            /* ============================================================ */
+            @media (max-width: 768px) {
+
+                /* Step 1: Battle UI Optimization */
+                .battle-container {
+                    gap: 8px;
+                    /* Use narrow gap to fit two cards */
+                    margin-top: 15px;
+                }
+
+                .battle-side {
+                    padding: 12px 6px;
+                    /* Tighter padding for horizontal space */
+                    box-sizing: border-box;
+                    /* Ensure padding doesn't push width beyond container */
+                }
+
+                .battle-title {
+                    font-size: 12px;
+                    margin-bottom: 3px;
+                }
+
+                .battle-subtitle {
+                    font-size: 10px;
+                    margin-bottom: 15px;
+                }
+
+                .battle-ball-grid {
+                    gap: 6px;
+                    /* Tighten ball spacing */
+                }
+
+                .battle-theme-text {
+                    font-size: 18px !important;
+                    /* Override inline style with specificity */
+                }
+            }
+
+            /* ============================================================ */
+            /* MOBILE ONLY END                                              */
+            /* ============================================================ */
         </style>
     </div> <!-- Close #app -->
 </body>
