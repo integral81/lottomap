@@ -6204,6 +6204,11 @@
                                         최종6단계는 KINOV AI가 선택드립니다!!
                                     </div>
                                 </div>
+                                <!-- 왼쪽 방향 손가락 프롬프트 -->
+                                <div class="finger-prompt-step5" id="step5FingerPrompt">
+                                    <span class="finger-prompt-text">번호를 골라주세요!</span>
+                                    <img src="left_finger.jpg" alt="point left">
+                                </div>
                             </div>
                         </div>
 
@@ -7004,6 +7009,9 @@
                 if (probTxt) probTxt.innerText = '0%';
                 if (complMsg) complMsg.style.display = 'none';
 
+                const fingerPrompt = document.getElementById('step5FingerPrompt');
+                if (fingerPrompt) fingerPrompt.style.display = 'flex';
+
                 // Rule 1: Exclude Step 1~4 numbers
                 const confirmed = [
                     ...(naviSelections.step1 || []),
@@ -7048,6 +7056,9 @@
 
                 // Show completion message & enable next button (no auto-transition)
                 document.getElementById('step5CompletionMsg').style.display = 'block';
+                const fingerPrompt = document.getElementById('step5FingerPrompt');
+                if (fingerPrompt) fingerPrompt.style.display = 'none';
+
                 document.getElementById('naviNextBtn').disabled = false;
                 document.getElementById('naviNextBtn').style.opacity = '1';
             }
@@ -8803,6 +8814,50 @@
                 color: #cbd5e1;
                 font-style: italic;
                 opacity: 0.9;
+            }
+
+            /* Step 5: Blinking Finger Animation */
+            @keyframes leftFingerBlink {
+                0% {
+                    opacity: 0;
+                    transform: translateX(10px) scale(0.95);
+                }
+
+                50% {
+                    opacity: 1;
+                    transform: translateX(0) scale(1.05);
+                }
+
+                100% {
+                    opacity: 0;
+                    transform: translateX(10px) scale(0.95);
+                }
+            }
+
+            .finger-prompt-step5 {
+                position: absolute;
+                bottom: -15px;
+                left: 17%;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                animation: leftFingerBlink 1.5s ease-in-out infinite;
+                pointer-events: none;
+                z-index: 100;
+            }
+
+            .finger-prompt-step5 img {
+                width: 50px;
+                height: auto;
+                filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.5));
+            }
+
+            .finger-prompt-text {
+                color: #4ade80;
+                font-weight: 900;
+                font-size: 14px;
+                text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+                white-space: nowrap;
             }
 
             .probability-container {
