@@ -1,9 +1,17 @@
-# Lotto Shop Verification Progress
+# 다음 세션 시작 가이드
 
-## Current Status
-- **Last Processed Index**: 501 (COMPLETED)
-- **Status**: All shops in `suspects_to_verify.txt` have been verified.
-- **Results Stored In**: `double_check_results.json`
+사용자님의 휴식 이후 업무 재개를 위해 현재 상태와 다음 단계를 기록합니다.
 
-## Summary
-The systematic verification of 501 lottery shops has been completed. Each shop was checked for its operational status (OPEN/CLOSED/RELOCATED) using web searches. The verified information, along with relevant comments, has been recorded in the results file.
+## 시스템 현재 상태
+- **소스 코드**: 아이폰 15 최적화 이전의 가장 안정적인 상태(`0401fac`)로 원복 완료.
+- **PC 레이아웃**: 원래의 720px 너비 가로형 레이아웃 100% 보존됨.
+- **모바일**: 기본적인 반응형만 적용된 상태 (특수 최적화 제거됨).
+
+## 🚩 다음 업무 시작 (Reminder)
+사용차님이 돌아오시면 다음 사항부터 시작해야 한다고 알려드릴 예정입니다:
+> **"사용자님, 이제 로또 네비(Navi) 모바일 최적화를 진행할 차례입니다."**
+
+## 향후 주의 사항
+- PC 레이아웃(노트북 작업 결과물)은 절대 침범하지 말 것.
+- 모든 모바일 스타일은 `@media (max-width: 768px)` 내부로 완벽 격리할 것.
+- Step 2 캡슐 겹침 문제는 PC 버전 수정 없이 모바일 미디어 쿼리 내에서 요소 크기만 정밀 축소할 것.
