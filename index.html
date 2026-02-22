@@ -6115,7 +6115,7 @@
                                 <!-- Premium Regression Cards -->
                                 <div class="regression-card-container"
                                     style="display: flex; justify-content: center; gap: 20px; width: 100%; perspective: 1000px; padding: 9px 0;">
-                                    <div class="reg-card-3d gold" id="regCard7" onclick="selectRegression(7)">
+                                    <div class="reg-card-3d gold active" id="regCard7" onclick="selectRegression(7)">
                                         <div class="bell-jar">
                                             <div class="jar-glass"></div>
                                             <div class="jar-dust"></div>
@@ -6124,7 +6124,7 @@
                                         </div>
                                         <div class="reg-card-label">7 WEEKS</div>
                                     </div>
-                                    <div class="reg-card-3d cyan active" id="regCard15" onclick="selectRegression(15)">
+                                    <div class="reg-card-3d cyan" id="regCard15" onclick="selectRegression(15)">
                                         <div class="bell-jar">
                                             <div class="jar-glass"></div>
                                             <div class="jar-dust"></div>
@@ -6974,8 +6974,8 @@
                 document.getElementById('naviNextBtn').disabled = true;
                 document.getElementById('naviNextBtn').style.opacity = '0.5';
 
-                // Default: 15 WEEKS 자동 선택
-                setTimeout(() => selectRegression(15), 50);
+                // Default: 7 WEEKS 자동 선택
+                setTimeout(() => selectRegression(7), 50);
             }
 
             function selectRegression(cycle) {
@@ -9837,7 +9837,7 @@
                 }
 
                 #regCumulativeStatus::before {
-                    content: '앞당첨번호: ';
+                    content: '앞번호: ';
                 }
 
                 .cumulative-status {
@@ -9879,8 +9879,8 @@
 
                 .reg-card-3d {
                     width: 60px !important;
-                    height: 95px !important;
-                    /* [요청] 높이 축소하여 밀착 */
+                    height: 123.5px !important;
+                    /* [요청] 1.3배 확대 */
                 }
 
                 .reg-card-3d .bell-jar {
@@ -9895,13 +9895,13 @@
 
                 #fingerPointer {
                     font-size: 30px !important;
-                    top: -25px !important;
-                    /* [요청] 손가락 강제 끌어올림 (핵심 중의 핵심) */
+                    top: -45px !important;
+                    /* [요청] 7 weeks 바로 아래 밀착 */
                 }
 
                 #fingerPointerWrap {
                     height: 20px !important;
-                    margin-top: -55px !important;
+                    margin-top: -65px !important;
                     /* 마진으로 상단과 더욱 밀착 */
                 }
 
