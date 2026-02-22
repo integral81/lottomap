@@ -9526,24 +9526,56 @@
                     /* Ensure padding doesn't push width beyond container */
                 }
 
+                /* Text Overrides: Hide PC text and inject concise mobile text */
+                .battle-theme-text {
+                    font-size: 18px !important;
+                    visibility: hidden;
+                    height: 24px;
+                    position: relative;
+                }
+
+                .battle-theme-text::before {
+                    content: '이월수 vs 이웃수';
+                    visibility: visible;
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    font-weight: 900;
+                    color: #d32f2f;
+                }
+
                 .battle-title {
                     font-size: 12px;
                     margin-bottom: 3px;
+                    visibility: hidden;
+                    position: relative;
+                    height: 18px;
+                }
+
+                .battle-title::before {
+                    visibility: visible;
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    font-weight: 900;
+                }
+
+                .side-left .battle-title::before {
+                    content: '지난주 이월수';
+                }
+
+                .side-right .battle-title::before {
+                    content: '지난주 이웃수';
                 }
 
                 .battle-subtitle {
-                    font-size: 10px;
-                    margin-bottom: 15px;
+                    display: none;
+                    /* Hide redundant descriptive text */
                 }
 
                 .battle-ball-grid {
                     gap: 6px;
                     /* Tighten ball spacing */
-                }
-
-                .battle-theme-text {
-                    font-size: 18px !important;
-                    /* Override inline style with specificity */
                 }
             }
 
