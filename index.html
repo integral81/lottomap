@@ -9849,11 +9849,12 @@
 
                 .fixed-num-tag,
                 .fixed-num-empty {
-                    width: 21.1px !important;
-                    height: 21.1px !important;
-                    font-size: 10.6px !important;
+                    width: 23.2px !important;
+                    /* [요청] 1.1배 확대 (21.1px -> 23.2px) */
+                    height: 23.2px !important;
+                    font-size: 11.6px !important;
                     margin: 0 2px !important;
-                    border-width: 1px !important;
+                    border-width: 1.2px !important;
                 }
 
                 #regInstructionText {
@@ -9865,23 +9866,27 @@
                 }
 
                 #regCycleBadge span {
-                    font-size: 10.8px !important;
-                    letter-spacing: 1px !important;
+                    font-size: 13px !important;
+                    /* [요청] 1.2배 확대 (10.8px -> 13px) */
+                    letter-spacing: 0.5px !important;
                 }
 
                 .regression-layout {
-                    gap: 5px !important;
-                    /* [요청] 캡슐과 손가락 사이 공백 단축 (20px -> 5px) */
+                    gap: 0px !important;
+                    /* [요청] 간격 제거 및 밀착 */
+                    margin-top: -10px !important;
                 }
 
                 .reg-card-3d {
                     width: 60px !important;
-                    height: 126px !important;
+                    height: 95px !important;
+                    /* [요청] 높이 축소하여 밀착 */
                 }
 
                 .reg-card-3d .bell-jar {
                     transform: scale(0.6) !important;
-                    margin-bottom: -15px !important;
+                    margin-bottom: -28px !important;
+                    /* 내부 요소 더 위로 */
                 }
 
                 .reg-card-label {
@@ -9889,12 +9894,15 @@
                 }
 
                 #fingerPointer {
-                    font-size: 25.8px !important;
+                    font-size: 30px !important;
+                    top: -25px !important;
+                    /* [요청] 손가락 강제 끌어올림 (핵심 중의 핵심) */
                 }
 
                 #fingerPointerWrap {
-                    height: 30px !important;
-                    /* [요청] 공백 단축 반영 (35px -> 30px) */
+                    height: 20px !important;
+                    margin-top: -55px !important;
+                    /* 마진으로 상단과 더욱 밀착 */
                 }
 
                 .candidate-grid {
