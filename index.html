@@ -6035,8 +6035,8 @@
                                 <!-- 손가락 포인터 (슬라이더 연동) -->
                                 <div id="fingerPointerWrapStep3"
                                     style="position:relative; height:35px; width:100%; margin-top:-4px;">
-                                    <img id="fingerPointerStep3" src="up_finger.jpg" alt="select"
-                                        style="width:43px; height:53px; object-fit:contain; transition:transform 0.3s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:0%; transform:translateX(calc(33.3% - 21.5px));">
+                                    <img id="fingerPointerStep3" src="left_finger.png" alt="select"
+                                        style="width:43px; height:43px; object-fit:contain; transition:transform 0.3s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:0%; transform:translateX(calc(33.3% - 21.5px)) rotate(90deg);">
                                 </div>
                             </div>
 
@@ -6652,7 +6652,7 @@
                     const minX = fingerHalf;
                     const maxX = wrapW - fingerHalf;
                     const px = minX + (pct / 100) * (maxX - minX);
-                    fingerStep3.style.transform = `translateX(${px - fingerHalf}px)`;
+                    fingerStep3.style.transform = `translateX(${px - fingerHalf}px) rotate(90deg)`;
                 }
 
                 // 1. AI 실시간 추출
@@ -6742,7 +6742,7 @@
                         const ballCenterX = ballRect.left + ballRect.width / 2;
                         const wrapCenterX = wrapRect.left + wrapRect.width / 2;
                         const offset = ballCenterX - wrapCenterX;
-                        fingerImg.style.transform = `translateX(calc(-50% + ${offset}px))`;
+                        fingerImg.style.transform = `translateX(calc(-50% + ${offset}px)) rotate(90deg)`;
                     }
                 }
 
@@ -6786,7 +6786,7 @@
                     const cardCenterX = cardRect.left + cardRect.width / 2;
                     const wrapCenterX = wrapRect.left + wrapRect.width / 2;
                     const offset = cardCenterX - wrapCenterX;
-                    finger.style.transform = `translateX(calc(-50% + ${offset}px))`;
+                    finger.style.transform = `translateX(calc(-50% + ${offset}px)) rotate(90deg)`;
                 }
 
                 // 2. Fetch Candidates
