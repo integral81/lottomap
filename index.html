@@ -5918,7 +5918,7 @@
                     style="background: linear-gradient(135deg, #1976d2, #1565c0); padding: 15px 20px; color: white;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h3 style="margin:0; font-size: 18px;">🧭 로또 Navi by Kinov Ai</h3>
+                            <h3 style="margin:0; font-size: 18px;">🧭 로또 Navi by KINOV AI</h3>
                             <p style="margin: 2px 0 0 0; font-size: 12px; opacity: 0.8;">1~1212회차 데이터를 분석한 번호 추천</p>
                         </div>
                         <button onclick="closeNaviModal()" style="
@@ -9512,55 +9512,66 @@
             /* ============================================================ */
             @media (max-width: 768px) {
 
-                /* 1. Header Optimization (Make it 1-line) */
+                /* 1. Header Optimization (uppercase + 90%) */
+                .admin-header h3 {
+                    font-size: 16.2px !important;
+                    /* ~90% of 18px */
+                }
+
                 .admin-header p {
                     display: none !important;
                 }
 
                 .admin-header {
-                    padding: 10px 20px !important;
+                    padding: 8px 20px !important;
                 }
 
-                /* 2. Global Scaling (Content Below Header @ 90%) */
+                /* 2. Global Scaling & Body Compression */
                 #naviStepsBody {
                     font-size: 90% !important;
-                    padding: 5px 15px !important;
+                    padding: 0px 15px 5px 15px !important;
+                    /* Extremely tight */
+                    min-height: auto !important;
+                    /* Removal of PC restriction */
                 }
 
-                /* [요청] 조합 수: 현재 대비 1.1배 (이전 80% -> 88%) */
+                /* [요청] 조합 수: 현재 대비 1.1배 (이전 17px -> ~18.7px) */
                 #naviComboCounter {
-                    font-size: 17px !important;
+                    font-size: 18.7px !important;
                     margin-bottom: 2px !important;
                 }
 
-                /* [요청] Step 1 타이틀: 현재 대비 1.1배 (이전 70% -> 77%) */
                 #naviStep1 h2 {
-                    margin-top: 5px !important;
-                    margin-bottom: 5px !important;
-                    font-size: 17.5px !important;
+                    margin-top: 2px !important;
+                    margin-bottom: 2px !important;
+                    font-size: 16.5px !important;
                     opacity: 0.9 !important;
                 }
 
-                /* Step 1: Battle UI Optimization */
+                /* [요청] 하단 공백 1/3로 압축을 위한 컨테이너 조정 */
                 .battle-container {
-                    gap: 15px;
-                    margin-top: 10px;
-                    min-height: auto;
+                    gap: 10px;
+                    margin-top: 5px;
+                    margin-bottom: 2px !important;
+                    /* Aggressive bottom margin reduction */
+                    min-height: auto !important;
                 }
 
                 .battle-side {
-                    padding: 10px 2px;
+                    padding: 4px 2px;
                     box-sizing: border-box;
-                    min-height: 180px;
+                    min-height: 130px !important;
+                    /* Ultimate reduced height */
                 }
 
                 /* [요청] 측면 타이틀: 90% 크기 조정 (줄바꿈 유지) */
                 .battle-title {
-                    font-size: 12.5px !important;
-                    margin-bottom: 15px;
+                    font-size: 11.25px !important;
+                    /* 90% of 12.5px */
+                    margin-bottom: 8px;
                     visibility: hidden;
                     position: relative;
-                    height: 32px;
+                    height: 28px;
                     white-space: pre;
                     line-height: 1.25;
                     width: 100%;
@@ -9591,19 +9602,19 @@
                 }
 
                 .battle-theme-text {
-                    font-size: 15px !important;
-                    margin-top: 5px !important;
-                    margin-bottom: 10px !important;
+                    font-size: 14px !important;
+                    margin-top: 2px !important;
+                    margin-bottom: 5px !important;
                 }
 
                 /* Vertical Ball Stacking */
                 .battle-ball-grid {
                     flex-direction: column;
-                    gap: 10px;
+                    gap: 5px;
                     z-index: 2;
                 }
 
-                /* [요청/수정] 추천번호 공 크기: 70% (42px) 로 정확히 타겟팅 */
+                /* 추천번호 공 크기: 70% (42px) */
                 .navi-ball-btn.battle-ball {
                     width: 42px !important;
                     height: 42px !important;
@@ -9611,17 +9622,17 @@
                     border-width: 2px !important;
                 }
 
-                /* [요청] 다음 단계 버튼: 현재 대비 1.2배 (이전 60% -> 72%) */
+                /* 다음 단계 버튼 (1.2배 상향 완료 상태) */
                 #naviNextBtn {
                     font-size: 13.5px !important;
-                    padding: 12px 28px !important;
+                    padding: 10px 24px !important;
                     height: auto !important;
                     border-radius: 10px !important;
                     font-weight: 900 !important;
                 }
 
                 #naviPrevBtn {
-                    font-size: 12px !important;
+                    font-size: 11px !important;
                     padding: 10px 15px !important;
                 }
             }
