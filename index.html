@@ -7020,6 +7020,13 @@
                 if (probTxt) probTxt.innerText = '0%';
                 if (complMsg) complMsg.style.display = 'none';
 
+                // Ensure Next button is disabled until selection
+                const nextBtn = document.getElementById('naviNextBtn');
+                if (nextBtn) {
+                    nextBtn.disabled = true;
+                    nextBtn.style.opacity = '0.5';
+                }
+
                 const fingerPrompt = document.getElementById('step5FingerPrompt');
                 if (fingerPrompt) fingerPrompt.style.display = 'flex';
 
