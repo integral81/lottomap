@@ -6079,16 +6079,17 @@
                         <!-- Step 4: Regression -->
                         <div class="navi-step-container" id="naviStep4">
                             <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23.4px; opacity:0.8;"><span
-                                    style="color:var(--secondary);">Step 4.</span> 영광의 재현 (회귀분석)</h2>
+                                    style="color:var(--secondary);">Step 4.</span> 영광의 재현(회귀분석)</h2>
                             <div class="cumulative-status" id="regCumulativeStatus">
-                                현재까지 확정된 번호: <span id="regFixedNumsList"></span>
+                                <span class="reg-label-pc">현재까지 확정된 번호:</span> <span id="regFixedNumsList"></span>
                             </div>
                             <div
                                 style="margin: 16px 0 9px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
-                                <div style="font-size: 14px; font-weight: 800; color: #7c3aed; letter-spacing: -0.2px;">
+                                <div id="regInstructionText"
+                                    style="font-size: 14px; font-weight: 800; color: #7c3aed; letter-spacing: -0.2px;">
                                     과거의 영광(회귀분석) — 아래 중 <em style="font-style:normal; color:#c084fc;">1개만</em> 고르세요!!
                                 </div>
-                                <div style="
+                                <div id="regCycleBadge" style="
                                     display: inline-flex;
                                     align-items: center;
                                     justify-content: center;
@@ -9821,6 +9822,79 @@
                 .capsule-weeks-label {
                     margin-top: 8px !important;
                     font-size: 9px !important;
+                }
+
+                /* Step 4: Regression Optimization */
+                #naviStep4 h2 {
+                    font-size: 14px !important;
+                    /* [요청] 60% 축소 (23.4px * 0.6) */
+                    margin-top: 5px !important;
+                    margin-bottom: 10px !important;
+                }
+
+                .reg-label-pc {
+                    display: none !important;
+                }
+
+                #regCumulativeStatus::before {
+                    content: '앞당첨번호: ';
+                }
+
+                .cumulative-status {
+                    padding: 8px 10px !important;
+                    font-size: 11px !important;
+                    width: 90% !important;
+                }
+
+                /* [요청] 박스 내부 원형 숫자 50% 축소 (32px -> 16px) */
+                .fixed-num-tag,
+                .fixed-num-empty {
+                    width: 16px !important;
+                    height: 16px !important;
+                    font-size: 8px !important;
+                    margin: 0 2px !important;
+                    border-width: 1px !important;
+                }
+
+                #regInstructionText {
+                    display: none !important;
+                    /* [요청] 문장 삭제 */
+                }
+
+                /* [요청] 7/15/52주 뱃지 60% 축소 */
+                #regCycleBadge {
+                    padding: 6.6px 16.8px !important;
+                }
+
+                #regCycleBadge span {
+                    font-size: 10.8px !important;
+                    /* 60% of 18px */
+                    letter-spacing: 1px !important;
+                }
+
+                /* [요청] 3가지 캡슐 가로길이 60% 축소 (100px -> 60px) */
+                .reg-card-3d {
+                    width: 60px !important;
+                    height: 75px !important;
+                }
+
+                .reg-card-3d .bell-jar {
+                    transform: scale(0.6) !important;
+                    margin-bottom: -15px !important;
+                }
+
+                .reg-card-label {
+                    font-size: 8.4px !important;
+                    /* 60% of 14px approx */
+                }
+
+                #fingerPointer {
+                    font-size: 25.8px !important;
+                    /* 60% of 43px */
+                }
+
+                #fingerPointerWrap {
+                    height: 35px !important;
                 }
             }
 
