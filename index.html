@@ -6272,11 +6272,10 @@
                                 <!-- Multi-indicator Row -->
                                 <div id="finalNaviIndicators"
                                     style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 12px; display: flex; justify-content: center; gap: 15px; font-size: 13px; font-weight: 800; margin-bottom: 30px;">
-                                    <span style="color: #60a5fa;">AC: <span id="finalAC">9</span></span>
-                                    <span style="color: #fbbf24;">합계: <span id="finalSum">148</span></span>
-                                    <span style="color: #34d399;"><span
-                                            style="display:inline-block; width:8px; height:8px; background:#34d399; border-radius:50%; margin-right:4px;"></span>역대당첨번호와
-                                        일치율 <span id="finalMatchRate">99.12</span>%</span>
+                                    <span style="color: #60a5fa;">AC:<br><span id="finalAC">9</span></span>
+                                    <span style="color: #fbbf24;">합계:<br><span id="finalSum">148</span></span>
+                                    <span style="color: #34d399; line-height: 1.4;">▶ 역대 당첨번호와 일치율<br><span
+                                            id="finalMatchRate">99.12</span>%</span>
                                 </div>
 
                                 <!-- Buttons -->
@@ -10007,12 +10006,16 @@
                     margin-bottom: 14px !important;
                 }
 
-                /* Lotto balls inside the final card */
+                /* Lotto balls inside the final card — must be circular */
                 #finalNaviNumbers .result-ball,
                 #finalNaviNumbers>div {
-                    width: 38px !important;
-                    height: 50px !important;
-                    font-size: 13px !important;
+                    width: 40px !important;
+                    height: 40px !important;
+                    min-width: 40px !important;
+                    min-height: 40px !important;
+                    font-size: 14px !important;
+                    border-radius: 50% !important;
+                    flex-shrink: 0 !important;
                 }
 
                 #finalNaviIndicators {
