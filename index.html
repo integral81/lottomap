@@ -20,8 +20,9 @@
 
     <meta charset="utf-8">
     <title>v1.5.2 🎰 KINOV 로또 명당 지도</title>
-    <!-- Library for QR Code Scanning -->
+    <!-- Library for QR Code Scanning & Screen Capture -->
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <!-- Preload Critical Images -->
@@ -33,6 +34,10 @@
     <link rel="preload" href="assets/markers/tier2.png" as="image">
     <link rel="preload" href="assets/markers/tier3.png" as="image">
     <link rel="preload" href="assets/markers/tier4.png" as="image">
+
+    <!-- Lotto Navi Data & Engine -->
+    <script src="lotto_history_data.js"></script>
+    <script src="lotto_navi.js"></script>
 
     <meta name="description" content="전국 로또 1등 당첨 판매점을 지도에서 한눈에 확인하세요. 내 주변 명당 찾기, 로또 번호 무료 추천 서비스 제공.">
     <meta name="keywords" content="로또, 로또명당, 로또지도, 로또1등, 로또당첨번호, 로또판매점, KINOV">
@@ -49,29 +54,48 @@
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎰</text></svg>">
     <script>
-        // SDK Error Handler (Defined first)
+        // Global Kakao Configuration & Dynamic URL Helper
+        const KAKAO_APP_KEY = 'a6b27b6dab16c7e3459bb9589bf1269d';
+
+        function getKakaoShareUrl() {
+            // Kakao SDK does NOT support file:// protocol.
+            // When opened as a local file, fallback to the production URL.
+            if (window.location.protocol === 'file:') {
+                return 'https://k-inov.com/lottomap/';
+            }
+            const currentOrigin = window.location.origin;
+            let currentPath = window.location.pathname;
+            if (currentPath.includes('index.html')) {
+                currentPath = currentPath.replace('index.html', '');
+            }
+            if (!currentPath.endsWith('/')) {
+                currentPath += '/';
+            }
+            return currentOrigin + currentPath;
+        }
+
+        // Initialize Kakao SDK as soon as it's loaded
+        function initKakaoGlobal() {
+            if (typeof window.Kakao !== 'undefined' && !window.Kakao.isInitialized()) {
+                window.Kakao.init(KAKAO_APP_KEY);
+                console.log('[KINOV Debug] Kakao SDK Centralized Init Complete');
+            }
+        }
+
+        // SDK Error Handler
         function handleScriptError() {
             const mapDiv = document.getElementById('map');
-            const usedKey = 'a6b27b6dab16c7e3459bb9589bf1269d';
             if (mapDiv) {
                 mapDiv.innerHTML = `
                     <div style="padding:40px; text-align:center; color:#d32f2f;">
-                        <h2 style="margin-bottom:10px;">🔑 카카오 지도 인증 실패 (Domain Mismatch)</h2>
-                        <p style="color:#333; font-size:16px;">인터넷 연결은 확인되었으나, 카카오 서버에서 <strong>도메인 거부</strong>가 발생했습니다.</p>
-                        
+                        <h2 style="margin-bottom:10px;">🔑 카카오 인증 실패 (Domain Mismatch)</h2>
+                        <p style="color:#333; font-size:16px;">로그인 혹은 공유 시 [Error 4019]가 발생한다면 카카오 개발자 콘솔 설정을 확인해 주세요.</p>
                         <div style="background:#fff; border:1px solid #d32f2f; padding:20px; border-radius:10px; text-align:left; margin: 20px auto; color:#333; max-width:600px; font-size:14px; line-height:1.6;">
-                            <strong>✅ 이 순서대로 해결해 보세요:</strong><br><br>
-                            1. <strong>도메인 추가 등록</strong>: 카카오 콘솔 [플랫폼 > Web] 사이트 도메인에 아래 주소들이 등록되어 있는지 확인해 주세요:
-                               <ul style="margin:5px 0 15px 20px;">
-                                 <li><code>http://localhost:8000</code></li>
-                                 <li><code>http://127.0.0.1:8000</code></li>
-                               </ul>
-                            2. <strong>올바른 키 사용 확인</strong>: 카카오 콘솔 [내 애플리케이션 > 요약 정보]에서 반드시 <strong>'JavaScript 키'</strong>를 복사했는지 확인해 주세요.<br><br>
-                            <div style="background:#eee; padding:10px; border-radius:5px; border:1px dashed #999;">
-                                <strong>현재 사용 중인 키:</strong> <code>${usedKey}</code>
-                            </div>
+                            <strong>✅ 해결 방법:</strong><br><br>
+                            1. <strong>현재 도메인 확인</strong>: <code>${window.location.origin}</code><br>
+                            2. <strong>콘솔 등록</strong>: 위 주소를 [플랫폼 > Web] 도메인 리스트에 정확히 추가하세요.<br>
+                            3. <strong>JavaScript 키 확인</strong>: <code>${KAKAO_APP_KEY}</code>
                         </div>
-                        <p style="color:#666;">설정을 변경한 후 브라우저를 <strong>새로고침(F5)</strong> 해주세요.</p>
                     </div>`;
             }
         }
@@ -80,7 +104,8 @@
         src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a6b27b6dab16c7e3459bb9589bf1269d&libraries=clusterer,services,roadview"
         onerror="handleScriptError()"></script>
     <!-- Kakao SDK for Sharing -->
-    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
+    <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" onload="initKakaoGlobal()"></script>
+    <script src="lotto_navi.js"></script>
     <style>
         :root {
             --primary: #d32f2f;
@@ -2544,6 +2569,14 @@
     <div id="app">
         <div id="sidebar">
             <h1>🎰 KINOV Lotto Map</h1>
+
+            <!-- 로또 Navi 시작 버튼 (사용자 요청 위치) -->
+            <button id="naviModeBtn" onclick="toggleNaviMode()"
+                style="width: 100%; margin: 10px 0 20px 0; padding: 12px; background: linear-gradient(135deg, #1976d2, #1565c0); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                🧭 로또 Navi 분석 모드 시작 <span
+                    style="background:rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 10px; font-size: 10px;">beta</span>
+            </button>
+
             <div class="section">
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <span class="section-title round-title" style="margin-bottom:0;">📅 회차 필터 (Round)</span>
@@ -5379,33 +5412,26 @@
 
                     console.log('[Kakao Share] Kakao SDK loaded successfully');
 
-                    // Initialize Kakao SDK if not already initialized
-                    if (!window.Kakao.isInitialized()) {
-                        console.log('[Kakao Share] Initializing Kakao SDK...');
-                        window.Kakao.init('a6b27b6dab16c7e3459bb9589bf1269d');
-                        console.log('[Kakao Share] Kakao SDK initialized');
-                    } else {
-                        console.log('[Kakao Share] Kakao SDK already initialized');
-                    }
+                    // Standard Dynamic URL logic
+                    const currentUrl = getKakaoShareUrl();
 
-                    // Prepare share data - NO IMAGE to ensure k-inov.co.kr link
-                    // works
+                    // Prepare share data
                     const shareData = {
                         objectType: 'feed',
                         content: {
                             title: '🎰 KINOV 로또 명당 지도',
                             description: '역대 1등 당첨 판매점을 한눈에! 당신의 행운을 찾아보세요.\n\n지금 바로 KINOV Mall을 방문하세요!',
                             link: {
-                                mobileWebUrl: 'https://www.k-inov.co.kr',
-                                webUrl: 'https://www.k-inov.co.kr'
+                                mobileWebUrl: currentUrl,
+                                webUrl: currentUrl
                             }
                         },
                         buttons: [
                             {
                                 title: 'KINOV Mall 방문하기',
                                 link: {
-                                    mobileWebUrl: 'https://www.k-inov.co.kr',
-                                    webUrl: 'https://www.k-inov.co.kr'
+                                    mobileWebUrl: currentUrl,
+                                    webUrl: currentUrl
                                 }
                             }
                         ]
@@ -5849,7 +5875,3107 @@
             // Initialize Admin Check (After elements are loaded)
             checkAdminMode();
         </script>
-    </div>
+        <!-- Lotto Navi UI Elements -->
+        <div id="naviModal" class="admin-modal-overlay" style="display:none; z-index: 10001;"
+            onclick="closeNaviModal()">
+            <div class="admin-modal-content" onclick="event.stopPropagation()"
+                style="max-width: 500px; padding: 0; overflow: hidden; border-radius: 20px;">
+                <div class="admin-header"
+                    style="background: linear-gradient(135deg, #1976d2, #1565c0); padding: 15px 20px; color: white;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 style="margin:0; font-size: 18px;">🧭 로또 Navi by Kinov Ai</h3>
+                            <p style="margin: 2px 0 0 0; font-size: 12px; opacity: 0.8;">1~1211회차 데이터를 분석한 번호 추천</p>
+                        </div>
+                        <span style="font-size:24px; cursor:pointer;" onclick="closeNaviModal()">&times;</span>
+                    </div>
+                </div>
+
+                <div id="naviStepContainer"> <!-- Premium Header & Counter -->
+                    <div style="background: #f8f9fa; padding: 20px; border-bottom: 1px solid #eee; text-align: center;">
+                        <div style="font-size: 15.6px; color: #1976d2; margin-bottom: 5px; font-weight: bold;">현재 분석 중인
+                            조합 수</div>
+                        <div id="naviComboCounter" class="combination-counter">8,145,060</div>
+                        <div
+                            style="width: 100%; height: 4px; background: #eee; margin-top: 15px; border-radius: 2px; overflow: hidden;">
+                            <div id="naviProgress"
+                                style="width: 16.6%; height: 100%; background: var(--secondary); transition: width 0.3s;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="naviStepsBody"
+                        style="padding: 5px 30px; min-height: 350px; position: relative; overflow-y: auto; flex: 1;">
+                        <!-- Step 1: CarryOver vs Neighbors (Battle!) -->
+                        <div class="navi-step-container active" id="naviStep1">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:26px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Step 1.</span> 운명의 대결</h2>
+                            <div class="battle-theme-text" style="text-align: center;">
+                                '이월수'의 불꽃 vs '이웃수'의 물결<br>
+                                <span style="font-size: 14px; opacity: 0.8; -webkit-text-fill-color: #666;">단 하나의
+                                    선택!!</span>
+                            </div>
+
+                            <div class="battle-container">
+                                <div class="battle-side side-left">
+                                    <div class="fire-bg" id="fireContainer"></div>
+                                    <div class="battle-title" style="font-size: 1.08em;">지난주 당첨의 <span
+                                            style="font-weight: 900;">이월수</span></div>
+                                    <div class="battle-subtitle" style="font-size: 0.96em;">운명을 이어갈 이월수</div>
+                                    <div class="battle-ball-grid" id="carryoverGrid"></div>
+                                </div>
+
+                                <div
+                                    style="display:flex; align-items:center; font-weight:bold; font-size:24px; color:#999; z-index:5;">
+                                    VS</div>
+
+                                <div class="battle-side side-right">
+                                    <div class="wave-bg">
+                                        <div class="wave-layer"></div>
+                                    </div>
+                                    <div class="battle-title" style="font-size: 1.08em;">지난주 당첨의 <span
+                                            style="font-weight: 900;">이웃수</span></div>
+                                    <div class="battle-subtitle" style="font-size: 0.96em;">새로운 기운의 이웃수</div>
+                                    <div class="battle-ball-grid" id="neighborGrid"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Missing Numbers (Eternal Capsules) -->
+                        <div class="navi-step-container" id="naviStep2">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:26px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Step 2.</span> 침묵의 각성 (미출현 번호)</h2>
+                            <div class="battle-theme-text" style="font-size:24.2px; margin: 15px 0;">
+                                잠든 번호를 깨워라.<br>
+                                <span style="font-size: 15.6px; opacity: 0.8; -webkit-text-fill-color: #666;">영원의 캡슐에 담긴
+                                    분석의 근거를 확인하십시오.</span>
+                            </div>
+
+                            <div id="capsuleContainer" class="capsule-container">
+                                <!-- AI Capsules filled here -->
+                            </div>
+
+                            <div class="capsule-info-box">
+                                <span style="font-weight:bold; color:#ffd700;">KINOV AI 추천숫자 :</span><br>
+                                AI가 추천하는 [미출현 숫자]에서 엄선한 3개의 번호
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Balance (KINOV AI Precision) -->
+                        <div class="navi-step-container" id="naviStep3">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:26px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Step 3.</span> 조화의 저울 (홀수 : 짝수의 비율)</h2>
+                            <div class="battle-theme-text"
+                                style="text-align: center; font-size:18px; margin: 19px 0 5px 0;">
+                                확률의 균형을 설계하라.
+                            </div>
+
+                            <div class="balance-container">
+                                <div
+                                    style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px;">
+                                    <span style="color: #ef4444; text-shadow: 0 0 10px #ef4444;">ODD (홀수)</span>
+                                    <span id="balanceScoreText" style="color: white; font-size: 24px;">2 : 4</span>
+                                    <span style="color: #3b82f6; text-shadow: 0 0 10px #3b82f6;">EVEN (짝수)</span>
+                                </div>
+
+                                <input type="range" id="balanceSlider" min="0" max="6" value="2" class="neon-slider"
+                                    style="margin-top: 12px;" oninput="updateStep3UI(this.value)">
+                            </div>
+
+                            <div class="step3-ai-result-panel"
+                                style="width: 82%; padding: 8px 12px; margin: 5px auto; min-height: 100px;">
+                                <div class="result-title"
+                                    style="font-size: 13px; margin-bottom: 3px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                                    KINOV AI GOLDEN-ZONE 추천
+                                </div>
+
+                                <div class="golden-zone-container" style="width: 100%; margin-bottom: 5px;">
+                                    <div class="gauge-label" style="font-size: 10px; margin-bottom: 2px;">
+                                        <span>MIN (21)</span>
+                                        <span style="color: #fbbf24; font-weight: 900;">GOLDEN-ZONE (100~170)</span>
+                                        <span>MAX (255)</span>
+                                    </div>
+                                    <div class="gauge-bg" style="height: 16px; border-radius: 8px;">
+                                        <div class="gauge-golden-zone"></div>
+                                        <div id="gaugeCurrentSum" class="gauge-current-sum"
+                                            style="left: 50%; width: 10px; height: 10px;">
+                                        </div>
+                                    </div>
+                                    <div id="gaugeSumValue"
+                                        style="margin-top: 2px; font-size: 11px; font-weight: 900; color: #60a5fa; line-height: 1;">
+                                        ...</div>
+                                </div>
+
+                                <div class="rotating-balls-container" id="step3BallsNew"
+                                    style="min-height: 40px; margin: 8px 0; display: flex !important; visibility: visible !important;">
+                                    <!-- AI Rotating Balls -->
+                                </div>
+                                <div class="result-footer" style="margin-top: 5px; font-size: 9px; opacity: 0.8;">
+                                    사용자 선택(<span id="step3FixedCount">0</span>) + AI 추천(<span
+                                        id="step3AiCount">0</span>) = <span style="color:#ffd700;">최적의 6조합 실시간
+                                        연산</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Regression -->
+                        <div class="navi-step-container" id="naviStep4">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:26px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Step 4.</span> 영광의 재현 (회귀분석)</h2>
+                            <div class="cumulative-status" id="regCumulativeStatus">
+                                현재까지 확정된 번호: <span id="regFixedNumsList"></span>
+                            </div>
+                            <div class="battle-theme-text"
+                                style="font-size:18px; margin: 20px 0; color: #1e293b; letter-spacing: -0.5px; white-space: nowrap;">
+                                <span
+                                    style="color: #7c3aed; font-weight: 800; font-size: 15px; vertical-align: middle;">과거의
+                                    영광(회귀분석)</span>
+                                <div
+                                    style="display: inline-block; position: relative; padding: 6px 18px; background: linear-gradient(135deg, #ffd700, #b8860b); border-radius: 50px; box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.5); border: 1px solid #926b08; margin: 0 5px; vertical-align: middle;">
+                                    <span
+                                        style="color: #5b21b6; font-weight: 900; font-size: 17.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.2);">'7
+                                        / 15 / 52주 중에서 1개만'</span>
+                                </div>
+                                <span
+                                    style="color: #7c3aed; font-weight: 900; font-size: 16px; vertical-align: middle;">고르세요!!</span>
+                            </div>
+
+                            <div class="regression-layout" style="flex-direction: column; gap: 20px;">
+                                <!-- Premium Regression Cards -->
+                                <div class="regression-card-container"
+                                    style="display: flex; justify-content: center; gap: 20px; width: 100%; perspective: 1000px; padding: 20px 0;">
+                                    <div class="reg-card-3d gold" id="regCard7" onclick="selectRegression(7)">
+                                        <div class="bell-jar">
+                                            <div class="jar-glass"></div>
+                                            <div class="jar-dust"></div>
+                                            <div class="jar-ring"></div>
+                                        </div>
+                                        <div class="reg-card-label">7 WEEKS</div>
+                                    </div>
+                                    <div class="reg-card-3d cyan active" id="regCard15" onclick="selectRegression(15)">
+                                        <div class="bell-jar">
+                                            <div class="jar-glass"></div>
+                                            <div class="jar-dust"></div>
+                                            <div class="jar-sphere"></div>
+                                            <div class="jar-ring"></div>
+                                        </div>
+                                        <div class="reg-card-label">15 WEEKS</div>
+                                        <div class="neon-select">SELECT</div>
+                                    </div>
+                                    <div class="reg-card-3d purple" id="regCard52" onclick="selectRegression(52)">
+                                        <div class="bell-jar">
+                                            <div class="jar-glass"></div>
+                                            <div class="jar-dust"></div>
+                                            <div class="jar-ring"></div>
+                                        </div>
+                                        <div class="reg-card-label">52 WEEKS</div>
+                                    </div>
+                                </div>
+
+                                <!-- Candidate Grid -->
+                                <div class="candidate-grid" id="regCandidates">
+                                    <!-- Balls will be injected here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="navi-step-container" id="naviStep5">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Step 5.</span> 행운의 끝수 <span
+                                    style="color: #7c3aed; font-weight: 900;">(왼쪽에서 고르세요!!)</span></h2>
+
+                            <div class="cumulative-status" id="endCumulativeStatus"
+                                style="margin-bottom: 2px; border-bottom: 2px solid #ef4444; padding-bottom: 15px; width: 90%;">
+                                현재까지 확정된 번호: <span id="endFixedNumsList"></span>
+                            </div>
+
+                            <div class="step5-main-layout">
+                                <!-- Left: Ending Digit Grid (7x2) -->
+                                <div class="ending-digit-grid" id="endingGrid">
+                                    <!-- 14 random numbers will be injected here (7x2) -->
+                                </div>
+
+                                <!-- Right: AI Analysis & Gauge -->
+                                <div class="ai-analysis-panel">
+                                    <p class="ai-instruction-text" id="step5Instruction"
+                                        style="font-size: 15px; font-weight: bold; line-height: 1.4;">
+                                        당신의 선택 기반으로<br>
+                                        당첨확율을 아래와 같이<br>
+                                        계산해서 알려드립니다.
+                                    </p>
+
+
+                                    <div class="probability-container">
+                                        <div class="gauge-label">
+                                            <span>실시간 당첨 조합 적합도</span>
+                                            <span id="probPercent">0%</span>
+                                        </div>
+                                        <div class="step5-gauge-bg">
+                                            <div id="step5ProbabilityBar" class="step5-gauge-fill"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="step5CompletionMsg"
+                                        style="display:none; margin-top:10px; font-weight:900; color:#4ade80; animation: bounce 0.5s infinite alternate;">
+                                        Navi 5단계 선택완료<br>
+                                        최종6단계는 KINOV AI가 선택드립니다!!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 6: AI 최종 번호 추출 & 운명의 완성 -->
+                        <div class="navi-step-container" id="naviStep6">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23.4px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Step 6.</span> KINOV AI가 제안하는 운명의 숫자</h2>
+                            <div style="text-align:center; margin-bottom: 5px;">
+                                <div class="battle-theme-text" style="font-size: 14.5px;">
+                                    데이터의 정수를 모아<br>
+                                    마침내 당신의 운명을 완성합니다.
+                                </div>
+                            </div>
+
+                            <!-- 1. 상단 현황판: 확정 5개 + 빈칸 1개 -->
+                            <div class="step6-status-bar" id="step6StatusBar"
+                                style="box-shadow: 0 0 30px rgba(251, 191, 36, 0.6); border: 1px solid rgba(251, 191, 36, 0.5);">
+                                <!-- JS 동적 생성 -->
+                            </div>
+
+                            <!-- 2. 중앙 레이아웃 -->
+                            <div class="step6-main-layout" id="step6MainArea">
+                                <!-- 왼쪽: AI 연산 매트릭스 7x2 -->
+                                <div class="step6-matrix-wrapper">
+                                    <div class="step6-matrix-label">AI MATRIX SCANNING...</div>
+                                    <div class="step6-matrix" id="step6Matrix">
+                                        <!-- 14개 후보 숫자 (JS 동적 생성) -->
+                                    </div>
+                                </div>
+                                <!-- 오른쪽: AI 결과창 -->
+                                <div class="step6-result-wrapper" id="step6ResultWrapper">
+                                    <div class="step6-result-sublabel">KINOV AI PICK</div>
+                                    <div class="step6-result-box" id="step6ResultBox">
+                                        <div class="result-number" id="step6FinalNum">?</div>
+                                    </div>
+                                    <div class="step6-result-caption">운명의 마지막 숫자</div>
+                                </div>
+                            </div>
+
+                            <!-- 3. 최종 결과 카드 (7단계 전용) -->
+                        </div>
+
+                        <!-- Step 7: 최종 운명 카드 (완성 및 다운로드) -->
+                        <div class="navi-step-container" id="naviStep7">
+                            <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:26px; opacity:0.8;"><span
+                                    style="color:var(--secondary);">Final.</span> 운명카드 다운로드</h2>
+                            <p style="text-align:center; margin-bottom: 15px; color:#c084fc; font-weight:700;">
+                                당신의 운명을 환하게 비춥니다.
+                            </p>
+
+                            <!-- Result Card Area (Premium Charcoal/Navy) -->
+                            <div id="finalNaviResult"
+                                style="display:none; background: radial-gradient(circle at center, #1e293b, #0f172a); 
+                                           border-radius: 25px; padding: 30px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.05); position:relative; overflow:hidden;">
+
+                                <!-- Subtle Rim Light -->
+                                <div
+                                    style="position:absolute; inset:0; border: 1px solid rgba(0, 242, 254, 0.1); border-radius: 25px; pointer-events:none;">
+                                </div>
+
+                                <h3
+                                    style="color: #94a3b8; font-size: 13px; letter-spacing: 3px; font-weight: 900; margin-bottom: 25px; opacity: 0.8; text-align: center;">
+                                    KINOV AI DESTINY NUMBER</h3>
+
+                                <div id="finalNaviNumbers"
+                                    style="display: flex; justify-content: space-around; gap: 8px; margin-bottom: 25px;">
+                                    <!-- Balls inserted here -->
+                                </div>
+
+                                <!-- Multi-indicator Row -->
+                                <div id="finalNaviIndicators"
+                                    style="background: rgba(15, 23, 42, 0.6); border-radius: 12px; padding: 12px; display: flex; justify-content: center; gap: 15px; font-size: 13px; font-weight: 800; margin-bottom: 30px;">
+                                    <span style="color: #60a5fa;">AC: <span id="finalAC">9</span></span>
+                                    <span style="color: #fbbf24;">합계: <span id="finalSum">148</span></span>
+                                    <span style="color: #34d399;"><span
+                                            style="display:inline-block; width:8px; height:8px; background:#34d399; border-radius:50%; margin-right:4px;"></span>AI
+                                        일치도 상위 1%</span>
+                                </div>
+
+                                <!-- Buttons -->
+                                <button id="downloadFateBtn" onclick="downloadShareCard()"
+                                    style="width: 100%; background: #ffffff; color: #1e293b; padding: 16px; border-radius: 12px; border: none; font-weight: 800; font-size:15px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; z-index: 10;">
+                                    📸 운명카드 다운로드(OMR이미지)
+                                </button>
+
+                                <div style="display: flex; gap: 10px;">
+                                    <button onclick="shareFateToKakao()"
+                                        style="flex: 1; background: #fee500; color: #3c1e1e; padding: 14px; border-radius: 10px; border: none; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; position: relative; z-index: 10;">
+                                        💬 카톡 공유
+                                    </button>
+                                    <button onclick="copyFateLink()"
+                                        style="flex: 1; background: rgba(255,255,255,0.1); color: #ffffff; padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; position: relative; z-index: 10;">
+                                        🔗 링크 복사
+                                    </button>
+                                </div>
+                            </div> <!-- Close finalNaviResult -->
+                        </div> <!-- Close naviStep7 -->
+                    </div> <!-- Close naviStepsBody -->
+                </div> <!-- Close naviStepContainer -->
+
+                <div
+                    style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: white; position: relative; z-index: 10;">
+                    <button id="naviPrevBtn" onclick="prevNaviStep()"
+                        style="padding: 8px 15px; border:none; background: #eee; border-radius: 10px; cursor:pointer; visibility:hidden;">이전단계</button>
+                    <button id="naviNextBtn" onclick="nextNaviStep()"
+                        style="padding: 8px 30px; border:none; background: var(--secondary); color:white; border-radius: 10px; font-weight:bold; cursor:pointer;">다음
+                        단계</button>
+                    <button id="naviCloseBtn" onclick="closeNaviModal()"
+                        style="display:none; padding: 8px 15px; border:none; background: #eee; border-radius: 10px; cursor:pointer;">운명
+                        카드 닫기</button>
+                </div>
+            </div> <!-- Close admin-modal-content -->
+        </div> <!-- Close naviModal -->
+
+        <script>
+            let naviEngine = null;
+            let currentNaviStep = 1;
+            let naviSelections = {
+                step1: [], // Carryover/Neighbor
+                step2: [], // Missing
+                step3: 2,  // Balance (Odd count) - Default 2:4
+                step3Nums: [], // Confirmed from Step 3
+                step4: [], // Regression
+                step5: []  // Endings
+            };
+
+            const TOTAL_COMBINATIONS = 8145060;
+            let currentDisplayCount = TOTAL_COMBINATIONS;
+
+            async function toggleNaviMode() {
+                if (!naviEngine) {
+                    try {
+                        if (typeof LOTTO_HISTORY !== 'undefined') {
+                            naviEngine = new LottoNaviEngine(LOTTO_HISTORY);
+                        } else {
+                            throw new Error('데이터가 정의되지 않았습니다');
+                        }
+                    } catch (err) {
+                        alert('데이터 로드 실패: ' + err.message);
+                        return;
+                    }
+                }
+                document.getElementById('naviModal').style.display = 'flex';
+                resetNaviWizard();
+            }
+
+            function resetNaviWizard() {
+                currentNaviStep = 1;
+                naviSelections = {
+                    step1: [],
+                    step2: [],
+                    step3: 2,
+                    step3Nums: [],
+                    step4: [],
+                    step5: []
+                };
+                currentDisplayCount = TOTAL_COMBINATIONS;
+                updateNaviUI();
+                initStep1();
+            }
+
+            function updateNaviUI() {
+                // Hide all steps
+                document.querySelectorAll('.navi-step-container').forEach(el => el.classList.remove('active'));
+                document.getElementById(`naviStep${currentNaviStep}`).classList.add('active');
+
+                // Progress Bar (out of 7 now)
+                const progress = (currentNaviStep / 7) * 100;
+                document.getElementById('naviProgress').style.width = `${progress}%`;
+
+                // Buttons
+                const prevBtn = document.getElementById('naviPrevBtn');
+                const nextBtn = document.getElementById('naviNextBtn');
+                const closeBtn = document.getElementById('naviCloseBtn');
+
+                prevBtn.style.visibility = (currentNaviStep > 1) ? 'visible' : 'hidden';
+
+                // Step Selection Enforcement
+                if (currentNaviStep === 1) {
+                    const hasSelection = naviSelections.step1.length > 0;
+                    nextBtn.disabled = !hasSelection;
+                    nextBtn.style.opacity = hasSelection ? '1' : '0.5';
+                } else if (currentNaviStep === 2) {
+                    const hasSelection = naviSelections.step2.length > 0;
+                    nextBtn.disabled = !hasSelection;
+                    nextBtn.style.opacity = hasSelection ? '1' : '0.5';
+                } else if (currentNaviStep === 3) {
+                    const hasSelection = naviSelections.step3Nums.length > 0;
+                    nextBtn.disabled = !hasSelection;
+                    nextBtn.style.opacity = hasSelection ? '1' : '0.5';
+                } else if (currentNaviStep === 4) {
+                    const hasSelection = naviSelections.step4 && naviSelections.step4.length > 0;
+                    nextBtn.disabled = !hasSelection;
+                    nextBtn.style.opacity = hasSelection ? '1' : '0.5';
+                } else {
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = '1';
+                }
+
+                if (currentNaviStep === 6) {
+                    // During AI analysis, hide next button until complete
+                    nextBtn.style.display = 'none';
+                    nextBtn.innerText = '운명 카드 받기';
+                } else if (currentNaviStep === 7) {
+                    nextBtn.style.display = 'none';
+                    closeBtn.style.display = 'block';
+                    closeBtn.innerText = '운명 카드 닫기';
+                    closeBtn.onclick = closeNaviModal;
+                } else {
+                    nextBtn.innerText = '다음 단계';
+                    nextBtn.style.display = 'block';
+                    closeBtn.style.display = 'none';
+                }
+
+                animateCombinationCount();
+            }
+
+            function nextNaviStep() {
+                if (currentNaviStep < 7) {
+                    currentNaviStep++;
+                    updateNaviUI();
+
+                    if (currentNaviStep === 2) initStep2();
+                    if (currentNaviStep === 3) initStep3();
+                    if (currentNaviStep === 4) initStep4();
+                    if (currentNaviStep === 5) setTimeout(initStep5, 50);
+                    if (currentNaviStep === 6) {
+                        // Step 6 진입 즉시 상단 바 렌더링 (빈칸 포함)
+                        const confirmed = [
+                            ...(naviSelections.step1 || []),
+                            ...(naviSelections.step2 || []),
+                            ...(naviSelections.step3Nums || []),
+                            ...(naviSelections.step4 || []),
+                            ...(naviSelections.step5 || [])
+                        ].map(Number).filter(n => !isNaN(n) && n > 0);
+                        const confirmedFive = [...new Set(confirmed)].slice(0, 5);
+                        buildStep6StatusBar(confirmedFive);
+
+                        startAICalculation();
+                    }
+                    if (currentNaviStep === 7) {
+                        // Transition to Final Step
+                        const confirmed = [
+                            ...(naviSelections.step1 || []),
+                            ...(naviSelections.step2 || []),
+                            ...(naviSelections.step3Nums || []),
+                            ...(naviSelections.step4 || []),
+                            ...(naviSelections.step5 || [])
+                        ].map(Number).filter(n => !isNaN(n) && n > 0);
+                        const confirmedFive = [...new Set(confirmed)].slice(0, 5);
+                        const finalNum = Number(naviSelections.step6Final);
+                        showFinalReport(confirmedFive, finalNum);
+                    }
+                }
+            }
+
+            function prevNaviStep() {
+                if (currentNaviStep > 1) {
+                    currentNaviStep--;
+
+                    // When going back from step 7, hide the fate card and reset step 6 UI
+                    const finalCard = document.getElementById('finalNaviResult');
+                    if (finalCard) finalCard.style.display = 'none';
+
+                    if (currentNaviStep === 6) {
+                        // Reset Step 6 animation state so it can re-run cleanly
+                        const mainArea = document.getElementById('step6MainArea');
+                        if (mainArea) { mainArea.style.display = 'flex'; mainArea.style.opacity = '1'; }
+                        const resultBox = document.getElementById('step6ResultBox');
+                        if (resultBox) resultBox.classList.remove('revealed');
+                        const numDisplay = document.getElementById('step6FinalNum');
+                        if (numDisplay) { numDisplay.innerText = '?'; numDisplay.style.opacity = '1'; }
+                        const statusBar = document.getElementById('step6StatusBar');
+                        if (statusBar) { statusBar.classList.remove('victory'); }
+                        const matrixLabel = document.querySelector('.step6-matrix-label');
+                        if (matrixLabel) { matrixLabel.textContent = 'AI MATRIX SCANNING...'; matrixLabel.style.color = '#00f2fe'; matrixLabel.style.animation = ''; }
+                    }
+
+                    updateNaviUI();
+                    if (currentNaviStep === 5) setTimeout(initStep5, 50);
+                    if (currentNaviStep === 6) {
+                        // Show the '운명 카드 받기' button
+                        const nextBtn = document.getElementById('naviNextBtn');
+                        nextBtn.style.display = 'block';
+                        nextBtn.innerText = '운명 카드 받기';
+                        // Re-run analysis so Step 6 works properly
+                        const confirmed = [
+                            ...(naviSelections.step1 || []),
+                            ...(naviSelections.step2 || []),
+                            ...(naviSelections.step3Nums || []),
+                            ...(naviSelections.step4 || []),
+                            ...(naviSelections.step5 || [])
+                        ].map(Number).filter(n => !isNaN(n) && n > 0);
+                        const confirmedFive = [...new Set(confirmed)].slice(0, 5);
+                        buildStep6StatusBar(confirmedFive);
+                        startAICalculation();
+                    }
+                }
+            }
+
+            function closeNaviModal() {
+                document.getElementById('naviModal').style.display = 'none';
+                // Reset Step 6 for next time
+                const mainArea = document.getElementById('step6MainArea');
+                if (mainArea) { mainArea.style.display = 'flex'; mainArea.style.opacity = '1'; }
+                const resultBox = document.getElementById('step6ResultBox');
+                if (resultBox) { resultBox.classList.remove('revealed'); }
+                const numDisplay = document.getElementById('step6FinalNum');
+                if (numDisplay) { numDisplay.innerText = '?'; numDisplay.style.opacity = '1'; }
+                const statusBar = document.getElementById('step6StatusBar');
+                if (statusBar) { statusBar.classList.remove('victory'); statusBar.innerHTML = ''; }
+                const matrixLabel = document.querySelector('.step6-matrix-label');
+                if (matrixLabel) { matrixLabel.textContent = 'AI MATRIX SCANNING...'; matrixLabel.style.color = '#00f2fe'; matrixLabel.style.animation = ''; }
+                document.getElementById('finalNaviResult').style.display = 'none';
+                currentNaviStep = 1;
+            }
+
+            // Step 1: CarryOver vs Neighbors
+            function initStep1() {
+                const carryGrid = document.getElementById('carryoverGrid');
+                const neighGrid = document.getElementById('neighborGrid');
+
+                carryGrid.innerHTML = '';
+                neighGrid.innerHTML = '';
+
+                const carryNums = naviEngine.getAIRecommendedCarryover();
+                const neighNums = naviEngine.getAIRecommendedNeighbors();
+
+                const createBall = (n, parent, side) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'navi-ball-btn battle-ball';
+                    if (naviSelections.step1.includes(n)) btn.classList.add('selected');
+                    btn.innerText = n;
+                    btn.onclick = () => {
+                        // Single selection logic
+                        document.querySelectorAll('.battle-ball').forEach(el => el.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        naviSelections.step1 = [n];
+
+                        updateNaviUI(); // Refresh button state
+                        animateCombinationCount();
+                    };
+                    parent.appendChild(btn);
+                };
+
+                carryNums.forEach(n => createBall(n, carryGrid, 'left'));
+                neighNums.forEach(n => createBall(n, neighGrid, 'right'));
+
+                // Fire Particles
+                const fire = document.getElementById('fireContainer');
+                if (fire && fire.children.length === 0) {
+                    for (let i = 0; i < 15; i++) {
+                        const p = document.createElement('div');
+                        p.className = 'particle';
+                        p.style.left = Math.random() * 100 + '%';
+                        p.style.bottom = '0';
+                        p.style.width = p.style.height = Math.random() * 8 + 4 + 'px';
+                        p.style.animationDelay = Math.random() * 1.5 + 's';
+                        fire.appendChild(p);
+                    }
+                }
+            }
+
+            // Step 2: Missing Numbers (Eternal Capsules)
+            function initStep2() {
+                const container = document.getElementById('capsuleContainer');
+                const nextBtn = document.getElementById('naviNextBtn');
+
+                container.innerHTML = '';
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = '0.5';
+
+                // 1단계 선택 번호 제외하고 추천
+                const caps = naviEngine.getAIRecommendedMissingCapsules(naviSelections.step1);
+
+                caps.forEach(cap => {
+                    const item = document.createElement('div');
+                    item.className = 'capsule-item';
+                    if (naviSelections.step2.includes(cap.num)) item.classList.add('selected');
+
+                    let highestHTML = cap.isHighest ? '<div class="highest-label">KINOV 최고확률</div>' : '';
+
+                    item.innerHTML = `
+                        ${highestHTML}
+                        <div class="capsule-glass">
+                            <div class="gold-ball">
+                                <span class="gold-ball-num">${cap.num}</span>
+                            </div>
+                            <div class="capsule-hologram">
+                                <div class="hologram-chart"></div>
+                                <div class="hologram-data">${cap.weeks} WEEKS</div>
+                            </div>
+                        </div>
+                        <div class="capsule-weeks-label">${cap.num} READY</div>
+                    `;
+
+                    item.onclick = () => {
+                        // Single selection for capsules
+                        document.querySelectorAll('.capsule-item').forEach(el => el.classList.remove('selected'));
+                        item.classList.add('selected');
+
+                        // Break/Light Effect
+                        const glass = item.querySelector('.capsule-glass');
+                        glass.style.animation = 'pulse 0.3s ease-in-out';
+                        setTimeout(() => glass.style.animation = '', 300);
+
+                        naviSelections.step2 = [cap.num];
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        animateCombinationCount();
+                    };
+
+                    container.appendChild(item);
+                });
+            }
+
+            // Step 3: Balance & Golden Zone (KINOV AI Precision)
+            function initStep3() {
+                const fixedNums = [...naviSelections.step1, ...naviSelections.step2];
+                document.getElementById('step3FixedCount').innerText = fixedNums.length;
+                updateStep3UI(naviSelections.step3 || 2);
+            }
+
+            function updateStep3UI(val) {
+                const odd = parseInt(val);
+                const even = 6 - odd;
+                naviSelections.step3 = odd;
+
+                const scoreText = document.getElementById('balanceScoreText');
+                if (scoreText) scoreText.innerText = `${odd} : ${even}`;
+
+                // 1. AI 실시간 추출
+                const fixedNums = [...naviSelections.step1, ...naviSelections.step2].filter(n => n !== null && n !== undefined).map(Number);
+                const recommended = naviEngine.getAIRecommendedBalanceNumbers(fixedNums, odd) || [];
+
+                // 2. 총합 계산 및 게이지 업데이트
+                const fullSet = [...fixedNums, ...recommended];
+                const sum = fullSet.length > 0 ? fullSet.reduce((a, b) => Number(a) + Number(b), 0) : 0;
+
+                const gaugeMarker = document.getElementById('gaugeCurrentSum');
+                const gaugeText = document.getElementById('gaugeSumValue');
+
+                if (gaugeMarker && gaugeText) {
+                    // 0~255 범위를 %로 환산 (21~255 가능)
+                    const percent = Math.min(100, Math.max(0, (sum / 255) * 100));
+                    gaugeMarker.style.left = `${percent}%`;
+                    gaugeText.innerText = `TOTAL SUM: ${sum}`;
+                    gaugeText.style.color = (sum >= 100 && sum <= 170) ? '#fbbf24' : '#60a5fa';
+                }
+
+                // 3. 숫자 공(Ball) 로테이팅 연출 (Corrected ID: step3BallsNew)
+                const ballContainer = document.getElementById('step3BallsNew');
+                if (ballContainer) {
+                    ballContainer.innerHTML = '';
+                    if (!Array.isArray(recommended) || recommended.length === 0) {
+                        ballContainer.innerHTML = '<div style="color:#60a5fa; font-size:10px; margin-top:10px;">조건에 맞는 조합 탐색 중...</div>';
+                    } else {
+                        recommended.forEach((n, i) => {
+                            const ball = document.createElement('div');
+                            ball.className = 'rotating-ball';
+                            ball.innerText = n;
+
+                            // 기존 선택 상태 복원 (Number 타입 비교) - 방어적 체크 포함
+                            const currentSelected = naviSelections.step3Nums || [];
+                            const isSelected = currentSelected.some(sn => Number(sn) === Number(n));
+                            if (isSelected) ball.classList.add('selected-step3');
+
+                            ball.onclick = () => selectStep3Num(Number(n), ball);
+                            ballContainer.appendChild(ball);
+
+                            // 순차적 활성화 애니메이션
+                            setTimeout(() => ball.classList.add('active'), i * 80);
+                        });
+                    }
+                }
+
+                // 4. 하단 카운트 텍스트 동적 업데이트
+                const step3AiCount = document.getElementById('step3AiCount');
+                if (step3AiCount) step3AiCount.innerText = recommended.length;
+
+                const step3FixedCount = document.getElementById('step3FixedCount');
+                if (step3FixedCount) step3FixedCount.innerText = fixedNums.length;
+
+                animateCombinationCount();
+            }
+
+            function selectStep3Num(num, ballElement) {
+                const n = Number(num);
+                if (naviSelections.step3Nums.map(Number).includes(n)) {
+                    naviSelections.step3Nums = [];
+                    ballElement.classList.remove('selected-step3');
+                } else {
+                    document.querySelectorAll('.rotating-ball').forEach(b => b.classList.remove('selected-step3'));
+                    naviSelections.step3Nums = [n];
+                    ballElement.classList.add('selected-step3');
+                }
+
+                const nextBtn = document.getElementById('naviNextBtn');
+                const hasSelection = naviSelections.step3Nums.length > 0;
+                nextBtn.disabled = !hasSelection;
+                nextBtn.style.opacity = hasSelection ? '1' : '0.5';
+
+                animateCombinationCount();
+            }
+
+            // Step 4: Regression (Past Glory Re-envisioned)
+            function initStep4() {
+                // Ensure all previous numbers are unique and numbers
+                naviSelections.step1 = naviSelections.step1.map(Number);
+                naviSelections.step2 = naviSelections.step2.map(Number);
+                naviSelections.step3Nums = naviSelections.step3Nums.map(Number);
+
+                updateCumulativeStatus();
+                const grid = document.getElementById('regCandidates');
+                grid.innerHTML = '<div style="grid-column: span 4; color: #666; font-size: 12px; margin-top: 15px;">회귀 주기를 선택하여<br>운명의 숫자를 찾으십시오.</div>';
+                document.getElementById('naviNextBtn').disabled = true;
+                document.getElementById('naviNextBtn').style.opacity = '0.5';
+
+                // Default: 15 WEEKS 자동 선택
+                setTimeout(() => selectRegression(15), 50);
+            }
+
+            function selectRegression(cycle) {
+                // 1. Premium Card Switching Logic (Updated for 3D Bell Jars)
+                document.querySelectorAll('.reg-card-3d').forEach(card => card.classList.remove('active'));
+                const selectedCard = document.getElementById(`regCard${cycle}`);
+                if (selectedCard) selectedCard.classList.add('active');
+
+                // 2. Fetch Candidates
+                // Type consistency: Ensure everything is a Number
+                const confirmed = [...naviSelections.step1, ...naviSelections.step2, ...naviSelections.step3Nums].map(Number);
+
+                // 과거 당첨 번호에서도 이미 선택된 번호는 제외 (사용자 요청)
+                const regNums = naviEngine.getRegressionNumbers(cycle).map(Number).filter(n => !confirmed.includes(n));
+
+                const aiPool = Array.from({ length: 45 }, (_, i) => i + 1)
+                    .filter(n => !confirmed.includes(n) && !regNums.includes(n))
+                    .sort((a, b) => naviEngine.calculateWeight(b) - naviEngine.calculateWeight(a))
+                    .slice(0, 8 - regNums.length);
+
+                const combined = [...regNums, ...aiPool].slice(0, 8);
+                const grid = document.getElementById('regCandidates');
+                grid.innerHTML = '';
+
+                combined.forEach((n, i) => {
+                    const ball = document.createElement('div');
+                    ball.className = 'candidate-ball';
+                    ball.innerText = n;
+                    if (confirmed.includes(n)) ball.classList.add('fade');
+                    grid.appendChild(ball);
+
+                    // Entrance animation
+                    ball.style.opacity = '0';
+                    ball.style.transform = 'scale(0.5)';
+                    setTimeout(() => {
+                        ball.style.opacity = '1';
+                        ball.style.transform = 'scale(1)';
+                    }, i * 50);
+                });
+
+                // 3. Jump-out Fate Number Animation
+                const fateIdx = Math.floor(Math.random() * Math.min(combined.length, 3)); // Pick one of top 3
+                const fateNum = combined[fateIdx];
+
+                // Find the source element for animation
+                setTimeout(() => {
+                    const sourceBalls = grid.querySelectorAll('.candidate-ball');
+                    let sourceEl = null;
+                    sourceBalls.forEach(b => {
+                        if (Number(b.innerText) === Number(fateNum)) sourceEl = b;
+                    });
+
+                    if (sourceEl) {
+                        // Add Hero class to emphasize it's the protagonist
+                        sourceEl.classList.add('hero');
+
+                        // Wait a bit more for the user to see the "Hero" before it flies
+                        setTimeout(() => {
+                            triggerFlyToStatusBar(fateNum, sourceEl);
+                        }, 800);
+                    } else {
+                        // Fallback if element not found
+                        naviSelections.step4 = [Number(fateNum)];
+                        updateCumulativeStatus();
+                        document.getElementById('naviNextBtn').disabled = false;
+                        document.getElementById('naviNextBtn').style.opacity = '1';
+                    }
+                }, 500);
+            }
+
+            function triggerFlyToStatusBar(n, sourceElement) {
+                if (!sourceElement) return;
+
+                const sourceRect = sourceElement.getBoundingClientRect();
+                const targetContainer = document.getElementById('regFixedNumsList');
+                if (!targetContainer) return;
+
+                // Target the first empty slot (X) specifically
+                const emptySlots = targetContainer.querySelectorAll('.fixed-num-empty');
+                const targetEl = emptySlots.length > 0 ? emptySlots[0] : targetContainer;
+                const targetRect = targetEl.getBoundingClientRect();
+
+                // Create the flying ball
+                const flyingBall = document.createElement('div');
+                // Use Hero gradient for Step 4 selection journey
+                flyingBall.style.cssText = `
+                                position: fixed;
+                                left: ${sourceRect.left}px;
+                                top: ${sourceRect.top}px;
+                                width: ${sourceRect.width}px;
+                                height: ${sourceRect.height}px;
+                                border-radius: 50%;
+                                background: radial-gradient(circle at 30% 30%, #00f2fe, #4facfe, #005bea);
+                                color: white;
+                                font-weight: 900;
+                                font-size: 16px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                z-index: 9999;
+                                box-shadow: 0 0 25px rgba(0, 242, 254, 1), 0 8px 15px rgba(0,0,0,0.5);
+                                border: 2px solid #fff;
+                                transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+                                pointer-events: none;
+                            `;
+                flyingBall.innerText = n;
+
+                document.body.appendChild(flyingBall);
+
+                // Trail effect
+                const trailInterval = setInterval(() => {
+                    const rect = flyingBall.getBoundingClientRect();
+                    createParticles(document.querySelector('.admin-modal-content'),
+                        rect.left + rect.width / 2 - document.querySelector('.admin-modal-content').getBoundingClientRect().left,
+                        rect.top + rect.height / 2 - document.querySelector('.admin-modal-content').getBoundingClientRect().top,
+                        1);
+                }, 40);
+
+                // Trigger particle burst at source
+                createParticles(document.querySelector('.admin-modal-content'),
+                    sourceRect.left + sourceRect.width / 2 - document.querySelector('.admin-modal-content').getBoundingClientRect().left,
+                    sourceRect.top + sourceRect.height / 2 - document.querySelector('.admin-modal-content').getBoundingClientRect().top);
+
+                // Animate to target
+                requestAnimationFrame(() => {
+                    // Shrink slightly to match the status bar ball size
+                    flyingBall.style.width = '32px';
+                    flyingBall.style.height = '32px';
+                    flyingBall.style.fontSize = '14px';
+                    flyingBall.style.left = `${targetRect.left}px`;
+                    flyingBall.style.top = `${targetRect.top}px`;
+                });
+
+                setTimeout(() => {
+                    clearInterval(trailInterval);
+                    // Final impact effect at target
+                    createParticles(document.querySelector('.admin-modal-content'),
+                        targetRect.left + targetRect.width / 2 - document.querySelector('.admin-modal-content').getBoundingClientRect().left,
+                        targetRect.top + targetRect.height / 2 - document.querySelector('.admin-modal-content').getBoundingClientRect().top,
+                        20);
+
+                    flyingBall.style.opacity = '0';
+                    setTimeout(() => {
+                        flyingBall.remove();
+                        // Update state and UI
+                        naviSelections.step4 = [Number(n)];
+                        updateCumulativeStatus();
+                        document.getElementById('naviNextBtn').disabled = false;
+                        document.getElementById('naviNextBtn').style.opacity = '1';
+                        animateCombinationCount();
+                    }, 200);
+                }, 1200);
+            }
+
+            function updateCumulativeStatus() {
+                const list = document.getElementById('regFixedNumsList');
+                if (!list) return;
+
+                // Collect and uniqueify numbers
+                const confirmed = [
+                    ...naviSelections.step1,
+                    ...naviSelections.step2,
+                    ...naviSelections.step3Nums,
+                    ...(naviSelections.step4 || [])
+                ].map(Number).filter((v, i, a) => a.indexOf(v) === i);
+
+                list.innerHTML = '';
+                confirmed.forEach((n, idx) => {
+                    const span = document.createElement('span');
+                    span.className = 'fixed-num-tag';
+
+                    const step4Num = naviSelections.step4 ? Number(naviSelections.step4[0]) : null;
+                    if (step4Num && Number(n) === step4Num) {
+                        span.classList.add('coin-flip');
+                        span.classList.add('destiny-ball');
+                    }
+
+                    span.innerText = n;
+                    list.appendChild(span);
+                });
+
+                // Fill remaining slots up to 6 with empty circles
+                for (let i = confirmed.length; i < 6; i++) {
+                    const empty = document.createElement('span');
+                    empty.className = 'fixed-num-empty';
+                    empty.innerText = 'X';
+                    list.appendChild(empty);
+                }
+            }
+
+            function createParticles(parent, x, y, count = 15, color = '#ffd700') {
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = x + 'px';
+                    p.style.top = y + 'px';
+                    p.style.background = color;
+                    p.style.width = p.style.height = Math.random() * 6 + 2 + 'px';
+
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 100 + 50;
+                    const tx = Math.cos(angle) * dist;
+                    const ty = Math.sin(angle) * dist;
+
+                    p.animate([
+                        { transform: 'translate(0, 0)', opacity: 1 },
+                        { transform: `translate(${tx}px, ${ty}px)`, opacity: 0 }
+                    ], { duration: 800, easing: 'ease-out' });
+
+                    parent.appendChild(p);
+                    setTimeout(() => p.remove(), 800);
+                }
+            }
+
+
+            // Step 5: Ending Digits (Precision Compression)
+            let step5Pool = [];
+            let step5SelectedNum = null;
+
+            function initStep5() {
+                console.log("DEBUG: initStep5 started - currentNaviStep:", currentNaviStep);
+                updateCumulativeStatusEnd();
+
+                const grid = document.getElementById('endingGrid');
+                if (!grid) {
+                    console.error("endingGrid element not found!");
+                    return;
+                }
+                grid.innerHTML = '';
+                step5SelectedNum = null;
+
+                const probBar = document.getElementById('step5ProbabilityBar');
+                const probTxt = document.getElementById('probPercent');
+                const complMsg = document.getElementById('step5CompletionMsg');
+
+                if (probBar) probBar.style.width = '0%';
+                if (probTxt) probTxt.innerText = '0%';
+                if (complMsg) complMsg.style.display = 'none';
+
+                // Rule 1: Exclude Step 1~4 numbers
+                const confirmed = [
+                    ...(naviSelections.step1 || []),
+                    ...(naviSelections.step2 || []),
+                    ...(naviSelections.step3Nums || []),
+                    ...(naviSelections.step4 || [])
+                ].map(Number);
+
+                const fullPool = Array.from({ length: 45 }, (_, i) => i + 1);
+                const availablePool = fullPool.filter(n => !confirmed.includes(n));
+
+                // Randomly extract 14 numbers (2 rows x 7 columns)
+                step5Pool = [];
+                const tempPool = [...availablePool];
+                for (let i = 0; i < 14; i++) {
+                    if (tempPool.length === 0) break;
+                    const idx = Math.floor(Math.random() * tempPool.length);
+                    step5Pool.push(tempPool.splice(idx, 1)[0]);
+                }
+
+                step5Pool.forEach(n => {
+                    const ball = document.createElement('div');
+                    ball.className = 'ending-ball';
+                    ball.innerText = n;
+                    ball.onclick = () => selectStep5Number(n, ball);
+                    grid.appendChild(ball);
+                });
+                console.log("Step 5 Grid Populated with 14 balls");
+            }
+
+            function selectStep5Number(num, element) {
+                // Clear previous selection
+                const prev = document.querySelector('.ending-ball.selected');
+                if (prev) prev.classList.remove('selected');
+
+                element.classList.add('selected');
+                step5SelectedNum = num;
+                naviSelections.step5 = [num % 10]; // Logic expects ending digit
+
+                // Real-time Probability Calculation
+                updateStep5Probability(num);
+
+                // Show completion message & enable next button (no auto-transition)
+                document.getElementById('step5CompletionMsg').style.display = 'block';
+                document.getElementById('naviNextBtn').disabled = false;
+                document.getElementById('naviNextBtn').style.opacity = '1';
+            }
+
+
+
+            function updateStep5Probability(num) {
+                const bar = document.getElementById('step5ProbabilityBar');
+                const percentText = document.getElementById('probPercent');
+                if (!bar || !percentText) return;
+
+                const weight = naviEngine.calculateWeight(num);
+                let prob = Math.floor((weight / 0.5) * 100);
+                prob = Math.min(98, Math.max(45, prob));
+                prob += Math.floor(Math.random() * 10 - 5);
+                prob = Math.min(100, prob);
+
+                bar.style.width = prob + '%';
+                percentText.innerText = prob + '%';
+
+                if (prob < 60) {
+                    bar.style.filter = 'hue-rotate(-40deg)';
+                } else if (prob < 85) {
+                    bar.style.filter = 'hue-rotate(0deg)';
+                } else {
+                    bar.style.filter = 'hue-rotate(60deg)';
+                }
+            }
+
+            // ===== STEP 6: AI 최종 번호 추출 & 운명의 완성 =====
+            function startAICalculation() {
+                console.log("DEBUG: startAICalculation() started");
+                // 1~5단계 확정 번호 수집
+                const confirmed = [
+                    ...(naviSelections.step1 || []),
+                    ...(naviSelections.step2 || []),
+                    ...(naviSelections.step3Nums || []),
+                    ...(naviSelections.step4 || []),
+                    ...(naviSelections.step5 || [])
+                ].map(Number).filter(n => !isNaN(n) && n > 0);
+
+                // 중복 제거 및 5개 추출
+                const uniqueConfirmed = [...new Set(confirmed)];
+                const confirmedFive = uniqueConfirmed.slice(0, 5);
+
+                console.log("DEBUG: Confirmed 5 numbers:", confirmedFive);
+
+                // 상단 현황판 구성 (이미 init 시점에 했지만 확실히 하기 위해)
+                buildStep6StatusBar(confirmedFive);
+
+                // 14개 후보 + 최종 1개 결정
+                const { candidates, finalNum } = buildStep6Matrix(confirmedFive);
+
+                // 매트릭스 레이블 블링크 시작
+                const label = document.querySelector('.step6-matrix-label');
+                if (label) {
+                    label.textContent = 'AI MATRIX SCANNING...';
+                    label.style.color = '#00f2fe';
+                    label.style.animation = 'pulse 1s infinite alternate';
+                }
+
+                // 랜덤 워킹 시작 (2.5초)
+                setTimeout(() => {
+                    runRandomWalking(candidates, finalNum, () => {
+                        console.log("DEBUG: Random walking complete. Final number:", finalNum);
+                        // 랜덤 워킹 종료 후 → 결과 표시
+                        if (label) {
+                            label.style.animation = 'none';
+                            label.textContent = 'AI MATRIX COMPLETE ✓';
+                            label.style.color = '#4ade80';
+                        }
+                        revealFinalNumber(finalNum, () => {
+                            // 결과 표시 후 → 상단 빈칸으로 날아감
+                            setTimeout(() => {
+                                flyToStatusBar(finalNum, () => {
+                                    // 날아간 후 → 승리 효과
+                                    showVictoryEffect(confirmedFive, finalNum);
+                                    // 승리 효과 후 → 다음 단계 버튼 활성화
+                                    naviSelections.step6Final = finalNum;
+                                    const nextBtn = document.getElementById('naviNextBtn');
+                                    nextBtn.style.display = 'block';
+                                    nextBtn.disabled = false;
+                                    nextBtn.style.opacity = '1';
+                                    nextBtn.innerText = '운명 카드 받기';
+                                });
+                            }, 800);
+                        });
+                    });
+                }, 500);
+            }
+
+            function buildStep6StatusBar(confirmedFive) {
+                const bar = document.getElementById('step6StatusBar');
+                bar.innerHTML = '';
+                confirmedFive.forEach(n => {
+                    const slot = document.createElement('div');
+                    slot.className = 'step6-slot';
+                    slot.innerText = n;
+                    bar.appendChild(slot);
+                });
+                // 빈 6번째 슬롯
+                const emptySlot = document.createElement('div');
+                emptySlot.className = 'step6-slot empty';
+                emptySlot.id = 'step6EmptySlot';
+                emptySlot.innerText = '?';
+                bar.appendChild(emptySlot);
+            }
+
+            function buildStep6Matrix(confirmedFive) {
+                const matrix = document.getElementById('step6Matrix');
+                if (!matrix) return { candidates: [], finalNum: 0 };
+                matrix.innerHTML = '';
+
+                // 1~45 전체에서 확정번호 제외
+                let pool = Array.from({ length: 45 }, (_, i) => i + 1)
+                    .filter(n => !confirmedFive.includes(n));
+
+                // 가중치 기반 정렬
+                const weighted = pool.map(n => ({
+                    num: n,
+                    weight: (naviEngine ? naviEngine.calculateWeight(n) : Math.random()) + (Math.random() * 0.1)
+                })).sort((a, b) => b.weight - a.weight);
+
+                // 상위 14개 후보
+                const candidates = weighted.slice(0, 14).map(w => w.num);
+                // 최종 번호 = 가중치 최고 (또는 상위 3개 중 랜덤 선택하여 다양성 부여)
+                const finalNum = candidates[Math.floor(Math.random() * Math.min(candidates.length, 3))];
+
+                // 섞어서 매트릭스에 배치 (최종 번호 위치를 모르게)
+                const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+
+                shuffled.forEach(n => {
+                    const cell = document.createElement('div');
+                    cell.className = 'step6-cell';
+                    cell.dataset.num = n;
+                    cell.innerText = n;
+                    matrix.appendChild(cell);
+                });
+
+                return { candidates: shuffled, finalNum };
+            }
+
+            function runRandomWalking(candidates, finalNum, onComplete) {
+                const cells = document.querySelectorAll('.step6-cell');
+                const totalDuration = 2500; // 2.5초
+                let interval = 100; // 초기 속도 (빠름)
+                let elapsed = 0;
+                let currentHighlight = -1;
+
+                function tick() {
+                    // 이전 하이라이트 제거
+                    cells.forEach(c => c.classList.remove('highlight'));
+
+                    if (elapsed >= totalDuration) {
+                        // 최종: finalNum 셀에 고정
+                        cells.forEach(c => {
+                            if (Number(c.dataset.num) === finalNum) {
+                                c.classList.add('highlight');
+                            } else {
+                                c.classList.add('dimmed');
+                            }
+                        });
+                        setTimeout(onComplete, 600);
+                        return;
+                    }
+
+                    // 랜덤 셀에 하이라이트
+                    let nextIdx;
+                    do {
+                        nextIdx = Math.floor(Math.random() * cells.length);
+                    } while (nextIdx === currentHighlight && cells.length > 1);
+                    currentHighlight = nextIdx;
+                    cells[nextIdx].classList.add('highlight');
+
+                    elapsed += interval;
+
+                    // 점점 느려지는 효과 (마지막에 가까울수록)
+                    if (elapsed > totalDuration * 0.7) {
+                        interval = Math.min(interval + 30, 350);
+                    }
+
+                    setTimeout(tick, interval);
+                }
+
+                tick();
+            }
+
+            function revealFinalNumber(finalNum, onComplete) {
+                const resultBox = document.getElementById('step6ResultBox');
+                const numDisplay = document.getElementById('step6FinalNum');
+
+                // 숫자 표시 + revealed 클래스
+                numDisplay.innerText = finalNum;
+                resultBox.classList.add('revealed');
+
+                // 스케일 팝 효과
+                numDisplay.style.transform = 'scale(0)';
+                requestAnimationFrame(() => {
+                    numDisplay.style.transform = 'scale(1.3)';
+                    setTimeout(() => {
+                        numDisplay.style.transform = 'scale(1)';
+                    }, 300);
+                });
+
+                setTimeout(onComplete, 800);
+            }
+
+            function flyToStatusBar(finalNum, onComplete) {
+                const bar = document.getElementById('step6StatusBar');
+                const emptySlot = bar.querySelector('.step6-slot.empty');
+                if (!emptySlot) {
+                    onComplete();
+                    return;
+                }
+
+                const resultBox = document.getElementById('step6ResultBox');
+                if (!resultBox) {
+                    onComplete();
+                    return;
+                }
+
+                const sourceRect = resultBox.getBoundingClientRect();
+                const targetRect = emptySlot.getBoundingClientRect();
+
+                // 날아가는 공 생성
+                const flyBall = document.createElement('div');
+                flyBall.className = 'flying-number';
+                flyBall.innerText = finalNum;
+                flyBall.style.left = (sourceRect.left + sourceRect.width / 2 - 22) + 'px';
+                flyBall.style.top = (sourceRect.top + sourceRect.height / 2 - 22) + 'px';
+                document.body.appendChild(flyBall);
+
+                // 결과박스 숨기기 (숫자가 날아가므로)
+                document.getElementById('step6FinalNum').style.opacity = '0';
+
+                // 타겟으로 이동
+                requestAnimationFrame(() => {
+                    flyBall.style.left = (targetRect.left + targetRect.width / 2 - 22) + 'px';
+                    flyBall.style.top = (targetRect.top + targetRect.height / 2 - 22) + 'px';
+                    flyBall.style.transform = 'scale(0.9)';
+                });
+
+                // 도착 후 처리
+                setTimeout(() => {
+                    flyBall.remove();
+                    // 빈 슬롯을 채움
+                    emptySlot.classList.remove('empty');
+                    emptySlot.classList.add('filled-final');
+                    emptySlot.innerText = finalNum;
+                    onComplete();
+                }, 750);
+            }
+
+            function showVictoryEffect(confirmedFive, finalNum) {
+                const bar = document.getElementById('step6StatusBar');
+                bar.classList.add('victory');
+
+                // 각 슬롯에 순차적 빛 효과
+                const slots = bar.querySelectorAll('.step6-slot');
+                slots.forEach((s, i) => {
+                    setTimeout(() => s.classList.add('victory-glow'), i * 200);
+                });
+
+                // 중앙 매트릭스 영역 페이드
+                const mainArea = document.getElementById('step6MainArea');
+                if (mainArea) {
+                    mainArea.style.transition = 'opacity 1s ease';
+                    mainArea.style.opacity = '0.15';
+                }
+            }
+
+            function showFinalReport(confirmedFive, finalNum) {
+                const allNums = [...confirmedFive, finalNum].sort((a, b) => a - b);
+
+                // 최종 결과 카드 표시
+                const result = document.getElementById('finalNaviResult');
+                if (result) {
+                    result.style.display = 'block';
+                }
+
+                // 번호 공 렌더 (크기 키움)
+                const numContainer = document.getElementById('finalNaviNumbers');
+                if (numContainer) {
+                    numContainer.innerHTML = '';
+                    allNums.forEach((n, i) => {
+                        const ball = document.createElement('div');
+                        let color = 'linear-gradient(135deg, #fbc02d, #f9a825)';
+                        if (n > 40) color = 'linear-gradient(135deg, #4caf50, #388e3c)';
+                        else if (n > 30) color = 'linear-gradient(135deg, #9e9e9e, #616161)';
+                        else if (n > 20) color = 'linear-gradient(135deg, #f44336, #d32f2f)';
+                        else if (n > 10) color = 'linear-gradient(135deg, #2196f3, #1976d2)';
+
+                        ball.style.cssText = `
+                                width: 42px; height: 42px; border-radius: 50%;
+                                display: flex; align-items: center; justify-content: center;
+                                font-weight: 900; font-size: 16px; color: white;
+                                background: ${color};
+                                box-shadow: 0 5px 15px rgba(0,0,0,0.3), inset 0 -4px 10px rgba(0,0,0,0.3);
+                                border: 2px solid rgba(255,255,255,0.3);
+                                opacity: 0;
+                                transform: scale(0.5);
+                                animation: ballEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 0.15}s forwards;
+                            `;
+
+                        if (n === finalNum) {
+                            ball.style.border = '2px solid #00f2fe';
+                            ball.style.boxShadow = '0 0 25px rgba(0, 242, 254, 1), inset 0 0 10px rgba(255,255,255,0.5)';
+                            ball.innerHTML = `<span style="position:relative; z-index:2;">${n}</span><div style="position:absolute; inset:0; border-radius:50%; background:rgba(0,242,254,0.3); animation: pulse 1s infinite alternate;"></div>`;
+                        } else {
+                            ball.innerText = n;
+                        }
+                        numContainer.appendChild(ball);
+                    });
+                }
+
+                const sum = allNums.reduce((a, b) => a + b, 0);
+                const ac = naviEngine ? naviEngine.calculateAC(allNums) : 0;
+                document.getElementById('finalAC').innerText = ac;
+                document.getElementById('finalSum').innerText = sum;
+
+                // SNS 공유 텍스트 준비
+                window.latestFateNumbers = allNums.join(', ');
+            }
+
+            function downloadShareCard() {
+                console.log('[OMR Download] Function triggered');
+                if (!window.latestFateNumbers) {
+                    alert('추출된 번호가 없습니다.');
+                    return;
+                }
+
+                // 1. OMR 모달 열기 (최종 번호로)
+                const numbers = window.latestFateNumbers.split(',').map(n => n.trim());
+                console.log('[OMR Download] Opening OMR with numbers:', numbers);
+                openOMR(numbers);
+
+                // 2. 잠시 대기 후 캡처 (모달 렌더링 시간 고려)
+                setTimeout(() => {
+                    const target = document.querySelector('#omrModal .omr-modal-content');
+                    console.log('[OMR Download] Target element:', target);
+                    if (!target) {
+                        alert('OMR 화면을 찾을 수 없습니다.');
+                        return;
+                    }
+
+                    if (typeof html2canvas === 'undefined') {
+                        alert('이미지 생성 도구(html2canvas)가 로드되지 않았습니다. 인터넷 연결이나 보안 설정을 확인해주세요.');
+                        return;
+                    }
+
+                    showToast('OMR 이미지 생성 중... 잠시만 기다려주세요. ✨');
+
+                    html2canvas(target, {
+                        backgroundColor: '#ffffff',
+                        scale: 2, // 해상도 높임
+                        useCORS: true,
+                        logging: true
+                    }).then(canvas => {
+                        console.log('[OMR Download] Capture success');
+                        const link = document.createElement('a');
+                        link.download = `KINOV_Destiny_OMR_${new Date().getTime()}.jpg`;
+                        link.href = canvas.toDataURL('image/jpeg', 0.9);
+                        link.click();
+
+                        showToast('OMR 이미지가 다운로드 되었습니다. ✨');
+                    }).catch(err => {
+                        console.error('[OMR Download] Capture Error:', err);
+                        alert('이미지 생성 중 오류가 발생했습니다: ' + err.message);
+                    });
+                }, 800);
+            }
+
+            // Dynamic Kakao Share for Fate Card
+            function shareFateToKakao() {
+                if (!window.latestFateNumbers) return;
+                try {
+                    if (typeof window.Kakao === 'undefined') {
+                        alert('카카오 SDK를 불러올 수 없습니다.');
+                        return;
+                    }
+
+                    initKakaoGlobal(); // Ensure init
+                    const currentUrl = getKakaoShareUrl();
+
+                    const shareData = {
+                        objectType: 'feed',
+                        content: {
+                            title: '✨ KINOV AI가 추출한 당신의 운명 번호',
+                            description: `추출된 번호: ${window.latestFateNumbers}\n당신의 운명을 환하게 비추는 6자리의 행운 확인하기!`,
+                            link: {
+                                mobileWebUrl: currentUrl,
+                                webUrl: currentUrl
+                            }
+                        },
+                        buttons: [
+                            {
+                                title: '나의 운명 확인하기',
+                                link: {
+                                    mobileWebUrl: currentUrl,
+                                    webUrl: currentUrl
+                                }
+                            }
+                        ]
+                    };
+                    window.Kakao.Share.sendDefault(shareData);
+                } catch (e) {
+                    console.error('Kakao Share Error:', e);
+                    alert(`카카오톡 공유 실패 (4019 가능성)\n\n현재 도메인: ${window.location.origin}\n전송된 주소: ${getKakaoShareUrl()}\n이 주소가 카카오 콘솔에 등록되어 있는지 확인하세요.`);
+                }
+            }
+
+            function copyFateLink() {
+                if (!window.latestFateNumbers) return;
+                const currentUrl = window.location.origin + window.location.pathname;
+                const text = `✨ KINOV 로또 명당 지도 - AI 운명 번호 ✨\n번호: ${window.latestFateNumbers}\n행운의 장소 찾기: ${currentUrl}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('운명 번호와 링크가 복사되었습니다! 행운을 나누세요 ✨');
+                });
+            }
+
+            function updateCumulativeStatusEnd() {
+                const list = document.getElementById('endFixedNumsList');
+                if (!list) return;
+
+                // Collect and uniqueify numbers
+                const confirmed = [
+                    ...(naviSelections.step1 || []),
+                    ...(naviSelections.step2 || []),
+                    ...(naviSelections.step3Nums || []),
+                    ...(naviSelections.step4 || [])
+                ].map(Number).filter(n => !isNaN(n)).filter((v, i, a) => a.indexOf(v) === i);
+
+                list.innerHTML = '';
+                confirmed.forEach(n => {
+                    const span = document.createElement('span');
+                    span.className = 'fixed-num-tag';
+                    span.innerText = n;
+                    list.appendChild(span);
+                });
+
+                // Fill remaining slots up to 6 with empty circles
+                for (let i = confirmed.length; i < 6; i++) {
+                    const empty = document.createElement('span');
+                    empty.className = 'fixed-num-empty';
+                    empty.innerText = 'X';
+                    list.appendChild(empty);
+                }
+            }
+
+            // Animation Engine: Combination Counter
+            function animateCombinationCount() {
+                let target = TOTAL_COMBINATIONS;
+                if (currentNaviStep >= 1) target /= (naviSelections.step1.length + 1) * 2;
+                if (currentNaviStep >= 2) target /= (naviSelections.step2.length + 1) * 3;
+                if (currentNaviStep >= 3) target /= 5;
+                if (currentNaviStep >= 4 && naviSelections.step4) target /= 10;
+                if (currentNaviStep >= 5) target /= (naviSelections.step5.length + 1) * 8;
+
+                target = Math.max(Math.floor(target), 1);
+                const el = document.getElementById('naviComboCounter');
+                if (!el) return;
+
+                const start = currentDisplayCount;
+                const end = target;
+                const duration = 1000;
+                let startTime = null;
+
+                function animate(currentTime) {
+                    if (!startTime) startTime = currentTime;
+                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    const current = Math.floor(start + (end - start) * progress);
+                    el.innerText = current.toLocaleString();
+                    currentDisplayCount = current;
+                    if (progress < 1) requestAnimationFrame(animate);
+                }
+                requestAnimationFrame(animate);
+            }
+
+            // (중복 함수 제거됨 - downloadShareCard는 7251번째 줄에 html2canvas/OMR 방식으로 정의됨)
+        </script>
+
+        <style>
+            @keyframes popIn {
+                0% {
+                    transform: scale(0.6);
+                    opacity: 0;
+                }
+
+                80% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateX(30px);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            .navi-step-container {
+                display: none;
+                animation: slideIn 0.4s ease-out forwards;
+            }
+
+            .navi-step-container.active {
+                display: block;
+            }
+
+            .navi-ball-btn {
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                border: 2px solid #ddd;
+                background: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 16px;
+                transition: all 0.2s;
+            }
+
+            .navi-ball-btn.selected {
+                background: var(--secondary);
+                color: white;
+                border-color: var(--secondary);
+                box-shadow: 0 0 10px rgba(21, 101, 192, 0.4);
+                transform: translateY(-3px);
+            }
+
+            .combination-counter {
+                font-family: 'monospace';
+                font-weight: bold;
+                color: #d32f2f;
+                font-size: 24px;
+                transition: all 0.1s;
+            }
+
+            /* Balance Scale */
+            .balance-container {
+                position: relative;
+                width: 230px;
+                height: 70px;
+                margin: 15px auto;
+            }
+
+            @keyframes flipCoin {
+                0% {
+                    transform: perspective(600px) rotateY(0deg) scale(1);
+                }
+
+                50% {
+                    transform: perspective(600px) rotateY(360deg) scale(1.3);
+                    filter: brightness(1.5);
+                }
+
+                100% {
+                    transform: perspective(600px) rotateY(720deg) scale(1.1);
+                }
+            }
+
+            .coin-flip {
+                animation: flipCoin 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                box-shadow: 0 0 30px #fbbf24 !important;
+            }
+
+            .balance-beam {
+                width: 100%;
+                height: 6px;
+                background: #555;
+                border-radius: 3px;
+                position: absolute;
+                top: 40px;
+                left: 0;
+                transform-origin: center center;
+                transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            .balance-pan {
+                width: 40px;
+                height: 40px;
+                border: 4px solid #555;
+                border-radius: 50%;
+                position: absolute;
+                top: 46px;
+            }
+
+            .balance-pan-left {
+                left: 0;
+            }
+
+            .balance-pan-right {
+                right: 0;
+            }
+
+            /* Battle Layout & Effects */
+            .battle-container {
+                display: flex;
+                gap: 20px;
+                margin-top: 20px;
+                min-height: 250px;
+            }
+
+            .battle-side {
+                flex: 1;
+                border-radius: 20px;
+                padding: 20px;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.3s;
+            }
+
+            .battle-side:hover {
+                transform: scale(1.02);
+            }
+
+            .side-left {
+                background: linear-gradient(135deg, #ff5252, #b71c1c);
+                color: white;
+            }
+
+            .side-right {
+                background: linear-gradient(135deg, #448aff, #0d47a1);
+                color: white;
+            }
+
+            .battle-title {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                opacity: 0.9;
+            }
+
+            .battle-subtitle {
+                font-size: 11px;
+                margin-bottom: 20px;
+                opacity: 0.7;
+            }
+
+            .battle-ball-grid {
+                display: flex;
+                gap: 15px;
+                z-index: 2;
+            }
+
+            /* Fire Effect */
+            .fire-bg {
+                position: absolute;
+                bottom: -20px;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+                /* Pattern fallback */
+                opacity: 0.2;
+                pointer-events: none;
+            }
+
+            @keyframes fireRise {
+                0% {
+                    transform: translateY(0) scale(1);
+                    opacity: 0.8;
+                }
+
+                100% {
+                    transform: translateY(-50px) scale(1.2);
+                    opacity: 0;
+                }
+            }
+
+            .particle {
+                position: absolute;
+                background: orange;
+                border-radius: 50%;
+                animation: fireRise 1.5s infinite ease-out;
+            }
+
+            /* Water Effect */
+            .wave-bg {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50% 50% 0 0;
+            }
+
+            @keyframes waveFlow {
+                0% {
+                    transform: translateX(-50%) skewY(2deg);
+                }
+
+                100% {
+                    transform: translateX(0%) skewY(-2deg);
+                }
+            }
+
+            .wave-layer {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 200%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.1);
+                animation: waveFlow 3s infinite alternate ease-in-out;
+            }
+
+            .navi-ball-btn.battle-ball {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+                border: 3px solid rgba(255, 255, 255, 0.5);
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .navi-ball-btn.battle-ball.selected {
+                background: white;
+                color: var(--secondary);
+                border-color: white;
+                transform: scale(1.1);
+            }
+
+            .battle-theme-text {
+                font-size: 24px;
+                font-weight: 900;
+                line-height: 1.4;
+                text-align: center;
+                margin: 25px 0;
+                background: linear-gradient(135deg, #ff5252, #448aff);
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                letter-spacing: -0.5px;
+            }
+
+            /* Step 2 Capsule UI - Cinematic 3D High-End */
+            .capsule-container {
+                display: flex;
+                justify-content: space-around;
+                gap: 25px;
+                margin: 25px 0 15px 0;
+                perspective: 1000px;
+            }
+
+            .capsule-item {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+                position: relative;
+                padding-top: 15px;
+            }
+
+            .capsule-item:hover {
+                transform: translateY(-20px) scale(1.05);
+            }
+
+            .capsule-glass {
+                width: 110px;
+                height: 180px;
+                border-radius: 55px;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.05) 100%);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(12px);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                padding-top: 25px;
+                box-shadow:
+                    inset 0 0 30px rgba(0, 242, 254, 0.15),
+                    0 25px 50px rgba(0, 0, 0, 0.4),
+                    inset 5px 5px 15px rgba(255, 255, 255, 0.2),
+                    0 0 20px rgba(0, 242, 254, 0.05);
+                position: relative;
+                overflow: hidden;
+                transition: all 0.4s ease;
+            }
+
+            .capsule-item:hover .capsule-glass {
+                border-color: rgba(0, 242, 254, 0.6);
+                box-shadow:
+                    inset 0 0 40px rgba(0, 242, 254, 0.3),
+                    0 30px 60px rgba(0, 0, 0, 0.5),
+                    0 0 30px rgba(0, 242, 254, 0.2);
+            }
+
+            /* Glass Refraction & Rim Light */
+            .capsule-glass::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(to right,
+                        rgba(255, 255, 255, 0) 0%,
+                        rgba(255, 255, 255, 0.1) 10%,
+                        rgba(255, 255, 255, 0) 20%,
+                        rgba(255, 255, 255, 0) 80%,
+                        rgba(255, 255, 255, 0.1) 90%,
+                        rgba(255, 255, 255, 0) 100%);
+                pointer-events: none;
+            }
+
+            .capsule-glass::after {
+                content: '';
+                position: absolute;
+                top: 10%;
+                left: 15%;
+                width: 30%;
+                height: 30%;
+                background: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+                filter: blur(8px);
+                pointer-events: none;
+            }
+
+            .gold-ball {
+                width: 72px;
+                height: 72px;
+                border-radius: 50%;
+                background: radial-gradient(circle at 35% 35%,
+                        #fff9c4 0%,
+                        #ffd700 30%,
+                        #b8860b 70%,
+                        #5d4037 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow:
+                    0 12px 24px rgba(0, 0, 0, 0.6),
+                    inset -6px -6px 15px rgba(0, 0, 0, 0.5),
+                    inset 4px 4px 10px rgba(255, 255, 255, 0.4);
+                position: relative;
+                z-index: 2;
+                border: 1.5px solid rgba(255, 255, 255, 0.3);
+                transition: all 0.5s ease;
+            }
+
+            .gold-ball-num {
+                font-size: 32px;
+                font-weight: 900;
+                color: rgba(50, 35, 0, 0.9);
+                /* Embossed effect */
+                text-shadow:
+                    -1px -1px 1px rgba(0, 0, 0, 0.5),
+                    1px 1px 1px rgba(255, 255, 255, 0.4);
+                letter-spacing: -1px;
+            }
+
+            /* Holographic Chart Area */
+            .capsule-hologram {
+                margin-top: auto;
+                margin-bottom: 20px;
+                width: 70%;
+                height: 40px;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hologram-chart {
+                width: 100%;
+                height: 25px;
+                background: transparent;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* SVG Chart Simulation */
+            .hologram-chart::before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent 0%, rgba(0, 242, 254, 0.2) 50%, transparent 100%);
+                mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'%3E%3Cpath d='M0,25 L10,15 L20,20 L30,5 L40,18 L50,10 L60,25 L70,8 L80,22 L90,12 L100,28 L100,30 L0,30 Z' fill='black'/%3E%3C/svg%3E");
+                -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 30'%3E%3Cpath d='M0,25 L10,15 L20,20 L30,5 L40,18 L50,10 L60,25 L70,8 L80,22 L90,12 L100,28 L100,30 L0,30 Z' fill='black'/%3E%3C/svg%3E");
+                mask-size: cover;
+                -webkit-mask-size: cover;
+                animation: hologramScan 2s infinite alternate;
+            }
+
+            @keyframes hologramScan {
+                from {
+                    opacity: 0.4;
+                    filter: brightness(1);
+                }
+
+                to {
+                    opacity: 1;
+                    filter: brightness(1.5) drop-shadow(0 0 5px rgba(0, 242, 254, 0.8));
+                }
+            }
+
+            .hologram-data {
+                font-size: 10px;
+                color: #00f2fe;
+                font-family: 'Courier New', Courier, monospace;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 900;
+                margin-top: 4px;
+                text-shadow: 0 0 5px rgba(0, 242, 254, 0.6);
+            }
+
+            .capsule-weeks-label {
+                margin-top: 15px;
+                font-size: 13px;
+                font-weight: 900;
+                color: rgba(255, 255, 255, 0.5);
+                letter-spacing: 1px;
+                transition: color 0.3s ease;
+            }
+
+            .capsule-item:hover .capsule-weeks-label {
+                color: #00f2fe;
+            }
+
+            .highest-label {
+                position: absolute;
+                top: -10px;
+                background: linear-gradient(to right, #e11d48, #be123c);
+                color: white;
+                font-size: 10px;
+                padding: 5px 10px;
+                border-radius: 12px;
+                font-weight: 900;
+                box-shadow: 0 8px 15px rgba(225, 29, 72, 0.4);
+                z-index: 10;
+                animation: pulse 1.5s infinite;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .capsule-info-box {
+                background: #0f172a;
+                border: 1px solid #b8860b;
+                padding: 20px;
+                border-radius: 15px;
+                font-size: 14px;
+                color: #e2e8f0;
+                margin: 15px 38px 0 38px;
+                line-height: 1.7;
+                text-align: center;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            .capsule-graph {
+                width: 80%;
+                height: 6px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 3px;
+                margin-top: 15px;
+                overflow: hidden;
+            }
+
+            .capsule-graph-bar {
+                height: 100%;
+                background: #4ade80;
+                box-shadow: 0 0 10px #4ade80;
+                animation: waveFlow 2s infinite alternate ease-in-out;
+            }
+
+            /* Step 3 Balance & Golden Zone Premium */
+            .balance-container {
+                background: radial-gradient(circle at center, #1e293b, #0f172a);
+                padding: 20px 40px;
+                border-radius: 25px;
+                position: relative;
+                overflow: visible;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                width: 70%;
+                margin: 5px auto;
+            }
+
+            /* Circuit Pattern Background */
+            .balance-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                    radial-gradient(rgba(71, 85, 105, 0.2) 1px, transparent 0),
+                    linear-gradient(rgba(71, 85, 105, 0.1) 1px, transparent 0),
+                    linear-gradient(90deg, rgba(71, 85, 105, 0.1) 1px, transparent 0);
+                background-size: 20px 20px, 40px 40px, 40px 40px;
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            .neon-slider {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 100%;
+                height: 15px;
+                border-radius: 8px;
+                background: linear-gradient(90deg, #ef4444 0%, #3b82f6 100%);
+                outline: none;
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+                margin: 35px 0;
+                z-index: 2;
+                position: relative;
+            }
+
+            .neon-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: white;
+                cursor: pointer;
+                box-shadow: 0 0 25px rgba(255, 255, 255, 1), 0 0 50px rgba(59, 130, 246, 0.9);
+                border: 3px solid #3b82f6;
+                transition: transform 0.2s;
+            }
+
+            .neon-slider::-webkit-slider-thumb:hover {
+                transform: scale(1.2);
+            }
+
+            .golden-zone-container {
+                margin-top: 40px;
+                text-align: center;
+                z-index: 2;
+                position: relative;
+            }
+
+            .gauge-label {
+                font-size: 13px;
+                color: #94a3b8;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .gauge-bg {
+                width: 100%;
+                height: 50px;
+                background: #334155;
+                border-radius: 25px;
+                position: relative;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .gauge-golden-zone {
+                position: absolute;
+                left: 39%;
+                /* 100/255 */
+                width: 27%;
+                /* (170-100)/255 */
+                height: 100%;
+                background: linear-gradient(to right, rgba(234, 179, 8, 0.2), rgba(234, 179, 8, 0.6), rgba(234, 179, 8, 0.2));
+                box-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
+                border-left: 1px dashed rgba(234, 179, 8, 0.8);
+                border-right: 1px dashed rgba(234, 179, 8, 0.8);
+            }
+
+            .gauge-current-sum {
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 18px;
+                height: 18px;
+                background: #60a5fa;
+                border-radius: 50%;
+                box-shadow: 0 0 15px #60a5fa;
+                transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                z-index: 5;
+            }
+
+            .rotating-balls-container {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 25px;
+            }
+
+            .rotating-ball {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: radial-gradient(circle at 30% 30%, #475569, #1e293b);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-weight: 900;
+                font-size: 14px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+            }
+
+            .rotating-ball.active {
+                background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b, #8b4513);
+                color: #322300;
+                border-color: #ffeb3b;
+                transform: rotate(360deg) scale(1.1);
+                box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.3);
+                cursor: pointer;
+            }
+
+            .rotating-ball.active:hover {
+                transform: rotate(360deg) scale(1.2);
+                filter: brightness(1.2);
+            }
+
+            .rotating-ball.selected-step3 {
+                background: radial-gradient(circle at 30% 30%, #00f2fe, #4facfe) !important;
+                color: white !important;
+                border-color: #fff !important;
+                box-shadow: 0 0 25px rgba(0, 242, 254, 0.8) !important;
+                transform: rotate(360deg) scale(1.25) !important;
+            }
+
+            .step3-ai-result-panel {
+                margin: 10px auto;
+                background: #0f172a;
+                border: 1px solid #b8860b;
+                padding: 12px 18px;
+                border-radius: 14px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+                width: 80%;
+                min-height: 130px;
+            }
+
+            .step3-ai-result-panel::before {
+                content: 'AI ANALYSIS';
+                position: absolute;
+                top: 5px;
+                right: 10px;
+                font-size: 9px;
+                color: #b8860b;
+                opacity: 0.5;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+
+            .result-title {
+                color: #ffd700;
+                font-size: 11px;
+                font-weight: 900;
+                margin-bottom: 5px;
+                letter-spacing: 0.5px;
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+
+            .result-footer {
+                margin-top: 12px;
+                font-size: 8.5px;
+                color: #94a3b8;
+                line-height: 1.5;
+            }
+
+            .capsule-item.selected .capsule-glass {
+                border-color: #00f2fe;
+                background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(0, 242, 254, 0.05));
+                box-shadow:
+                    inset 0 0 50px rgba(0, 242, 254, 0.4),
+                    0 40px 80px rgba(0, 0, 0, 0.6),
+                    0 0 50px rgba(0, 242, 254, 0.3);
+            }
+
+            .capsule-item.selected .gold-ball {
+                transform: scale(1.1);
+                box-shadow:
+                    0 15px 30px rgba(0, 0, 0, 0.7),
+                    inset -6px -6px 15px rgba(0, 0, 0, 0.5),
+                    0 0 20px rgba(255, 215, 0, 0.8);
+            }
+
+            /* Step 4: Regression & Cumulative UI */
+            .cumulative-status {
+                background: rgba(15, 23, 42, 0.05);
+                /* Lighter background for status bar */
+                border: 2px solid rgba(15, 23, 42, 0.1);
+                padding: 10px 15px;
+                border-radius: 12px;
+                margin: 12px auto 10px;
+                width: 85%;
+                text-align: center;
+                font-size: 13px;
+                font-weight: 900;
+                color: #1e293b;
+                /* Dark text for visibility */
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            }
+
+            .fixed-num-tag {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b, #8b4513);
+                color: #322300;
+                font-weight: 900;
+                font-size: 15px;
+                margin: 0 5px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.3);
+                border: 1px solid #ffeb3b;
+                text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.3);
+            }
+
+            .fixed-num-tag.destiny-ball {
+                background: radial-gradient(circle at 30% 30%, #00f2fe, #4facfe, #005bea);
+                color: white;
+                border-color: #fff;
+                box-shadow: 0 0 25px rgba(0, 242, 254, 1), 0 5px 15px rgba(0, 0, 0, 0.4);
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            }
+
+            .fixed-num-empty {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.05);
+                color: #444;
+                border: 1px dashed #334155;
+                margin: 0 5px;
+                font-size: 12px;
+            }
+
+            .regression-layout {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 15px;
+            }
+
+            /* Step 4: Regression 3D Bell Jar UI */
+            .reg-card-3d {
+                position: relative;
+                width: 100px;
+                height: 140px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            }
+
+            .bell-jar {
+                position: relative;
+                width: 80px;
+                height: 100px;
+                margin-bottom: 10px;
+                transform-style: preserve-3d;
+            }
+
+            .jar-glass {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+                border-radius: 40px 40px 10px 10px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(4px);
+                box-shadow:
+                    inset 0 10px 20px rgba(255, 255, 255, 0.1),
+                    inset 0 -5px 15px rgba(0, 0, 0, 0.5),
+                    0 20px 40px rgba(0, 0, 0, 0.4);
+                overflow: hidden;
+            }
+
+            .jar-dust {
+                position: absolute;
+                inset: 15%;
+                border-radius: 50%;
+                filter: blur(15px);
+                opacity: 0.6;
+                animation: swirl 4s infinite linear;
+            }
+
+            @keyframes swirl {
+                0% {
+                    transform: rotate(0deg) scale(1);
+                }
+
+                50% {
+                    transform: rotate(180deg) scale(1.2);
+                }
+
+                100% {
+                    transform: rotate(360deg) scale(1);
+                }
+            }
+
+            .gold .jar-dust {
+                background: radial-gradient(circle, #fbbf24 0%, transparent 70%);
+            }
+
+            .cyan .jar-dust {
+                background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
+            }
+
+            .purple .jar-dust {
+                background: radial-gradient(circle, #a855f7 0%, transparent 70%);
+            }
+
+            .jar-ring {
+                position: absolute;
+                bottom: -5px;
+                left: 50%;
+                transform: translateX(-50%) rotateX(75deg);
+                width: 90px;
+                height: 90px;
+                border: 3px solid transparent;
+                border-radius: 50%;
+                box-shadow: 0 0 20px currentColor;
+            }
+
+            .gold .jar-ring {
+                color: #fbbf24;
+                border-color: #fbbf24;
+            }
+
+            .cyan .jar-ring {
+                color: #06b6d4;
+                border-color: #06b6d4;
+            }
+
+            .purple .jar-ring {
+                color: #a855f7;
+                border-color: #a855f7;
+            }
+
+            .jar-sphere {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 28px;
+                height: 28px;
+                background: radial-gradient(circle at 30% 30%, #e2e8f0, #475569);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), inset -2px -2px 5px rgba(0, 0, 0, 0.5);
+                z-index: 2;
+            }
+
+            .reg-card-label {
+                font-size: 13px;
+                font-weight: 900;
+                color: #334155;
+                /* Darker slate for better visibility */
+                letter-spacing: 1px;
+                transition: all 0.3s;
+                text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+                margin-top: 5px;
+            }
+
+            .reg-card-3d.active .reg-card-label {
+                transform: scale(1.15);
+                font-weight: 1000;
+            }
+
+            .reg-card-3d.gold.active .reg-card-label {
+                color: #fbbf24;
+            }
+
+            .reg-card-3d.cyan.active .reg-card-label {
+                color: #06b6d4;
+                text-shadow: 0 0 10px #06b6d4;
+            }
+
+            .reg-card-3d.purple.active .reg-card-label {
+                color: #a855f7;
+                text-shadow: 0 0 10px #a855f7;
+            }
+
+            .neon-select {
+                position: absolute;
+                bottom: -30px;
+                background: #06b6d4;
+                color: white;
+                font-size: 9px;
+                font-weight: 900;
+                padding: 4px 10px;
+                border-radius: 4px;
+                box-shadow: 0 0 15px #06b6d4;
+                opacity: 0;
+                transform: translateY(10px);
+                transition: all 0.3s;
+            }
+
+            .reg-card-3d.active .neon-select {
+                opacity: 1;
+                transform: translateY(0);
+                animation: neonPulse 1s infinite alternate;
+            }
+
+            @keyframes neonPulse {
+                from {
+                    box-shadow: 0 0 10px #06b6d4;
+                }
+
+                to {
+                    box-shadow: 0 0 25px #06b6d4, 0 0 5px white;
+                }
+            }
+
+            .reg-card-3d:hover {
+                transform: translateY(-10px) scale(1.05);
+            }
+
+            .reg-card-3d:hover .jar-glass {
+                border-color: rgba(255, 255, 255, 0.4);
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            }
+
+            .candidate-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                gap: 12px;
+                flex: 1;
+            }
+
+            .candidate-ball {
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                background: radial-gradient(circle at 30% 30%, #334155, #0f172a);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #f8fafc;
+                font-weight: 900;
+                font-size: 16px;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+                cursor: default;
+            }
+
+            .candidate-ball:hover {
+                transform: scale(1.1);
+                border-color: #fbbf24;
+                box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+            }
+
+            .candidate-ball.fade {
+                opacity: 0.3;
+            }
+
+            .candidate-ball.hero {
+                background: radial-gradient(circle at 30% 30%, #00f2fe, #4facfe, #005bea);
+                color: white;
+                border-color: #fff;
+                box-shadow: 0 0 20px rgba(0, 242, 254, 0.8), 0 0 40px rgba(0, 242, 254, 0.4);
+                text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+                z-index: 10;
+                animation: heroPulse 1.5s infinite alternate;
+            }
+
+            @keyframes heroPulse {
+                0% {
+                    transform: scale(1);
+                    box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+                }
+
+                100% {
+                    transform: scale(1.15);
+                    box-shadow: 0 0 35px rgba(0, 242, 254, 1), 0 0 15px rgba(255, 255, 255, 0.5);
+                }
+            }
+
+            /* Jump-out Animation */
+            .fate-ball-popup {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+                border-radius: 50%;
+                z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #000;
+                font-weight: 900;
+                font-size: 24px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.6);
+                animation: jumpOut 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards;
+            }
+
+            @keyframes jumpOut {
+                0% {
+                    transform: scale(0.1) translate(0, 0);
+                    opacity: 0;
+                }
+
+                50% {
+                    transform: scale(1.4) translate(-20px, -40px);
+                    opacity: 1;
+                }
+
+                100% {
+                    transform: scale(1.2) translate(0, 0);
+                    opacity: 1;
+                }
+            }
+
+            /* Step 5: Ending Digit & Real-time Gauge */
+            .step5-main-layout {
+                display: flex;
+                gap: 15px;
+                margin-top: 5px;
+                align-items: flex-start;
+            }
+
+            .ending-selection-area {
+                flex: 1.2;
+                background: rgba(255, 255, 255, 0.03);
+                padding: 20px;
+                border-radius: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .ending-digit-grid {
+                flex: 1;
+                display: grid;
+                grid-template-columns: repeat(2, 60px);
+                gap: 7px;
+                justify-content: center;
+            }
+
+            .ending-ball {
+                width: 46px;
+                height: 46px;
+                background: rgba(15, 23, 42, 0.6);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 13px;
+                font-weight: 900;
+                color: #ffffff;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .ending-ball:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+            }
+
+            .ending-ball.selected {
+                background: linear-gradient(135deg, #00f2fe, #4facfe, #005bea);
+                background-size: 200% auto;
+                border-color: #fff;
+                color: white;
+                box-shadow: 0 0 25px rgba(0, 242, 254, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.4);
+                transform: scale(1.1) rotate(2deg);
+                animation: shimmer 2s infinite linear;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    background-position: -200% 0;
+                }
+
+                100% {
+                    background-position: 200% 0;
+                }
+            }
+
+            .ai-analysis-panel {
+                flex: 0 0 45%;
+                max-width: 45%;
+                background: rgba(15, 23, 42, 0.85);
+                padding: 15px;
+                border-radius: 20px;
+                border: 1px solid rgba(0, 242, 254, 0.3);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(12px);
+            }
+
+            .ai-instruction-text {
+                font-size: 13px;
+                line-height: 1.6;
+                color: #cbd5e1;
+                font-style: italic;
+                opacity: 0.9;
+            }
+
+            .probability-container {
+                margin: 10px 0;
+            }
+
+            .gauge-label {
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                margin-bottom: 8px;
+                color: #94a3b8;
+                font-weight: bold;
+            }
+
+            .step5-gauge-bg {
+                width: 100%;
+                height: 14px;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 7px;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .step5-gauge-fill {
+                width: 0%;
+                height: 100%;
+                background: linear-gradient(to right, #ef4444, #f59e0b, #10b981, #06b6d4);
+                background-size: 200% 100%;
+                transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            }
+
+            .combination-counter {
+                font-size: 33.6px;
+                font-weight: 900;
+                color: #ef4444;
+                /* 빨간색으로 변경 */
+                margin: 10px 0;
+                font-family: 'Inter', sans-serif;
+                text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 6px;
+                /* 더 굵게 */
+                background: rgba(238, 238, 238, 0.5);
+                /* 연한 배경 */
+                border-radius: 3px;
+                overflow: hidden;
+            }
+
+            #naviProgress {
+                height: 100%;
+                background: #1976d2;
+                /* 굵고 진한 파란색 */
+                transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 0 10px rgba(25, 118, 210, 0.4);
+            }
+
+            .ai-result-chips {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
+                justify-content: flex-start;
+            }
+
+            .ai-chip {
+                padding: 6px 14px;
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(0, 242, 254, 0.2);
+                border-radius: 6px;
+                font-size: 11px;
+                color: #00f2fe;
+                font-family: 'Courier New', Courier, monospace;
+                letter-spacing: 1.5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            /* ===== STEP 6: AI 최종 번호 추출 & 운명의 완성 ===== */
+            .step6-status-bar {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 10px auto 20px;
+                padding: 12px 20px;
+                background: #1e293b;
+                /* 더 진한 색상 */
+                border-radius: 16px;
+                border: 1px solid rgba(255, 215, 0, 0.4);
+                box-shadow: 0 0 20px rgba(251, 191, 36, 0.5), inset 0 0 12px rgba(0, 0, 0, 0.5);
+                width: fit-content;
+            }
+
+            .step6-slot {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 900;
+                font-size: 14px;
+                color: #1e293b;
+                background: linear-gradient(135deg, #fbbf24, #f59e0b);
+                box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .step6-slot.empty {
+                background: rgba(255, 255, 255, 0.05);
+                /* 투명한 배경 */
+                border: 1.5px dashed rgba(255, 255, 255, 0.2);
+                color: rgba(255, 255, 255, 0.2);
+                font-size: 18px;
+                box-shadow: none;
+                animation: emptySlotPulse 1.5s infinite;
+            }
+
+            .step6-slot.filled-final {
+                background: linear-gradient(135deg, #00f2fe, #4facfe);
+                color: white;
+                box-shadow: 0 0 30px rgba(0, 242, 254, 0.8), 0 0 60px rgba(79, 172, 254, 0.4);
+                animation: slotGlow 1s ease-out;
+            }
+
+            @keyframes emptySlotPulse {
+
+                0%,
+                100% {
+                    border-color: rgba(255, 255, 255, 0.15);
+                    transform: scale(1);
+                }
+
+                50% {
+                    border-color: rgba(0, 242, 254, 0.5);
+                    transform: scale(1.05);
+                }
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.8;
+                }
+
+                100% {
+                    transform: scale(1.05);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes slotGlow {
+                0% {
+                    transform: scale(0.3);
+                    opacity: 0;
+                }
+
+                50% {
+                    transform: scale(1.3);
+                }
+
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            .step6-main-layout {
+                display: flex;
+                gap: 15px;
+                margin-top: 10px;
+                align-items: stretch;
+            }
+
+            .step6-matrix-wrapper {
+                flex: 1;
+                background: rgba(15, 23, 42, 0.85);
+                border-radius: 16px;
+                padding: 15px 10px;
+                border: 1px solid rgba(0, 242, 254, 0.15);
+            }
+
+            .step6-matrix-label {
+                font-size: 11px;
+                color: #00f2fe;
+                letter-spacing: 2px;
+                margin-bottom: 12px;
+                font-weight: bold;
+                opacity: 0.8;
+                animation: labelBlink 0.8s infinite;
+            }
+
+            @keyframes labelBlink {
+
+                0%,
+                100% {
+                    opacity: 0.8;
+                }
+
+                50% {
+                    opacity: 0.3;
+                }
+            }
+
+            .step6-matrix {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .step6-cell {
+                width: 100%;
+                aspect-ratio: 1;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 15px;
+                color: #64748b;
+                background: rgba(30, 41, 59, 0.8);
+                border: 1px solid rgba(100, 116, 139, 0.2);
+                transition: all 0.12s ease;
+                position: relative;
+            }
+
+            .step6-cell.highlight {
+                color: white;
+                background: linear-gradient(135deg, #00f2fe, #4facfe, #005bea);
+                border-color: #00f2fe;
+                box-shadow: 0 0 20px rgba(0, 242, 254, 0.7), 0 0 40px rgba(0, 242, 254, 0.3);
+                transform: scale(1.15);
+                z-index: 5;
+            }
+
+            .step6-cell.dimmed {
+                opacity: 0.25;
+            }
+
+            .step6-result-wrapper {
+                flex: 0 0 35%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .step6-result-sublabel {
+                font-size: 11px;
+                letter-spacing: 3px;
+                color: #94a3b8;
+                font-weight: bold;
+            }
+
+            .step6-result-box {
+                width: 100px;
+                height: 100px;
+                border-radius: 20px;
+                background: rgba(15, 23, 42, 0.9);
+                border: 2px solid rgba(100, 116, 139, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.4s ease;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .step6-result-box::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                border-radius: 22px;
+                background: conic-gradient(from 0deg, transparent, #00f2fe, transparent, #4facfe, transparent);
+                opacity: 0;
+                animation: none;
+                z-index: -1;
+            }
+
+            .step6-result-box.revealed {
+                border-color: #00f2fe;
+                box-shadow: 0 0 40px rgba(0, 242, 254, 0.6), 0 0 80px rgba(0, 242, 254, 0.2);
+            }
+
+            .step6-result-box.revealed::before {
+                opacity: 1;
+                animation: borderSpin 2s linear infinite;
+            }
+
+            @keyframes borderSpin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .step6-result-box .result-number {
+                font-size: 42px;
+                font-weight: 900;
+                color: rgba(100, 116, 139, 0.3);
+                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .step6-result-box.revealed .result-number {
+                color: #00f2fe;
+                text-shadow: 0 0 20px rgba(0, 242, 254, 0.8), 0 0 40px rgba(0, 242, 254, 0.4);
+            }
+
+            .step6-result-caption {
+                font-size: 11px;
+                color: #64748b;
+                font-style: italic;
+            }
+
+            /* 승리 후광 효과 */
+            .step6-status-bar.victory {
+                border-color: rgba(255, 215, 0, 0.8);
+                box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), 0 0 60px rgba(255, 215, 0, 0.2);
+                animation: victoryPulse 0.6s ease-out 3;
+            }
+
+            @keyframes victoryPulse {
+                0% {
+                    transform: scale(1);
+                    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+                }
+
+                50% {
+                    transform: scale(1.03);
+                    box-shadow: 0 0 60px rgba(255, 215, 0, 0.8), 0 0 100px rgba(0, 242, 254, 0.4);
+                }
+
+                100% {
+                    transform: scale(1);
+                    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+                }
+            }
+
+            .step6-slot.victory-glow {
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 0 50px rgba(255, 215, 0, 0.4);
+                animation: slotVictory 0.4s ease-out;
+            }
+
+            @keyframes slotVictory {
+                0% {
+                    transform: scale(1);
+                }
+
+                50% {
+                    transform: scale(1.2);
+                }
+
+                100% {
+                    transform: scale(1);
+                }
+            }
+
+            /* 날아가는 공 */
+            .flying-number {
+                position: fixed;
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 900;
+                font-size: 13px;
+                color: white;
+                background: linear-gradient(135deg, #00f2fe, #4facfe);
+                box-shadow: 0 0 25px rgba(0, 242, 254, 0.8);
+                z-index: 9999;
+                pointer-events: none;
+                transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            @keyframes popIn {
+                0% {
+                    transform: scale(0.6);
+                    opacity: 0;
+                }
+
+                80% {
+                    transform: scale(1.05);
+                }
+
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+
+            @keyframes ballEntrance {
+                0% {
+                    transform: scale(0.5);
+                    opacity: 0;
+                }
+
+                100% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+            }
+        </style>
+    </div> <!-- Close #app -->
 </body>
 
 </html>
