@@ -8847,8 +8847,12 @@
 
             .finger-prompt-step5 {
                 position: absolute;
-                bottom: -15px;
-                left: 30%;
+                bottom: -10px;
+                /* 위로 5px (기존 -15px -> -10px) */
+                left: 31%;
+                /* 우측으로 이동 (기존 30% -> ~31% + 보간) */
+                margin-left: 5px;
+                /* 정확히 5px 우측 이동 */
                 display: flex;
                 align-items: center;
                 gap: 8px;
@@ -8860,14 +8864,17 @@
             .finger-prompt-step5 img {
                 width: 50px;
                 height: auto;
-                filter: drop-shadow(0 0 10px rgba(74, 222, 128, 0.5));
+                filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
+                /* 보라색 쉐도우로 변경 */
             }
 
             .finger-prompt-text {
-                color: #4ade80;
+                color: #a855f7;
+                /* 보라색 (purple-500 계열) */
                 font-weight: 900;
+                /* 굵게 */
                 font-size: 14px;
-                text-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+                text-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
                 white-space: nowrap;
             }
 
