@@ -7350,25 +7350,87 @@
             // Dynamic Kakao Share for Fate Card
             function shareFateToKakao() {
                 if (!window.latestFateNumbers) return;
-                try {
-                    if (typeof window.Kakao === 'undefined') {
-                        alert('카카오 SDK를 불러올 수 없습니다.');
+
+                initKakaoGlobal();
+
+                if (typeof window.Kakao === 'undefined') {
+                    alert('카카오 SDK를 불러올 수 없습니다.');
+                    return;
+                }
+
+                const currentUrl = getKakaoShareUrl();
+                const numbers = window.latestFateNumbers.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+
+                showToast('카카오 공유를 위해 OMR 이미지 생성 중... ✨');
+
+                // Step 1: OMR 모달을 백그라운드에 열어두고 html2canvas 캡처
+                openOMR(numbers);
+
+                setTimeout(() => {
+                    const target = document.querySelector('#omrModal .omr-modal-content');
+                    if (!target || typeof html2canvas === 'undefined') {
+                        // html2canvas 없으면 이미지 없이 바로 공유
+                        _sendKakaoShare(currentUrl, null);
                         return;
                     }
 
-                    initKakaoGlobal(); // Ensure init
-                    const currentUrl = getKakaoShareUrl();
-
-                    const shareData = {
-                        objectType: 'feed',
-                        content: {
-                            title: '✨ KINOV AI가 추출한 당신의 운명 번호',
-                            description: `추출된 번호: ${window.latestFateNumbers}\n당신의 운명을 환하게 비추는 6자리의 행운 확인하기!`,
-                            link: {
-                                mobileWebUrl: currentUrl,
-                                webUrl: currentUrl
+                    html2canvas(target, {
+                        backgroundColor: '#ffffff',
+                        scale: 2,
+                        useCORS: true,
+                        logging: false
+                    }).then(canvas => {
+                        // Step 2: canvas → Blob → File
+                        canvas.toBlob(blob => {
+                            if (!blob) {
+                                closeOMR();
+                                _sendKakaoShare(currentUrl, null);
+                                return;
                             }
-                        },
+                            const file = new File([blob], 'KINOV_OMR.jpg', { type: 'image/jpeg' });
+
+                            // Step 3: Kakao CDN 업로드
+                            Kakao.Share.uploadImage({ file: [file] })
+                                .then(res => {
+                                    closeOMR();
+                                    const imageUrl = res.infos.original.url;
+                                    console.log('[Kakao] Image uploaded:', imageUrl);
+                                    _sendKakaoShare(currentUrl, imageUrl);
+                                })
+                                .catch(err => {
+                                    console.warn('[Kakao] Image upload failed, sharing without image:', err);
+                                    closeOMR();
+                                    _sendKakaoShare(currentUrl, null);
+                                });
+                        }, 'image/jpeg', 0.9);
+                    }).catch(err => {
+                        console.warn('[Kakao] html2canvas failed:', err);
+                        closeOMR();
+                        _sendKakaoShare(currentUrl, null);
+                    });
+                }, 700);
+            }
+
+            // 내부 공유 실행함수 (imageUrl 있으면 OMR 이미지, 없으면 기본 공유)
+            function _sendKakaoShare(currentUrl, imageUrl) {
+                try {
+                    const content = {
+                        title: '✨ KINOV AI가 추출한 당신의 운명 번호',
+                        description: `추출된 번호: ${window.latestFateNumbers}\n당신의 운명을 환하게 비추는 6자리의 행운 확인하기!`,
+                        link: {
+                            mobileWebUrl: currentUrl,
+                            webUrl: currentUrl
+                        }
+                    };
+                    if (imageUrl) {
+                        content.imageUrl = imageUrl;
+                        content.imageWidth = 800;
+                        content.imageHeight = 900;
+                    }
+
+                    window.Kakao.Share.sendDefault({
+                        objectType: 'feed',
+                        content,
                         buttons: [
                             {
                                 title: '나의 운명 확인하기',
@@ -7378,11 +7440,10 @@
                                 }
                             }
                         ]
-                    };
-                    window.Kakao.Share.sendDefault(shareData);
+                    });
                 } catch (e) {
                     console.error('Kakao Share Error:', e);
-                    alert(`카카오톡 공유 실패 (4019 가능성)\n\n현재 도메인: ${window.location.origin}\n전송된 주소: ${getKakaoShareUrl()}\n이 주소가 카카오 콘솔에 등록되어 있는지 확인하세요.`);
+                    alert(`카카오톡 공유 실패\n\n현재 도메인: ${window.location.origin}\n이 주소가 카카오 콘솔에 등록되어 있는지 확인하세요.`);
                 }
             }
 
