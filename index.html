@@ -6854,7 +6854,7 @@
                 if (fingerStep3 && wrapStep3) {
                     const pct = (parseInt(val) / 6) * 100; // 0~100%
                     const wrapW = wrapStep3.offsetWidth || 240;
-                    const fingerHalf = (window.innerWidth <= 768) ? 10 : 20; // [요청] 미세조정: 모바일/PC 사이즈 분리 하여 일직선 정렬
+                    const fingerHalf = (window.innerWidth <= 768) ? 8 : 20; // [요청] 80% 축소 반영: 16px의 절반인 8px로 조정
                     const minX = fingerHalf;
                     const maxX = wrapW - fingerHalf;
                     const px = minX + (pct / 100) * (maxX - minX);
@@ -9748,12 +9748,13 @@
                 }
 
                 #fingerPointerStep3 {
-                    font-size: 20px !important;
-                    /* 50% of 40px */
+                    font-size: 16px !important;
+                    /* [요청] 현재의 80% (20px * 0.8) */
                 }
 
                 #fingerPointerWrapStep3 {
-                    height: 18px !important;
+                    height: 14.4px !important;
+                    /* [요청] 현재의 80% (18px * 0.8) */
                 }
 
                 /* 2번째 검정박스 아래 손가락 삭제 */
