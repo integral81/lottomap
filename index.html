@@ -6115,7 +6115,6 @@
                                             <div class="jar-ring"></div>
                                         </div>
                                         <div class="reg-card-label">15 WEEKS</div>
-                                        <div class="neon-select">SELECT</div>
                                     </div>
                                     <div class="reg-card-3d purple" id="regCard52" onclick="selectRegression(52)">
                                         <div class="bell-jar">
@@ -6128,9 +6127,9 @@
                                 </div>
                                 <!-- 손가락 포인터 (선택시 이동) -->
                                 <div id="fingerPointerWrap"
-                                    style="position:relative; height:35px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px;">
+                                    style="position:relative; height:65px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px;">
                                     <img id="fingerPointer" src="up_finger.jpg" alt="select"
-                                        style="width:43px; height:53px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%);">
+                                        style="width:67px; height:82px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%);">
                                 </div>
 
                                 <!-- Candidate Grid -->
@@ -8547,24 +8546,7 @@
             }
 
             .neon-select {
-                position: absolute;
-                bottom: -30px;
-                background: #06b6d4;
-                color: white;
-                font-size: 9px;
-                font-weight: 900;
-                padding: 4px 10px;
-                border-radius: 4px;
-                box-shadow: 0 0 15px #06b6d4;
-                opacity: 0;
-                transform: translateY(10px);
-                transition: all 0.3s;
-            }
-
-            .reg-card-3d.active .neon-select {
-                opacity: 1;
-                transform: translateY(0);
-                animation: neonPulse 1s infinite alternate;
+                display: none;
             }
 
             @keyframes neonPulse {
