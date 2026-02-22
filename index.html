@@ -6120,6 +6120,12 @@
                                         <div class="reg-card-label">52 WEEKS</div>
                                     </div>
                                 </div>
+                                <!-- 손가락 포인터 (선택시 이동) -->
+                                <div id="fingerPointerWrap"
+                                    style="position:relative; height:70px; display:flex; align-items:flex-start; justify-content:center; margin-top:-10px;">
+                                    <img id="fingerPointer" src="up_finger.jpg" alt="select"
+                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%);">
+                                </div>
 
                                 <!-- Candidate Grid -->
                                 <div class="candidate-grid" id="regCandidates">
@@ -6699,6 +6705,18 @@
                 document.querySelectorAll('.reg-card-3d').forEach(card => card.classList.remove('active'));
                 const selectedCard = document.getElementById(`regCard${cycle}`);
                 if (selectedCard) selectedCard.classList.add('active');
+
+                // 2. 손가락 포인터 이동
+                const finger = document.getElementById('fingerPointer');
+                const wrap = document.getElementById('fingerPointerWrap');
+                if (finger && wrap && selectedCard) {
+                    const wrapRect = wrap.getBoundingClientRect();
+                    const cardRect = selectedCard.getBoundingClientRect();
+                    const cardCenterX = cardRect.left + cardRect.width / 2;
+                    const wrapCenterX = wrapRect.left + wrapRect.width / 2;
+                    const offset = cardCenterX - wrapCenterX;
+                    finger.style.transform = `translateX(calc(-50% + ${offset}px))`;
+                }
 
                 // 2. Fetch Candidates
                 // Type consistency: Ensure everything is a Number
@@ -8374,7 +8392,7 @@
             .reg-card-3d {
                 position: relative;
                 width: 100px;
-                height: 140px;
+                height: 112px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -8385,7 +8403,7 @@
             .bell-jar {
                 position: relative;
                 width: 80px;
-                height: 100px;
+                height: 80px;
                 margin-bottom: 10px;
                 transform-style: preserve-3d;
             }
