@@ -6854,7 +6854,7 @@
                 if (fingerStep3 && wrapStep3) {
                     const pct = (parseInt(val) / 6) * 100; // 0~100%
                     const wrapW = wrapStep3.offsetWidth || 240;
-                    const fingerHalf = 20; // Updated for emoji 40px width/2
+                    const fingerHalf = (window.innerWidth <= 768) ? 10 : 20; // [요청] 미세조정: 모바일/PC 사이즈 분리 하여 일직선 정렬
                     const minX = fingerHalf;
                     const maxX = wrapW - fingerHalf;
                     const px = minX + (pct / 100) * (maxX - minX);
@@ -9707,8 +9707,8 @@
                 #naviStep3 h2 {
                     margin-top: 2px !important;
                     margin-bottom: 8px !important;
-                    font-size: 15.2px !important;
-                    /* 65% of 23.4px */
+                    font-size: 18.2px !important;
+                    /* 1.2x of 15.2px */
                     opacity: 0.9 !important;
                     letter-spacing: -1px !important;
                 }
@@ -9724,13 +9724,13 @@
                 }
 
                 .balance-container>div:first-child {
-                    font-size: 9px !important;
-                    /* 50% of 18px */
+                    font-size: 9.9px !important;
+                    /* 1.1x of 9px */
                 }
 
                 #balanceScoreText {
-                    font-size: 12px !important;
-                    /* 50% of 24px */
+                    font-size: 13.2px !important;
+                    /* 1.1x of 12px */
                 }
 
                 .neon-slider {
@@ -9758,6 +9758,21 @@
                 /* 2번째 검정박스 아래 손가락 삭제 */
                 #fingerPointerWrapStep3Balls {
                     display: none !important;
+                }
+
+                /* [요청] Step 3 결과 공 80% 축소 (38px -> 30px) */
+                .rotating-ball {
+                    width: 30px !important;
+                    height: 30px !important;
+                    font-size: 11px !important;
+                }
+
+                .rotating-ball.active {
+                    transform: rotate(360deg) scale(1.05) !important;
+                }
+
+                .rotating-ball.selected-step3 {
+                    transform: rotate(360deg) scale(1.1) !important;
                 }
 
                 .hologram-chart {
