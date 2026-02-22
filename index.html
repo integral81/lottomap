@@ -6103,6 +6103,7 @@
                                         <div class="bell-jar">
                                             <div class="jar-glass"></div>
                                             <div class="jar-dust"></div>
+                                            <div class="jar-sphere"></div>
                                             <div class="jar-ring"></div>
                                         </div>
                                         <div class="reg-card-label">7 WEEKS</div>
@@ -6120,6 +6121,7 @@
                                         <div class="bell-jar">
                                             <div class="jar-glass"></div>
                                             <div class="jar-dust"></div>
+                                            <div class="jar-sphere"></div>
                                             <div class="jar-ring"></div>
                                         </div>
                                         <div class="reg-card-label">52 WEEKS</div>
@@ -8513,6 +8515,12 @@
                 transform: translate(-50%, -50%);
                 box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), inset -2px -2px 5px rgba(0, 0, 0, 0.5);
                 z-index: 2;
+                opacity: 0;
+                transition: opacity 0.35s ease, box-shadow 0.35s ease;
+            }
+
+            .reg-card-3d.active .jar-sphere {
+                opacity: 1;
             }
 
             .reg-card-label {
