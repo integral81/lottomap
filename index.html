@@ -700,10 +700,40 @@
             padding: 2px;
         }
 
-        .omr-number.marked {
-            background: #000;
+        .omr-number.marked,
+        .omr-number.marked-yellow {
+            background: #f9a825;
             color: #fff;
-            border-color: #000;
+            border-color: #e65100;
+            font-weight: 900;
+        }
+
+        .omr-number.marked-blue {
+            background: #1565c0;
+            color: #fff;
+            border-color: #0d47a1;
+            font-weight: 900;
+        }
+
+        .omr-number.marked-red {
+            background: #c62828;
+            color: #fff;
+            border-color: #b71c1c;
+            font-weight: 900;
+        }
+
+        .omr-number.marked-gray {
+            background: #546e7a;
+            color: #fff;
+            border-color: #37474f;
+            font-weight: 900;
+        }
+
+        .omr-number.marked-green {
+            background: #2e7d32;
+            color: #fff;
+            border-color: #1b5e20;
+            font-weight: 900;
         }
 
         .omr-action-btn {
@@ -5478,8 +5508,15 @@
                     const cell = document.createElement('div');
                     cell.className = 'omr-number';
                     cell.innerText = i;
-                    if (numbers.includes(i)) {
-                        cell.className += ' marked';
+                    if (numbers.map(Number).includes(i)) {
+                        // 로또 번호 범위별 실제 색상 적용
+                        let colorClass = 'marked';
+                        if (i <= 10) colorClass = 'marked-yellow';
+                        else if (i <= 20) colorClass = 'marked-blue';
+                        else if (i <= 30) colorClass = 'marked-red';
+                        else if (i <= 40) colorClass = 'marked-gray';
+                        else colorClass = 'marked-green';
+                        cell.className += ' ' + colorClass;
                     }
                     grid.appendChild(cell);
                 }
@@ -7257,8 +7294,8 @@
                     return;
                 }
 
-                // 1. OMR 모달 열기 (최종 번호로)
-                const numbers = window.latestFateNumbers.split(',').map(n => n.trim());
+                // 1. OMR 모달 열기 (연동된 최종 번호로) — 숫자로 변환
+                const numbers = window.latestFateNumbers.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
                 console.log('[OMR Download] Opening OMR with numbers:', numbers);
                 openOMR(numbers);
 
