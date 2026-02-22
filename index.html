@@ -6013,7 +6013,7 @@
                         <!-- Step 3: Balance (KINOV AI Precision) -->
                         <div class="navi-step-container" id="naviStep3">
                             <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23.4px; opacity:0.8;"><span
-                                    style="color:var(--secondary);">Step 3.</span> 조화의 저울(홀수:짝수)</h2>
+                                    style="color:var(--secondary);">Step 3.</span> 조화의 저울(홀수 : 짝수)</h2>
                             <div class="battle-theme-text" id="step3Subtitle"
                                 style="text-align: center; font-size:18px; margin: 19px 0 5px 0;">
                                 확률의 균형을 설계하라.
@@ -9706,7 +9706,8 @@
                 /* Step 3: Balance Scale (Odd/Even) Optimization */
                 #naviStep3 h2 {
                     margin-top: 2px !important;
-                    margin-bottom: 8px !important;
+                    margin-bottom: 13px !important;
+                    /* [요청] 5px 추가 (8px -> 13px) */
                     font-size: 18.2px !important;
                     /* 1.2x of 15.2px */
                     opacity: 0.9 !important;
@@ -9724,13 +9725,13 @@
                 }
 
                 .balance-container>div:first-child {
-                    font-size: 9.9px !important;
-                    /* 1.1x of 9px */
+                    font-size: 10.9px !important;
+                    /* [요청] 1.1x 확대 (9.9px -> 10.9px) */
                 }
 
                 #balanceScoreText {
-                    font-size: 13.2px !important;
-                    /* 1.1x of 12px */
+                    font-size: 14.5px !important;
+                    /* [요청] 1.1x 확대 (13.2px -> 14.5px) */
                 }
 
                 .neon-slider {
@@ -9758,6 +9759,11 @@
                 /* 2번째 검정박스 아래 손가락 삭제 */
                 #fingerPointerWrapStep3Balls {
                     display: none !important;
+                }
+
+                /* [요청] 2번째 검정박스 상단 공백 1/2 (48px -> 24px) */
+                .step3-ai-result-panel {
+                    margin-top: 24px !important;
                 }
 
                 /* [요청] Step 3 결과 공 80% 축소 (38px -> 30px) */
