@@ -6320,11 +6320,8 @@
             </div> <!-- Close admin-modal-content -->
         </div> <!-- Close naviModal -->
 
-        <!-- Lotto Navi Data -->
-        <script src="lotto_data.js?v=20260222-6"
-            onerror="window.errLottoData=true; console.error('Failed to load lotto_data.js')"></script>
-        <script src="lotto_history_data.js?v=20260222-6"
-            onerror="window.errLottoHistory=true; console.error('Failed to load lotto_history_data.js')"></script>
+        <!-- Lotto Navi Data (Unified with main map data sources) -->
+
 
         <!-- Lotto Navi Engine (Inlined) -->
         <script>
@@ -6528,27 +6525,27 @@
             async function toggleNaviMode() {
                 if (!naviEngine) {
                     try {
-                        let errorMsg = '';
-                        if (window.errLottoData) errorMsg += '[lotto_data.js 로드 실패] ';
-                        if (window.errLottoHistory) errorMsg += '[lotto_history_data.js 로드 실패] ';
-                        if (window.errLottoNavi) errorMsg += '[lotto_navi.js 로드 실패] ';
+                        // Resilient Data Source: use main map data if available
+                        let historyData = (typeof LOTTO_HISTORY !== 'undefined') ? LOTTO_HISTORY : window.lottoHistory;
 
-                        if (errorMsg) throw new Error('파일 로딩 실패 요인: ' + errorMsg);
-
-                        if (typeof LottoNaviEngine === 'undefined') {
-                            throw new Error('엔진(LottoNaviEngine)이 정의되지 않았습니다. 파일 로드 여부를 확인해주세요.');
+                        // Deep Fallback: If not ready, attempt manual fetch
+                        if (!historyData) {
+                            console.log('[Navi] Data missing, attempting manual fetch...');
+                            const cacheBuster = '?v=' + Date.now();
+                            const baseUrl = window.currentBaseUrl || './';
+                            historyData = await fetch(baseUrl + 'lotto_history.json' + cacheBuster)
+                                .then(res => res.ok ? res.json() : null)
+                                .catch(() => null);
                         }
-
-                        // Support both static script load (LOTTO_HISTORY) and dynamic fetch loader (window.lottoHistory)
-                        const historyData = (typeof LOTTO_HISTORY !== 'undefined') ? LOTTO_HISTORY : window.lottoHistory;
 
                         if (historyData) {
                             naviEngine = new LottoNaviEngine(historyData);
+                            console.log('[Navi] Engine initialized with history data.');
                         } else {
-                            throw new Error('데이터 원본을 찾을 수 없습니다.');
+                            throw new Error('로또 당첨 데이터(lotto_history.json)를 찾을 수 없습니다.');
                         }
                     } catch (err) {
-                        alert('데이터 로드 실패: ' + err.message + '\n\n지속적으로 오류가 발생 시 브라우저 캐시 삭제 후 다시 시도해 주세요.');
+                        alert('데이터 로드 실패: ' + err.message + '\n\n만약 계속 오류가 발생하면 인터넷 연결 확인 후 다시 시도해 주세요.');
                         return;
                     }
                 }
