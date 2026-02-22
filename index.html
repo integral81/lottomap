@@ -6198,7 +6198,7 @@
                             <!-- 왼쪽 방향 손가락 프롬프트 -->
                             <div class="finger-prompt-step5" id="step5FingerPrompt">
                                 <span class="finger-prompt-text">번호를 골라주세요!</span>
-                                <span style="font-size:40px; line-height:1;">👈</span>
+                                <span style="font-size:40px; line-height:1;">👉</span>
                             </div>
                         </div>
                     </div>
@@ -9010,8 +9010,9 @@
             /* 우측으로 10px 추가 이동 (기존 22px -> 32px) */
             /* 최종 위치: 우측으로 5px 추가 이동 */
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 2px;
             animation: leftFingerBlink 1.5s ease-in-out infinite;
             pointer-events: none;
             z-index: 100;
