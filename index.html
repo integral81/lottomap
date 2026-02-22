@@ -6159,12 +6159,11 @@
 
                         <div class="navi-step-container" id="naviStep5">
                             <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:21.8px; opacity:0.8;"><span
-                                    style="color:var(--secondary);">Step 5.</span> 행운의 끝수 <span
-                                    style="color: #7c3aed; font-weight: 900;">(왼쪽에서 고르세요!!)</span></h2>
+                                    style="color:var(--secondary);">Step 5.</span> 행운의 끝수 (왼쪽에서 선택) :</h2>
 
                             <div class="cumulative-status" id="endCumulativeStatus"
                                 style="margin-bottom: 2px; border-bottom: 2px solid #ef4444; padding-bottom: 15px; width: 90%;">
-                                현재까지 확정된 번호: <span id="endFixedNumsList"></span>
+                                <strong>앞번호:</strong> <span id="endFixedNumsList"></span>
                             </div>
 
                             <div class="step5-main-layout">
@@ -9917,6 +9916,29 @@
 
                 .candidate-grid {
                     display: none !important;
+                }
+
+                /* Step 5: Ending Digits Optimization */
+                #naviStep5 h2 {
+                    font-size: 14.17px !important;
+                    /* 65% of 21.8px */
+                }
+
+                .step5-main-layout {
+                    gap: 5px !important;
+                    margin-top: 0 !important;
+                }
+
+                .ending-selection-area {
+                    padding: 10px !important;
+                }
+
+                .ending-ball {
+                    font-size: 7.8px !important;
+                    /* 60% of 13px */
+                    width: 32px !important;
+                    /* Proactive scaling for better fit */
+                    height: 32px !important;
                 }
             }
 
