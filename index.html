@@ -6068,6 +6068,12 @@
                                     style="min-height: 40px; margin: 8px 0; display: flex !important; visibility: visible !important;">
                                     <!-- AI Rotating Balls -->
                                 </div>
+                                <!-- 손가락 포인터 (공 선택시 이동) -->
+                                <div id="fingerPointerWrapStep3Balls"
+                                    style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px; opacity:0; pointer-events:none; transition:opacity 0.3s;">
+                                    <img id="fingerPointerStep3Balls" src="up_finger.jpg" alt="select"
+                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%);">
+                                </div>
                                 <div class="result-footer" style="margin-top: 5px; font-size: 9px; opacity: 0.8;">
                                     사용자 선택(<span id="step3FixedCount">0</span>) + AI 추천(<span
                                         id="step3AiCount">0</span>) = <span style="color:#ffd700;">최적의 6조합 실시간
@@ -6701,13 +6707,27 @@
 
             function selectStep3Num(num, ballElement) {
                 const n = Number(num);
+                const fingerWrap = document.getElementById('fingerPointerWrapStep3Balls');
+                const fingerImg = document.getElementById('fingerPointerStep3Balls');
+
                 if (naviSelections.step3Nums.map(Number).includes(n)) {
                     naviSelections.step3Nums = [];
                     ballElement.classList.remove('selected-step3');
+                    if (fingerWrap) fingerWrap.style.opacity = '0';
                 } else {
                     document.querySelectorAll('.rotating-ball').forEach(b => b.classList.remove('selected-step3'));
                     naviSelections.step3Nums = [n];
                     ballElement.classList.add('selected-step3');
+
+                    if (fingerWrap && fingerImg && ballElement) {
+                        fingerWrap.style.opacity = '1';
+                        const wrapRect = fingerWrap.getBoundingClientRect();
+                        const ballRect = ballElement.getBoundingClientRect();
+                        const ballCenterX = ballRect.left + ballRect.width / 2;
+                        const wrapCenterX = wrapRect.left + wrapRect.width / 2;
+                        const offset = ballCenterX - wrapCenterX;
+                        fingerImg.style.transform = `translateX(calc(-50% + ${offset}px))`;
+                    }
                 }
 
                 const nextBtn = document.getElementById('naviNextBtn');
