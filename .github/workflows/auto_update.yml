@@ -32,6 +32,6 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add lotto_data.json temp_data.xlsx geocoded_cache_healthy.xlsx
+          git add lotto_data.json lotto_history.json temp_data.xlsx geocoded_cache_healthy.xlsx
           git commit -m "Data: Weekly update for new lottery round" || echo "No changes to commit"
           git push
