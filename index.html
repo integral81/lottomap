@@ -6797,7 +6797,7 @@
                     item.className = 'capsule-item';
                     if (naviSelections.step2.includes(cap.num)) item.classList.add('selected');
 
-                    let highestHTML = cap.isHighest ? '<div class="highest-label">KINOV 최고확률</div>' : '';
+                    let highestHTML = cap.isHighest ? `<div class="highest-label">${window.innerWidth <= 768 ? '최고확률' : 'KINOV 최고확률'}</div>` : '';
 
                     item.innerHTML = `
                         ${highestHTML}
@@ -7886,6 +7886,7 @@
                 background: linear-gradient(90deg, #c084fc 0%, #c084fc 40%, #ffffff 50%, #c084fc 60%, #c084fc 100%);
                 background-size: 200% auto;
                 -webkit-background-clip: text;
+                background-clip: text;
                 -webkit-text-fill-color: transparent;
                 animation: fateShine 4s linear infinite;
                 display: inline-block;
@@ -9515,6 +9516,7 @@
                 /* 1. Header Optimization (uppercase + 90%) */
                 .admin-header h3 {
                     font-size: 16.2px !important;
+                    text-transform: uppercase !important;
                     /* ~90% of 18px */
                 }
 
@@ -9640,6 +9642,95 @@
                 #naviPrevBtn {
                     font-size: 11px !important;
                     padding: 10px 15px !important;
+                }
+
+                /* Step 2: Missing Numbers (Eternal Capsules) Optimization */
+                #naviStep2 h2 {
+                    margin-top: 2px !important;
+                    margin-bottom: 3px !important;
+                    font-size: 15.3px !important;
+                    /* 65% of 23.5px */
+                    opacity: 0.9 !important;
+                    letter-spacing: -1px !important;
+                }
+
+                #naviStep2 .battle-theme-text {
+                    margin: 8px 0 !important;
+                    font-size: 15px !important;
+                    /* 65% of 23px approx */
+                }
+
+                #naviStep2 .battle-theme-text span {
+                    font-size: 12.6px !important;
+                    /* 85% of 14.8px approx */
+                }
+
+                .capsule-container {
+                    gap: 8px !important;
+                    /* Extremely tight */
+                    margin: 10px 0 10px 0 !important;
+                }
+
+                .capsule-glass {
+                    width: 52.8px !important;
+                    /* 60% of 88px */
+                    height: 86.4px !important;
+                    /* 60% of 144px */
+                    border-radius: 26px !important;
+                    padding-top: 12px !important;
+                }
+
+                .gold-ball {
+                    width: 34.8px !important;
+                    /* 60% of 58px */
+                    height: 34.8px !important;
+                    border-width: 1px !important;
+                }
+
+                .gold-ball-num {
+                    font-size: 15.6px !important;
+                    /* 60% of 26px */
+                }
+
+                .capsule-hologram {
+                    height: 24px !important;
+                    /* 60% approx */
+                    margin-bottom: 10px !important;
+                }
+
+                .hologram-chart {
+                    height: 15px !important;
+                }
+
+                .capsule-info-box {
+                    display: none !important;
+                    /* Removed in mobile as per request */
+                }
+
+                .highest-label {
+                    font-size: 8px !important;
+                    padding: 3px 6px !important;
+                    top: -8px !important;
+                }
+
+                .absence-weeks-badge {
+                    min-width: 42px !important;
+                    /* ~60% approx scaling */
+                    padding: 2px 4px !important;
+                    margin-bottom: 6px !important;
+                }
+
+                .absence-weeks-num {
+                    font-size: 11px !important;
+                }
+
+                .absence-weeks-text {
+                    font-size: 6px !important;
+                }
+
+                .capsule-weeks-label {
+                    margin-top: 8px !important;
+                    font-size: 9px !important;
                 }
             }
 
