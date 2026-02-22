@@ -6072,7 +6072,7 @@
                                 <div id="fingerPointerWrapStep3Balls"
                                     style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px; opacity:0; pointer-events:none; transition:opacity 0.3s;">
                                     <img id="fingerPointerStep3Balls" src="up_finger.jpg" alt="select"
-                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%);">
+                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%); mix-blend-mode: multiply;">
                                 </div>
                                 <div class="result-footer" style="margin-top: 5px; font-size: 9px; opacity: 0.8;">
                                     사용자 선택(<span id="step3FixedCount">0</span>) + AI 추천(<span
@@ -6152,7 +6152,7 @@
                                 <div id="fingerPointerWrap"
                                     style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px;">
                                     <img id="fingerPointer" src="up_finger.jpg" alt="select"
-                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%);">
+                                        style="width:54px; height:66px; object-fit:contain; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:50%; transform:translateX(-50%); mix-blend-mode: multiply;">
                                 </div>
 
                                 <!-- Candidate Grid -->
@@ -6706,6 +6706,17 @@
 
                 const step3FixedCount = document.getElementById('step3FixedCount');
                 if (step3FixedCount) step3FixedCount.innerText = fixedNums.length;
+
+                // 5. 초기화: 아무것도 선택 안된 경우 3번째 공(추천 중 하나)을 자동 선택 & 가리킴
+                if (naviSelections.step3Nums.length === 0 && recommended && recommended.length >= 3) {
+                    const thirdVal = recommended[2]; // Index 2
+                    // 렌더링 직후 위치 계산을 위해 약간의 지연
+                    setTimeout(() => {
+                        const allBalls = document.querySelectorAll('.rotating-ball');
+                        const targetBall = Array.from(allBalls).find(b => Number(b.innerText) === Number(thirdVal));
+                        if (targetBall) selectStep3Num(thirdVal, targetBall);
+                    }, 300);
+                }
 
                 animateCombinationCount();
             }
