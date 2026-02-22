@@ -9842,11 +9842,11 @@
 
                 .cumulative-status {
                     padding: 8px 10px !important;
-                    font-size: 11px !important;
+                    font-size: 12.1px !important;
+                    /* [요청] 1.1배 확대 (11px -> 12.1px) */
                     width: 90% !important;
                 }
 
-                /* [요청] 박스 내부 원형 숫자 1.1배 상향 (19.2px -> 21.1px) */
                 .fixed-num-tag,
                 .fixed-num-empty {
                     width: 21.1px !important;
@@ -9858,21 +9858,22 @@
 
                 #regInstructionText {
                     display: none !important;
-                    /* [요청] 문장 삭제 */
                 }
 
-                /* [요청] 7/15/52주 뱃지 60% 축소 */
                 #regCycleBadge {
                     padding: 6.6px 16.8px !important;
                 }
 
                 #regCycleBadge span {
                     font-size: 10.8px !important;
-                    /* 60% of 18px */
                     letter-spacing: 1px !important;
                 }
 
-                /* [요청] 높이 추가 1.3배 확대 (97.5px -> 126px) */
+                .regression-layout {
+                    gap: 5px !important;
+                    /* [요청] 캡슐과 손가락 사이 공백 단축 (20px -> 5px) */
+                }
+
                 .reg-card-3d {
                     width: 60px !important;
                     height: 126px !important;
@@ -9885,19 +9886,17 @@
 
                 .reg-card-label {
                     font-size: 8.4px !important;
-                    /* 60% of 14px approx */
                 }
 
                 #fingerPointer {
                     font-size: 25.8px !important;
-                    /* 60% of 43px */
                 }
 
                 #fingerPointerWrap {
-                    height: 35px !important;
+                    height: 30px !important;
+                    /* [요청] 공백 단축 반영 (35px -> 30px) */
                 }
 
-                /* [요청] 손가락 아래 원숫자 2행(후보군) 삭제 */
                 .candidate-grid {
                     display: none !important;
                 }
