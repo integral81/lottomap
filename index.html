@@ -9558,20 +9558,21 @@
                 }
 
                 .battle-side {
-                    padding: 4px 2px;
+                    padding: 4px 2px 7px 2px;
+                    /* Bottom padding slightly increased */
                     box-sizing: border-box;
-                    min-height: 130px !important;
+                    min-height: 133px !important;
                     /* Ultimate reduced height */
                 }
 
-                /* [요청] 측면 타이틀: 90% 크기 조정 (줄바꿈 유지) */
+                /* [요청] 측면 타이틀: 1.1배 확대 (11.25px -> 12.4px) */
                 .battle-title {
-                    font-size: 11.25px !important;
+                    font-size: 12.4px !important;
                     /* 90% of 12.5px */
                     margin-bottom: 8px;
                     visibility: hidden;
                     position: relative;
-                    height: 28px;
+                    height: 30px;
                     white-space: pre;
                     line-height: 1.25;
                     width: 100%;
@@ -9601,10 +9602,11 @@
                     display: none;
                 }
 
+                /* [요청] 테마 텍스트 아래 5px 공백 추가 (기본 5px -> 10px) */
                 .battle-theme-text {
                     font-size: 14px !important;
                     margin-top: 2px !important;
-                    margin-bottom: 5px !important;
+                    margin-bottom: 10px !important;
                 }
 
                 /* Vertical Ball Stacking */
