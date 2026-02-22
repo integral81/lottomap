@@ -6017,6 +6017,12 @@
 
                                 <input type="range" id="balanceSlider" min="0" max="6" value="2" class="neon-slider"
                                     style="margin-top: 12px;" oninput="updateStep3UI(this.value)">
+                                <!-- 손가락 포인터 (슬라이더 연동) -->
+                                <div id="fingerPointerWrapStep3"
+                                    style="position:relative; height:35px; width:100%; margin-top:-4px;">
+                                    <img id="fingerPointerStep3" src="up_finger.jpg" alt="select"
+                                        style="width:43px; height:53px; object-fit:contain; transition:transform 0.3s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:0%; transform:translateX(calc(33.3% - 21.5px));">
+                                </div>
                             </div>
 
                             <div class="step3-ai-result-panel"
@@ -6608,6 +6614,19 @@
 
                 const scoreText = document.getElementById('balanceScoreText');
                 if (scoreText) scoreText.innerText = `${odd} : ${even}`;
+
+                // 손가락 포인터: 슬라이더 위치 동기화 (val 0~6 → % 0~100)
+                const fingerStep3 = document.getElementById('fingerPointerStep3');
+                const wrapStep3 = document.getElementById('fingerPointerWrapStep3');
+                if (fingerStep3 && wrapStep3) {
+                    const pct = (parseInt(val) / 6) * 100; // 0~100%
+                    const wrapW = wrapStep3.offsetWidth || 240;
+                    const fingerHalf = 21.5; // img width/2
+                    const minX = fingerHalf;
+                    const maxX = wrapW - fingerHalf;
+                    const px = minX + (pct / 100) * (maxX - minX);
+                    fingerStep3.style.transform = `translateX(${px - fingerHalf}px)`;
+                }
 
                 // 1. AI 실시간 추출
                 const fixedNums = [...naviSelections.step1, ...naviSelections.step2].filter(n => n !== null && n !== undefined).map(Number);
