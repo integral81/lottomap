@@ -7047,7 +7047,7 @@
                         // Wait a bit more for the user to see the "Hero" before it flies
                         setTimeout(() => {
                             triggerFlyToStatusBar(fateNum, sourceEl);
-                        }, 800);
+                        }, 200); // 800ms -> 200ms로 단축
                     } else {
                         // Fallback if element not found
                         naviSelections.step4 = [Number(fateNum)];
@@ -7055,7 +7055,7 @@
                         document.getElementById('naviNextBtn').disabled = false;
                         document.getElementById('naviNextBtn').style.opacity = '1';
                     }
-                }, 500);
+                }, 100); // 500ms -> 100ms로 단축
             }
 
             function triggerFlyToStatusBar(n, sourceElement) {
@@ -7090,7 +7090,7 @@
                                 z-index: 9999;
                                 box-shadow: 0 0 25px rgba(0, 242, 254, 1), 0 8px 15px rgba(0,0,0,0.5);
                                 border: 2px solid #fff;
-                                transition: all 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+                                transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1); /* 1.2s -> 0.4s 단축 */
                                 pointer-events: none;
                             `;
                 flyingBall.innerText = n;
@@ -7139,7 +7139,7 @@
                         document.getElementById('naviNextBtn').style.opacity = '1';
                         animateCombinationCount();
                     }, 200);
-                }, 1200);
+                }, 400); // 1200ms -> 400ms 단축
             }
 
             function updateCumulativeStatus() {
