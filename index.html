@@ -6560,10 +6560,10 @@
                             <div class="gold-ball">
                                 <span class="gold-ball-num">${cap.num}</span>
                             </div>
-                            <div class="capsule-hologram">
-                                <div class="hologram-chart"></div>
-                                <div class="hologram-data">${cap.weeks} WEEKS</div>
-                            </div>
+                                <div class="absence-weeks-badge">
+                                    <span class="absence-weeks-num">${cap.weeks}</span>
+                                    <span class="absence-weeks-text">WEEKS AGO</span>
+                                </div>
                         </div>
                         <div class="capsule-weeks-label">${cap.num} READY</div>
                     `;
@@ -7980,6 +7980,56 @@
                 font-weight: 900;
                 margin-top: 4px;
                 text-shadow: 0 0 5px rgba(0, 242, 254, 0.6);
+            }
+
+            /* 미출현 기간 배지 - 눈에 확 들어오는 네온 스타일 */
+            .absence-weeks-badge {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                margin-top: auto;
+                margin-bottom: 10px;
+                padding: 6px 14px;
+                background: linear-gradient(135deg, #ff0040, #ff6600);
+                border-radius: 10px;
+                box-shadow: 0 0 16px rgba(255, 0, 64, 0.7), 0 0 32px rgba(255, 102, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+                border: 1.5px solid rgba(255, 180, 0, 0.6);
+                animation: weeksGlow 1.4s ease-in-out infinite;
+                min-width: 80px;
+            }
+
+            .absence-weeks-num {
+                font-size: 22px;
+                font-weight: 900;
+                color: #ffffff;
+                line-height: 1;
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
+                letter-spacing: 1px;
+            }
+
+            .absence-weeks-text {
+                font-size: 9px;
+                font-weight: 800;
+                color: #ffe066;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                margin-top: 1px;
+                text-shadow: 0 0 6px rgba(255, 200, 0, 0.8);
+            }
+
+            @keyframes weeksGlow {
+
+                0%,
+                100% {
+                    box-shadow: 0 0 14px rgba(255, 0, 64, 0.6), 0 0 28px rgba(255, 102, 0, 0.3);
+                    transform: scale(1);
+                }
+
+                50% {
+                    box-shadow: 0 0 26px rgba(255, 40, 80, 1), 0 0 52px rgba(255, 120, 0, 0.5), inset 0 0 8px rgba(255, 255, 255, 0.2);
+                    transform: scale(1.06);
+                }
             }
 
             .capsule-weeks-label {
