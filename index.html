@@ -9877,16 +9877,21 @@
                     margin-top: -10px !important;
                 }
 
+                .regression-card-container {
+                    padding: 0 !important;
+                    /* 컨테이너 내부 여백 제거 */
+                }
+
                 .reg-card-3d {
                     width: 60px !important;
                     height: 123.5px !important;
-                    /* [요청] 1.3배 확대 */
+                    margin-bottom: -40px !important;
+                    /* [미션] 아래 요소와 강제 밀착 */
                 }
 
                 .reg-card-3d .bell-jar {
                     transform: scale(0.6) !important;
                     margin-bottom: -28px !important;
-                    /* 내부 요소 더 위로 */
                 }
 
                 .reg-card-label {
@@ -9895,14 +9900,14 @@
 
                 #fingerPointer {
                     font-size: 30px !important;
-                    top: -45px !important;
-                    /* [요청] 7 weeks 바로 아래 밀착 */
+                    top: -60px !important;
+                    /* [미션] 손가락을 캡슐 밑면으로 바짝 끌어올림 */
                 }
 
                 #fingerPointerWrap {
                     height: 20px !important;
-                    margin-top: -65px !important;
-                    /* 마진으로 상단과 더욱 밀착 */
+                    margin-top: -85px !important;
+                    /* [미션] 전체 레이아웃 텐션 극대화 */
                 }
 
                 .candidate-grid {
