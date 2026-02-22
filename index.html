@@ -35,10 +35,7 @@
     <link rel="preload" href="assets/markers/tier3.png" as="image">
     <link rel="preload" href="assets/markers/tier4.png" as="image">
 
-    <!-- Lotto Navi Data & Engine -->
-    <script src="lotto_data.js?v=20260222-3"></script>
-    <script src="lotto_history_data.js?v=20260222-3"></script>
-    <script src="lotto_navi.js?v=20260222-3"></script>
+    <!-- Core Data Scripts will be loaded at the bottom -->
 
     <meta name="description" content="전국 로또 1등 당첨 판매점을 지도에서 한눈에 확인하세요. 내 주변 명당 찾기, 로또 번호 무료 추천 서비스 제공.">
     <meta name="keywords" content="로또, 로또명당, 로또지도, 로또1등, 로또당첨번호, 로또판매점, KINOV">
@@ -6323,7 +6320,14 @@
             </div> <!-- Close admin-modal-content -->
         </div> <!-- Close naviModal -->
 
+        <!-- Lotto Navi Data & Engine (Moved to bottom for guaranteed execution) -->
+        <script src="lotto_data.js?v=20260222-4" onerror="console.error('Failed to load lotto_data.js')"></script>
+        <script src="lotto_history_data.js?v=20260222-4"
+            onerror="console.error('Failed to load lotto_history_data.js')"></script>
+        <script src="lotto_navi.js?v=20260222-4" onerror="console.error('Failed to load lotto_navi.js')"></script>
+
         <script>
+            console.log("Main script block initializing...");
             let naviEngine = null;
             let currentNaviStep = 1;
             let naviSelections = {
