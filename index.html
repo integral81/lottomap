@@ -6162,7 +6162,7 @@
                                     style="color:var(--secondary);">Step 5.</span> 행운의 끝수 (왼쪽에서 선택) :</h2>
 
                             <div class="cumulative-status" id="endCumulativeStatus"
-                                style="margin-bottom: 2px; border-bottom: 2px solid #ef4444; padding-bottom: 15px; width: 90%;">
+                                style="margin-bottom: 2px; border-bottom: none; padding-bottom: 15px; width: 90%;">
                                 <strong>앞번호:</strong> <span id="endFixedNumsList"></span>
                             </div>
 
@@ -6176,9 +6176,9 @@
                                 <div class="ai-analysis-panel">
                                     <p class="ai-instruction-text" id="step5Instruction"
                                         style="font-size: 15px; font-weight: bold; line-height: 1.4;">
-                                        당신의 선택 기반으로<br>
-                                        당첨확율을 아래와 같이<br>
-                                        계산해서 알려드립니다.
+                                        당신의 선택!!<br>
+                                        아래 게이지로<br>
+                                        알려드려요
                                     </p>
 
 
@@ -9939,6 +9939,11 @@
                     width: 32px !important;
                     /* Proactive scaling for better fit */
                     height: 32px !important;
+                }
+
+                .ai-analysis-panel {
+                    flex: 0 0 70% !important;
+                    max-width: 70% !important;
                 }
             }
 
