@@ -9925,25 +9925,31 @@
                 }
 
                 .step5-main-layout {
-                    gap: 5px !important;
+                    gap: 2px !important;
                     margin-top: 0 !important;
+                    justify-content: center !important;
+                    display: flex !important;
                 }
 
-                .ending-selection-area {
-                    padding: 10px !important;
+                .ending-digit-grid {
+                    grid-template-columns: repeat(2, 34px) !important;
+                    gap: 4px !important;
+                    justify-content: flex-end !important;
+                    flex: 1 !important;
+                    padding-right: 0 !important;
                 }
 
                 .ending-ball {
                     font-size: 9.36px !important;
-                    /* 1.2x of previous 7.8px (60% of 13px) */
+                    /* 1.2x of 7.8px */
                     width: 32px !important;
-                    /* Proactive scaling for better fit */
                     height: 32px !important;
                 }
 
                 .ai-analysis-panel {
-                    flex: 0 0 50% !important;
-                    max-width: 50% !important;
+                    flex: 0 0 53% !important;
+                    max-width: 53% !important;
+                    margin-left: 0 !important;
                 }
             }
 
