@@ -6031,9 +6031,9 @@
                                     style="color: #7c3aed; font-weight: 800; font-size: 15px; vertical-align: middle;">과거의
                                     영광(회귀분석)</span>
                                 <div
-                                    style="display: inline-block; position: relative; padding: 6px 18px; background: linear-gradient(135deg, #ffd700, #b8860b); border-radius: 50px; box-shadow: 0 4px 12px rgba(184, 134, 11, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.5); border: 1px solid #926b08; margin: 0 5px; vertical-align: middle;">
+                                    style="display: inline-block; position: relative; padding: 7px 20px; background: linear-gradient(135deg, #ffe600, #ff9900); border-radius: 50px; box-shadow: 0 0 18px rgba(255, 180, 0, 0.7), 0 0 36px rgba(255, 120, 0, 0.35), inset 0 2px 3px rgba(255, 255, 255, 0.6); border: 2px solid #ff8c00; margin: 0 5px; vertical-align: middle; animation: badgePulse 1.6s ease-in-out infinite;">
                                     <span
-                                        style="color: #5b21b6; font-weight: 900; font-size: 17.5px; text-shadow: 0 1px 0 rgba(255,255,255,0.2);">'7
+                                        style="color: #3b0764; font-weight: 900; font-size: 18px; letter-spacing: 0.3px; text-shadow: 0 1px 0 rgba(255,255,255,0.4);">'7
                                         / 15 / 52주 중에서 1개만'</span>
                                 </div>
                                 <span
@@ -6402,10 +6402,12 @@
                     updateNaviUI();
                     if (currentNaviStep === 5) setTimeout(initStep5, 50);
                     if (currentNaviStep === 6) {
-                        // Show the '운명 카드 받기' button
+                        // Show the '운명 카드 받기' button, hide the close button
                         const nextBtn = document.getElementById('naviNextBtn');
                         nextBtn.style.display = 'block';
                         nextBtn.innerText = '운명 카드 받기';
+                        const cBtn = document.getElementById('naviCloseBtn');
+                        if (cBtn) cBtn.style.display = 'none';
                         // Re-run analysis so Step 6 works properly
                         const confirmed = [
                             ...(naviSelections.step1 || []),
@@ -8375,6 +8377,20 @@
 
                 to {
                     box-shadow: 0 0 25px #06b6d4, 0 0 5px white;
+                }
+            }
+
+            @keyframes badgePulse {
+
+                0%,
+                100% {
+                    box-shadow: 0 0 14px rgba(255, 160, 0, 0.6), 0 0 28px rgba(255, 100, 0, 0.25);
+                    transform: scale(1);
+                }
+
+                50% {
+                    box-shadow: 0 0 28px rgba(255, 200, 0, 1), 0 0 56px rgba(255, 140, 0, 0.55), inset 0 0 8px rgba(255, 255, 255, 0.3);
+                    transform: scale(1.06);
                 }
             }
 
