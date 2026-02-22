@@ -2610,8 +2610,8 @@
                     <div class="input-row" style="display: flex; align-items: center; gap: 6px; width: 100%;">
                         <input type="number" id="minRound" value="1">
                         <span style="font-weight: bold; margin: 0 2px;">~</span>
-                        <input type="number" id="maxRound" value="1211" max="1211"
-                            oninput="if(parseInt(this.value) > 1211) this.value = 1211;">
+                        <input type="number" id="maxRound" value="1212" max="1212"
+                            oninput="if(parseInt(this.value) > 1212) this.value = 1212;">
                         <div class="recent-dropdown">
                             <button id="filterGuideAnchor" class="dropdown-toggle" onclick="toggleRecentDropdown()"
                                 style="padding: 6px 18px !important; min-width: 65px;">전체</button>
@@ -2636,7 +2636,7 @@
             <div class="section" id="recentRoundsContainer"
                 style="background:#f0f4f8; padding:10px; border-radius:8px; margin-bottom:20px;">
                 <span class="section-title" style="margin-bottom:8px;">📊 최근 3회차 당첨번호 (기준: <span id="recentRefRound"
-                        style="color:#d32f2f;">1211</span>회)</span>
+                        style="color:#d32f2f;">1212</span>회)</span>
                 <div id="recentRoundsList" style="display:flex; flex-direction:column; gap:6px;">
                     <!-- Javascript will populate this -->
                     <div style="font-size:12px; color:#666; text-align:center;">데이터 로딩 중...</div>
@@ -3363,7 +3363,7 @@
                     data.forEach(item => {
                         // Use existing 'w' or 'totalWins' if provided by Scheme B
                         item.totalWins = item.w || item.totalWins || 1;
-                        if (item.r === undefined) item.r = 1211; // Default to newest if round missing
+                        if (item.r === undefined) item.r = 1212; // Default to newest if round missing
                         if (item.m === undefined) item.m = "정보없음"; // Default method
                     });
                 } else {
@@ -3399,7 +3399,7 @@
                 document.getElementById('totalDataCount').innerText = data.length.toLocaleString();
                 if (data.length > 0) {
                     const rounds = data.map(d => d.r || 0);
-                    const maxR = Math.max(...rounds, 1211);
+                    const maxR = Math.max(...rounds, 1212);
                     const minR = Math.min(...rounds, 1);
 
                     document.getElementById('maxRound').value = maxR;
@@ -3409,7 +3409,7 @@
                 applyFilters();
 
                 // Initial load of recent rounds
-                const initialMax = parseInt(document.getElementById('maxRound').value) || 1211;
+                const initialMax = parseInt(document.getElementById('maxRound').value) || 1212;
                 updateRecentRounds(initialMax);
 
                 // --- Add Real-time Event Listeners ---
@@ -3839,9 +3839,9 @@
 
             function setRecentNRounds(n) {
                 let currentMax = parseInt(document.getElementById('maxRound').value);
-                // 입력값이 없거나 유효하지 않으면 기본 최신 회차(1211) 사용
+                // 입력값이 없거나 유효하지 않으면 기본 최신 회차(1212) 사용
                 if (isNaN(currentMax) || currentMax < 1) {
-                    currentMax = 1211;
+                    currentMax = 1212;
                 }
 
                 // "전체" 옵션 처리
@@ -3981,8 +3981,8 @@
                     const row = document.createElement('div');
                     row.className = 'recent-row';
 
-                    // Apply Highlight to the absolute newest round (1211)
-                    if (targetRound === 1211) {
+                    // Apply Highlight to the absolute newest round (1212)
+                    if (targetRound === 1212) {
                         row.classList.add('latest-round-glow');
                     }
 
@@ -5919,7 +5919,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
                             <h3 style="margin:0; font-size: 18px;">🧭 로또 Navi by Kinov Ai</h3>
-                            <p style="margin: 2px 0 0 0; font-size: 12px; opacity: 0.8;">1~1211회차 데이터를 분석한 번호 추천</p>
+                            <p style="margin: 2px 0 0 0; font-size: 12px; opacity: 0.8;">1~1212회차 데이터를 분석한 번호 추천</p>
                         </div>
                         <button onclick="closeNaviModal()" style="
                             position:absolute; top:12px; right:14px;
