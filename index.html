@@ -10001,21 +10001,23 @@
                     margin-bottom: 14px !important;
                 }
 
+                /* Mobile Final card: 3+3 two-row layout */
                 #finalNaviNumbers {
-                    gap: 3px !important;
+                    display: grid !important;
+                    grid-template-columns: repeat(3, 44px) !important;
+                    gap: 8px !important;
                     margin-bottom: 14px !important;
-                    flex-wrap: nowrap !important;
                     justify-content: center !important;
                 }
 
-                /* Lotto balls inside the final card — must be circular, 6 in one row */
+                /* Balls: perfectly circular, 44px */
                 #finalNaviNumbers .result-ball,
                 #finalNaviNumbers>div {
-                    width: 34px !important;
-                    height: 34px !important;
-                    min-width: 34px !important;
-                    min-height: 34px !important;
-                    font-size: 12px !important;
+                    width: 44px !important;
+                    height: 44px !important;
+                    min-width: 44px !important;
+                    min-height: 44px !important;
+                    font-size: 15px !important;
                     border-radius: 50% !important;
                     flex-shrink: 0 !important;
                 }
