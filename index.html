@@ -9512,43 +9512,58 @@
             /* ============================================================ */
             @media (max-width: 768px) {
 
-                /* Global Scaling for Content Below Header (90% size) */
-                #naviStepsBody {
-                    font-size: 90% !important;
-                    padding: 5px 15px !important;
-                    /* Tighten side padding */
+                /* 1. Header Optimization (Make it 1-line) */
+                .admin-header p {
+                    display: none !important;
                 }
 
-                /* General Step Layout Compression for Step 1 */
-                #naviStep1 h2 {
-                    margin-top: 5px !important;
+                .admin-header {
+                    padding: 10px 20px !important;
+                }
+
+                /* Reduce header height */
+
+                /* 2. Global Scaling (Content Below Header @ 90% then specific elements @ 80/70/60%) */
+                #naviStepsBody {
+                    font-size: 90% !important;
+                    padding: 2px 15px !important;
+                    /* Reduced padding further */
+                }
+
+                /* 2. Combination Count (80%) */
+                #naviComboCounter {
+                    font-size: 80% !important;
                     margin-bottom: 2px !important;
-                    font-size: 19px !important;
-                    /* 90% of PC size */
+                }
+
+                /* 3. Step 1 Title (70%) */
+                #naviStep1 h2 {
+                    margin-top: 2px !important;
+                    margin-bottom: 2px !important;
+                    font-size: 15.5px !important;
+                    /* ~70% of original 22.2px */
+                    opacity: 0.9 !important;
                 }
 
                 /* Step 1: Battle UI Optimization */
                 .battle-container {
-                    gap: 6px;
-                    /* Use even narrower gap */
-                    margin-top: 5px;
+                    gap: 4px;
+                    margin-top: 2px;
                 }
 
                 .battle-side {
-                    padding: 6px 2px;
-                    /* Super tight padding to save space */
+                    padding: 4px 2px;
                     box-sizing: border-box;
-                    min-height: 160px;
-                    /* Reduced further for vertical fit */
+                    min-height: 140px;
+                    /* Compress height to show button */
                 }
 
                 /* Text Overrides: Hide PC text and inject concise mobile text */
                 .battle-theme-text {
-                    font-size: 16px !important;
-                    /* Keeping current mobile size as it's already ~75% */
+                    font-size: 14px !important;
                     margin-bottom: 2px !important;
                     visibility: hidden;
-                    height: 20px;
+                    height: 18px;
                     position: relative;
                 }
 
@@ -9564,12 +9579,11 @@
                 }
 
                 .battle-title {
-                    font-size: 11px;
-                    margin-bottom: 5px;
+                    font-size: 10px;
+                    margin-bottom: 4px;
                     visibility: hidden;
                     position: relative;
-                    height: 26px;
-                    /* Support 2 lines */
+                    height: 24px;
                     white-space: pre;
                     line-height: 1.1;
                     width: 100%;
@@ -9585,7 +9599,6 @@
                     display: block;
                     width: 100%;
                     text-align: center;
-                    /* Center the multi-line text */
                 }
 
                 .side-left .battle-title::before {
@@ -9603,16 +9616,29 @@
                 /* Vertical Ball Stacking */
                 .battle-ball-grid {
                     flex-direction: column;
-                    /* Stack balls vertically */
-                    gap: 4px;
+                    gap: 3px;
                     z-index: 2;
                 }
 
-                /* Scale down ball size (90% of current mobile 36px = ~32px) */
+                /* 4. Original Balls (70%) */
+                /* Current mobile 32px * 0.7 = ~22px */
                 .battle-ball-grid .mini-ball {
-                    width: 32px;
-                    height: 32px;
-                    font-size: 13px;
+                    width: 22px !important;
+                    height: 22px !important;
+                    font-size: 11px !important;
+                }
+
+                /* 5. Next Step Button (60%) */
+                #naviNextBtn {
+                    font-size: 60% !important;
+                    padding: 6px 18px !important;
+                    height: auto !important;
+                    border-radius: 6px !important;
+                }
+
+                #naviPrevBtn {
+                    font-size: 60% !important;
+                    padding: 6px 12px !important;
                 }
             }
 
