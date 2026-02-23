@@ -6131,14 +6131,11 @@
                             <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23.4px; opacity:0.8;"><span
                                     style="color:var(--secondary);">Step 4.</span> 영광의 재현(회귀분석)</h2>
                             <div class="cumulative-status" id="regCumulativeStatus">
-                                <span class="reg-label-pc">현재까지 확정된 번호:</span> <span id="regFixedNumsList"></span>
+                                <span class="reg-label-pc">앞 추천번호:</span> <span id="regFixedNumsList"></span>
                             </div>
                             <div
                                 style="margin: 16px 0 9px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center;">
-                                <div id="regInstructionText"
-                                    style="font-size: 14px; font-weight: 800; color: #7c3aed; letter-spacing: -0.2px;">
-                                    과거의 영광(회귀분석) — 아래 중 <em style="font-style:normal; color:#c084fc;">1개만</em> 고르세요!!
-                                </div>
+                                <!-- Removed #regInstructionText per user request -->
                                 <div id="regCycleBadge" style="
                                     display: inline-flex;
                                     align-items: center;
@@ -10272,12 +10269,14 @@
                     /* [요청] 7px 공백 추가 (10px -> 17px) */
                 }
 
+                /* Removed #regInstructionText from Mobile CSS */
+
                 .reg-label-pc {
                     display: none !important;
                 }
 
                 #regCumulativeStatus::before {
-                    content: '앞번호: ';
+                    content: '앞 추천번호: ';
                 }
 
                 .cumulative-status {
@@ -10297,10 +10296,7 @@
                     border-width: 1.2px !important;
                 }
 
-                #regInstructionText {
-                    display: none !important;
-                }
-
+                /* Removed #regInstructionText CSS entirely */
                 #regCycleBadge {
                     padding: 6.6px 16.8px !important;
                 }
@@ -10349,8 +10345,11 @@
                     font-size: 8px !important;
                     margin-bottom: 8px !important;
                     letter-spacing: -0.5px !important;
-                    height: 24px !important;
+                    height: 38px !important;
+                    /* Increased height for mobile visibility */
                     line-height: 1.2 !important;
+                    overflow: visible !important;
+                    /* Removed text clipping or hiding rules if there were any affecting this */
                 }
 
                 #aiMatchingScoreContainer {
