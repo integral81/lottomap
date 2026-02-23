@@ -10305,7 +10305,7 @@
                 }
 
                 #regCumulativeStatus::before {
-                    content: '앞 추천번호: ';
+                    content: '앞번호: ';
                 }
 
                 .cumulative-status {
@@ -10350,51 +10350,70 @@
                 }
 
                 .glass-trend-card {
-                    padding: 12px 6px !important;
+                    padding: 8px 4px !important;
                     min-width: unset !important;
                     flex: 1 !important;
                     /* Keep equal width on mobile */
                 }
 
-                .pc-br {
-                    display: none !important;
-                    /* Hide line breaks on Mobile */
-                }
-
                 .trend-icon {
                     font-size: 22px !important;
-                    margin-bottom: 6px !important;
+                    margin-bottom: 2px !important;
                 }
 
                 .trend-title {
-                    font-size: 12px !important;
+                    font-size: 13.2px !important;
                 }
 
                 .trend-tags {
-                    font-size: 8px !important;
-                    padding: 2px 4px !important;
+                    font-size: 8.8px !important;
+                    padding: 2px 2px !important;
                     margin-bottom: 5px !important;
                     letter-spacing: -0.5px !important;
+                    line-height: 1.2 !important;
                 }
 
                 .trend-desc {
-                    font-size: 8px !important;
-                    margin-bottom: 8px !important;
+                    font-size: 9.6px !important;
+                    margin-bottom: 4px !important;
                     letter-spacing: -0.5px !important;
-                    height: 38px !important;
+                    height: 48px !important;
                     /* Increased height for mobile visibility */
-                    line-height: 1.2 !important;
+                    line-height: 1.1 !important;
                     overflow: visible !important;
                     /* Removed text clipping or hiding rules if there were any affecting this */
                 }
 
                 #aiMatchingScoreContainer {
-                    padding: 10px !important;
-                    margin: 5px auto 5px !important;
+                    padding: 8px !important;
+                    margin: 0px auto 2px !important;
+                    transform: scale(0.95);
+                    /* Slightly shrink gauge */
                 }
 
                 #matchingScoreText {
-                    font-size: 15px !important;
+                    font-size: 14px !important;
+                }
+
+                /* Step 4 Finger Pointer Compress on Mobile to fit Gauge */
+                #naviStep4 #fingerPointer {
+                    font-size: 21px !important;
+                    /* exactly half */
+                    position: absolute !important;
+                    top: -10px !important;
+                    left: 50% !important;
+                }
+
+                #naviStep4 #fingerPointerWrap {
+                    position: relative !important;
+                    display: flex;
+                    justify-content: center;
+                    height: 20px !important;
+                    /* Reduced 1/2 */
+                    margin-top: -18px !important;
+                    /* Extreme compression for gap */
+                    margin-bottom: -5px !important;
+                    overflow: visible !important;
                 }
             }
 
@@ -10403,7 +10422,6 @@
                 position: absolute !important;
                 top: 0 !important;
                 left: 50% !important;
-                /* JS translation handle: transform: translateX(calc(-50% + ...)) */
             }
 
             #naviStep2 #fingerPointerWrap {
@@ -10412,7 +10430,6 @@
                 justify-content: center;
                 height: 35px !important;
                 margin-top: -12px !important;
-                /* Tight to capsules */
                 overflow: visible !important;
             }
 
