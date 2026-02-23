@@ -6030,65 +6030,79 @@
                             <h2 style="margin-top: 15px; margin-bottom: 5px; font-size:23.4px; opacity:0.8;"><span
                                     style="color:var(--secondary);">Step 3.</span> 조화의 저울(홀수 : 짝수)</h2>
                             <div class="battle-theme-text" id="step3Subtitle"
-                                style="text-align: center; font-size:18px; margin: 19px 0 5px 0;">
+                                style="text-align: center; font-size:18px; margin: 19px 0 15px 0;">
                                 확률의 균형을 설계하라.
                             </div>
 
-                            <!-- Top Section (Input): Balance Slider -->
-                            <div class="balance-container" style="position: relative; z-index: 2;">
-                                <div
-                                    style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px;">
-                                    <span style="color: #ef4444; text-shadow: 0 0 10px #ef4444;">ODD (홀수)</span>
-                                    <span id="balanceScoreText" style="color: white; font-size: 24px;">2 : 4</span>
-                                    <span style="color: #3b82f6; text-shadow: 0 0 10px #3b82f6;">EVEN (짝수)</span>
-                                </div>
+                            <!-- Top Module: Input (Odds/Evens) -->
+                            <div class="futuristic-card" id="step3TopCard" style="position: relative; z-index: 2;">
+                                <div class="balance-container" style="position: relative; z-index: 2;">
+                                    <div
+                                        style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; margin-bottom: 5px;">
+                                        <span style="color: #ef4444; text-shadow: 0 0 10px #ef4444;">ODD (홀수)</span>
+                                        <span id="balanceScoreText"
+                                            style="color: white; font-size: 26px; text-shadow: 0 0 15px rgba(255,255,255,0.5);">2
+                                            : 4</span>
+                                        <span style="color: #3b82f6; text-shadow: 0 0 10px #3b82f6;">EVEN (짝수)</span>
+                                    </div>
 
-                                <input type="range" id="balanceSlider" min="0" max="6" value="2" class="neon-slider"
-                                    style="margin-top: 12px; position:relative; z-index:2;"
-                                    oninput="updateStep3UI(this.value)">
-                                <!-- 손가락 포인터 (슬라이더 연동) -->
-                                <div id="fingerPointerWrapStep3"
-                                    style="position:relative; height:35px; width:100%; margin-top:-4px; z-index:2;">
-                                    <span id="fingerPointerStep3"
-                                        style="font-size:40px; line-height:1; transition:transform 0.3s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:0%; transform:translateX(calc(33.3% - 20px)); pointer-events:none;">👆</span>
+                                    <!-- Perfect Balance Hit Indicator -->
+                                    <div id="perfectBalanceText" class="perfect-balance-text">
+                                        ✔ PERFECT BALANCE
+                                    </div>
+
+                                    <input type="range" id="balanceSlider" min="0" max="6" value="2" class="neon-slider"
+                                        style="margin-top: 18px; position:relative; z-index:2;"
+                                        oninput="updateStep3UI(this.value)">
+
+                                    <!-- 손가락 포인터 (슬라이더 연동) -->
+                                    <div id="fingerPointerWrapStep3"
+                                        style="position:relative; height:35px; width:100%; margin-top:-4px; z-index:2;">
+                                        <span id="fingerPointerStep3"
+                                            style="font-size:40px; line-height:1; transition:transform 0.3s cubic-bezier(0.23,1,0.32,1); position:absolute; top:0; left:0%; transform:translateX(calc(33.3% - 20px)); pointer-events:none;">👆</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Middle Section: Energy Beam Connection -->
-                            <div class="energy-beam-container">
-                                <div class="energy-beam" id="step3EnergyBeam"></div>
+                            <!-- Middle Section: Energy Funnel Connection -->
+                            <div class="energy-funnel-container">
+                                <div class="energy-funnel" id="step3EnergyFunnel"></div>
                             </div>
 
-                            <!-- Bottom Section (Processing & Output): Golden Zone & Aura Spheres -->
-                            <div class="step3-ai-result-panel"
-                                style="position: relative; z-index: 2; width: 82%; padding: 15px 12px 10px 12px; margin: 0 auto; min-height: auto; justify-content: flex-start;">
+                            <!-- Bottom Module: Processing Setup & Output (Golden Zone & Aura Spheres) -->
+                            <div class="futuristic-card" id="step3BottomCard"
+                                style="position: relative; z-index: 2; margin-top:0;">
 
                                 <div class="golden-zone-container"
-                                    style="width: 100%; margin-bottom: 5px; position:relative;">
-                                    <div class="gauge-label" style="font-size: 11px; margin-bottom: 2px;">
+                                    style="width: 100%; margin-bottom: 10px; position:relative;">
+                                    <div class="gauge-label"
+                                        style="font-size: 11px; margin-bottom: 5px; color:#9ca3af;">
                                         <span>MIN(21)</span>
-                                        <span style="color: #fbbf24; font-weight: 900; letter-spacing:1px;">GOLDEN-ZONE
+                                        <span
+                                            style="color: #fbbf24; font-weight: 900; letter-spacing:1px; text-shadow: 0 0 5px rgba(251,191,36,0.5);">GOLDEN-ZONE
                                             (100~170)</span>
                                         <span>MAX(255)</span>
                                     </div>
-                                    <div class="gauge-bg" style="height: 16px; border-radius: 8px;">
-                                        <div class="gauge-golden-zone"></div>
+                                    <div class="gauge-bg"
+                                        style="height: 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                                        <div class="gauge-golden-zone"
+                                            style="background: rgba(251,191,36,0.3); border-radius: 8px;"></div>
                                         <div id="gaugeCurrentSum" class="gauge-current-sum"
-                                            style="left: 50%; width: 10px; height: 10px;">
+                                            style="left: 50%; width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; box-shadow: 0 0 10px #3b82f6; top: 50%; transform: translate(-50%, -50%); position: absolute; transition: left 0.4s ease-out;">
                                         </div>
                                     </div>
                                     <div id="gaugeSumValue"
-                                        style="margin-top: 5px; margin-bottom: 5px; font-size: 13px; font-weight: 900; color: #60a5fa; line-height: 1;">
+                                        style="margin-top: 10px; margin-bottom: 5px; font-size: 14px; font-weight: 900; color: #60a5fa; line-height: 1; text-align:center;">
                                         ...</div>
 
                                     <!-- Golden Zone Hit Indicator -->
-                                    <div id="goldenZoneHitText" class="golden-zone-hit-text">
+                                    <div id="goldenZoneHitText" class="golden-zone-hit-text" style="top: 70%;">
                                         GOLDEN ZONE HIT
                                     </div>
                                 </div>
 
                                 <div class="rotating-balls-container" id="step3BallsNew"
-                                    style="min-height: 80px; margin: 15px 0 8px 0; display: flex !important; visibility: visible !important;">
+                                    style="min-height: 80px; margin: 25px 0 15px 0; display: flex !important; visibility: visible !important; justify-content: center; gap: 15px;">
                                     <!-- Premium Aura Spheres rendered here -->
                                 </div>
                                 <!-- 손가락 포인터 (공 선택시 이동) -->
@@ -6635,6 +6649,16 @@
 
                 prevBtn.style.visibility = 'visible';
 
+                // Toggle Dark Mode Override for Step 3
+                const naviModalContent = document.querySelector('.navi-modal-content');
+                if (currentNaviStep === 3) {
+                    document.body.classList.add('step3-dark-override');
+                    if (naviModalContent) naviModalContent.classList.add('step3-dark-override');
+                } else {
+                    document.body.classList.remove('step3-dark-override');
+                    if (naviModalContent) naviModalContent.classList.remove('step3-dark-override');
+                }
+
                 // Step Selection Enforcement
                 if (currentNaviStep === 1) {
                     const hasSelection = naviSelections.step1.length > 0;
@@ -6783,6 +6807,9 @@
                 if (matrixLabel) { matrixLabel.textContent = 'AI MATRIX SCANNING...'; matrixLabel.style.color = '#00f2fe'; matrixLabel.style.animation = ''; }
                 document.getElementById('finalNaviResult').style.display = 'none';
                 currentNaviStep = 1;
+                document.body.classList.remove('step3-dark-override');
+                const naviModalContent = document.querySelector('.navi-modal-content');
+                if (naviModalContent) naviModalContent.classList.remove('step3-dark-override');
             }
 
             // Step 1: CarryOver vs Neighbors
@@ -6898,6 +6925,16 @@
 
                 const scoreText = document.getElementById('balanceScoreText');
                 if (scoreText) scoreText.innerText = `${odd} : ${even}`;
+
+                // Perfect Balance Hit Indicator
+                const perfectText = document.getElementById('perfectBalanceText');
+                if (perfectText) {
+                    if (odd === 3) {
+                        perfectText.classList.add('active');
+                    } else {
+                        perfectText.classList.remove('active');
+                    }
+                }
 
                 // 손가락 포인터: 슬라이더 위치 동기화 (val 0~6 → % 0~100)
                 const fingerStep3 = document.getElementById('fingerPointerStep3');
@@ -8469,6 +8506,118 @@
                 pointer-events: none;
             }
 
+            /* True Dark Mode Futuristic Layout */
+            body.step3-dark-override {
+                background-color: #050814 !important;
+                transition: background-color 0.5s ease;
+            }
+
+            .navi-modal-content.step3-dark-override {
+                background: linear-gradient(180deg, #050814 0%, #0f172a 100%) !important;
+                border: 1px solid rgba(59, 130, 246, 0.4) !important;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(59, 130, 246, 0.15) !important;
+            }
+
+            .futuristic-card {
+                background: rgba(15, 23, 42, 0.85);
+                border: 1px solid rgba(148, 163, 184, 0.15);
+                border-radius: 24px;
+                padding: 24px 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .futuristic-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.6), transparent);
+            }
+
+            /* Energy Funnel */
+            .energy-funnel-container {
+                width: 100%;
+                height: 80px;
+                display: flex;
+                justify-content: center;
+                position: relative;
+                z-index: 1;
+                margin: -15px 0;
+                pointer-events: none;
+            }
+
+            .energy-funnel {
+                width: 80px;
+                height: 100%;
+                background: linear-gradient(180deg, rgba(96, 165, 250, 0.15) 0%, rgba(167, 139, 250, 0.7) 100%);
+                clip-path: polygon(0 0, 100% 0, 65% 100%, 35% 100%);
+                opacity: 0.6;
+                transition: opacity 0.3s ease;
+                box-shadow: 0 0 25px rgba(167, 139, 250, 0.5);
+            }
+
+            .energy-funnel.pulse {
+                opacity: 1;
+                animation: funnelPulse 0.6s ease-out;
+            }
+
+            @keyframes funnelPulse {
+                0% {
+                    filter: brightness(1);
+                    transform: scaleY(1);
+                }
+
+                50% {
+                    filter: brightness(1.6);
+                    transform: scaleY(1.05);
+                }
+
+                100% {
+                    filter: brightness(1);
+                    transform: scaleY(1);
+                }
+            }
+
+            /* Perfect Balance Text */
+            .perfect-balance-text {
+                position: absolute;
+                top: 35%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.9);
+                color: #34d399;
+                font-weight: 900;
+                font-size: 26px;
+                text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 25px rgba(16, 185, 129, 0.6);
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                letter-spacing: 1.5px;
+                z-index: 10;
+                white-space: nowrap;
+            }
+
+            .perfect-balance-text.active {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+                animation: perfectPulse 2s infinite alternate;
+            }
+
+            @keyframes perfectPulse {
+                0% {
+                    text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+                }
+
+                100% {
+                    text-shadow: 0 0 25px rgba(16, 185, 129, 1), 0 0 40px rgba(52, 211, 153, 0.9);
+                }
+            }
+
             .neon-slider {
                 -webkit-appearance: none;
                 appearance: none;
@@ -9782,9 +9931,27 @@
                     display: none !important;
                 }
 
-                /* [요청] 2번째 검정박스 상단 공백 1/2 (48px -> 24px) */
-                .step3-ai-result-panel {
-                    margin-top: 24px !important;
+                /* [요청] 2번째 박스 간격 1/2 (48px -> 24px) */
+                .futuristic-card {
+                    padding: 15px 12px !important;
+                }
+
+                .energy-funnel-container {
+                    height: 50px !important;
+                    margin: -5px 0 !important;
+                }
+
+                .energy-funnel {
+                    width: 50px !important;
+                }
+
+                .perfect-balance-text {
+                    font-size: 16px !important;
+                    top: 25% !important;
+                }
+
+                #balanceScoreText {
+                    font-size: 20px !important;
                 }
 
                 /* [요청] 게이지 라벨 및 합계 텍스트 90% 축소 (11px -> 9.9px) */
