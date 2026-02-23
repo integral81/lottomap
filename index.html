@@ -9950,15 +9950,18 @@
                     margin-bottom: 2px !important;
                     /* Aggressive bottom margin reduction */
                     min-height: auto !important;
+                    justify-content: center !important;
+                    /* Center the narrower boxes */
                 }
 
                 .battle-side {
                     padding: 4px 2px 7px 2px;
                     /* Bottom padding slightly increased */
                     box-sizing: border-box;
-                    min-height: 137px !important;
-                    /* +4px additional height */
-                    /* Ultimate reduced height */
+                    min-height: 165px !important;
+                    /* 1.2x of current 137px */
+                    flex: 0 0 41.5% !important;
+                    /* 85% of original width */
                 }
 
                 /* [요청] 측면 타이틀: 1.1배 확대 (11.25px -> 12.4px) */
@@ -10002,7 +10005,8 @@
                 .battle-theme-text {
                     font-size: 14px !important;
                     margin-top: 2px !important;
-                    margin-bottom: 10px !important;
+                    margin-bottom: 17px !important;
+                    /* [요청] 7px 공백 추가 (기존 10px -> 17px) */
                 }
 
                 /* Vertical Ball Stacking */
