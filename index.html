@@ -6751,6 +6751,11 @@
                     const hasSelection = naviSelections.step4 && naviSelections.step4.length > 0;
                     nextBtn.disabled = !hasSelection;
                     nextBtn.style.opacity = hasSelection ? '1' : '0.5';
+                } else if (currentNaviStep === 5) {
+                    // [필수] 5단계 선택 강제 (번호 누락 방지)
+                    const hasSelection = naviSelections.step5 && naviSelections.step5.length > 0;
+                    nextBtn.disabled = !hasSelection;
+                    nextBtn.style.opacity = hasSelection ? '1' : '0.5';
                 } else {
                     nextBtn.disabled = false;
                     nextBtn.style.opacity = '1';
@@ -6792,7 +6797,16 @@
                             ...(naviSelections.step4 || []),
                             ...(naviSelections.step5 || [])
                         ].map(Number).filter(n => !isNaN(n) && n > 0);
-                        const confirmedFive = [...new Set(confirmed)].slice(0, 5);
+
+                        // [안전장치] 중복 제거 및 5개 수 보장 (필요시 보충)
+                        let uniqueConfirmed = [...new Set(confirmed)];
+                        if (uniqueConfirmed.length < 5) {
+                            const pool5 = Array.from({ length: 45 }, (_, i) => i + 1).filter(n => !uniqueConfirmed.includes(n));
+                            while (uniqueConfirmed.length < 5 && pool5.length > 0) {
+                                uniqueConfirmed.push(pool5.splice(Math.floor(Math.random() * pool5.length), 1)[0]);
+                            }
+                        }
+                        const confirmedFive = uniqueConfirmed.slice(0, 5);
                         buildStep6StatusBar(confirmedFive);
 
                         startAICalculation();
@@ -7512,7 +7526,10 @@
 
                 element.classList.add('selected');
                 step5SelectedNum = num;
-                naviSelections.step5 = [num % 10]; // Logic expects ending digit
+                // [수정] 끝수만 저장하는 것이 아니라 전체 번호를 저장하여 중복 보정 시 손실 방지
+                naviSelections.step5 = [num];
+
+                // 엔진 필터용으로 끝수도 필요한 경우 대비 (현재는 번호 자체를 confirmed에 합류시킴)
 
                 // Real-time Probability Calculation
                 updateStep5Probability(num);
@@ -7563,8 +7580,16 @@
                     ...(naviSelections.step5 || [])
                 ].map(Number).filter(n => !isNaN(n) && n > 0);
 
-                // 중복 제거 및 5개 추출
-                const uniqueConfirmed = [...new Set(confirmed)];
+                // 중복 제거
+                let uniqueConfirmed = [...new Set(confirmed)];
+                // [안전장치] 중복 제거 및 항상 5개 번호 보장 (누락 발생 시 자동 보충)
+                if (uniqueConfirmed.length < 5) {
+                    console.log("[Navi] Filling missing confirmed numbers...");
+                    const poolCalc = Array.from({ length: 45 }, (_, i) => i + 1).filter(n => !uniqueConfirmed.includes(n));
+                    while (uniqueConfirmed.length < 5 && poolCalc.length > 0) {
+                        uniqueConfirmed.push(poolCalc.splice(Math.floor(Math.random() * poolCalc.length), 1)[0]);
+                    }
+                }
                 const confirmedFive = uniqueConfirmed.slice(0, 5);
 
                 console.log("DEBUG: Confirmed 5 numbers:", confirmedFive);
