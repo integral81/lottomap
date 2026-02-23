@@ -6157,7 +6157,7 @@
                                         letter-spacing: 2px;
                                         text-shadow: 0 2px 10px rgba(0,0,0,0.45);
                                         white-space: nowrap;
-                                    ">7/15/52주 ★자동선택★</span>
+                                    ">7 vs 15 vs 52 중 1개 선택!!</span>
                                 </div>
                             </div>
 
@@ -6216,6 +6216,13 @@
                                     </div>
                                 </div>
 
+                                <!-- 손가락 포인터 (선택시 이동) -->
+                                <div id="fingerPointerWrap"
+                                    style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px; z-index: 3;">
+                                    <span id="fingerPointer"
+                                        style="font-size:43px; line-height:1; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:5px; left:50%; transform:translateX(-50%); pointer-events:none;">👆</span>
+                                </div>
+
                                 <!-- AI Matching Score UI -->
                                 <div id="aiMatchingScoreContainer"
                                     style="width: 100%; max-width: 400px; margin: 5px auto 10px; padding: 15px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; position: relative;">
@@ -6234,12 +6241,6 @@
 
                                 <!-- Data Texture Animation Background Layer -->
                                 <div id="dataTextureCanvas" class="data-texture-cyan"></div>
-                                <!-- 손가락 포인터 (선택시 이동) -->
-                                <div id="fingerPointerWrap"
-                                    style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px;">
-                                    <span id="fingerPointer"
-                                        style="font-size:43px; line-height:1; transition:transform 0.4s cubic-bezier(0.23,1,0.32,1); position:absolute; top:5px; left:50%; transform:translateX(-50%); pointer-events:none;">👆</span>
-                                </div>
 
                                 <!-- Candidate Grid -->
                                 <div class="candidate-grid" id="regCandidates">
@@ -6698,9 +6699,9 @@
 
                 prevBtn.style.visibility = 'visible';
 
-                // Toggle Dark Mode Override for Step 3
+                // Toggle Dark Mode Override for Step 3 and 4
                 const naviModalContent = document.querySelector('#naviModal .admin-modal-content');
-                if (currentNaviStep === 3) {
+                if (currentNaviStep === 3 || currentNaviStep === 4) {
                     document.body.classList.add('step3-dark-override');
                     if (naviModalContent) naviModalContent.classList.add('step3-dark-override');
                 } else {
@@ -8609,7 +8610,7 @@
                 pointer-events: none;
             }
 
-            /* True Dark Mode Futuristic Layout */
+            /* True Dark Mode Futuristic Layout for Step 3 & 4 */
             body.step3-dark-override {
                 background-color: #050814 !important;
                 transition: background-color 0.5s ease;
@@ -10362,7 +10363,7 @@
                 }
             }
 
-            #fingerPointer {
+            #naviStep2 #fingerPointer {
                 font-size: 30px !important;
                 position: absolute !important;
                 top: 0 !important;
@@ -10370,7 +10371,7 @@
                 /* JS translation handle: transform: translateX(calc(-50% + ...)) */
             }
 
-            #fingerPointerWrap {
+            #naviStep2 #fingerPointerWrap {
                 position: relative !important;
                 display: flex;
                 justify-content: center;
