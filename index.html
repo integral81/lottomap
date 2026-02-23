@@ -2602,7 +2602,7 @@
 
             <!-- 로또 Navi 시작 버튼 (사용자 요청 위치) -->
             <button id="naviModeBtn" onclick="toggleNaviMode()"
-                style="width: 100%; margin: 10px 0 20px 0; padding: 9.5px 12px; font-size: 19.2px; background: linear-gradient(135deg, #5D31D4, #4A27AB); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                style="width: 100%; margin: 10px 0 20px 0; padding: 9.5px 20px; font-size: 19.2px; background: linear-gradient(135deg, #5D31D4, #4A27AB); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: flex-start; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 🧭 로또 Navi by AI
             </button>
 
@@ -10518,9 +10518,14 @@
                     width: 84% !important;
                     margin: 10px 0 20px 0 !important;
                     font-size: 16.2px !important;
-                    padding: 14px 10px !important;
+                    padding: 14px 20px !important;
+                    /* [요청] 왼쪽 정렬을 위한 패딩 조정 */
                     border-radius: 14px !important;
                     letter-spacing: 0.5px !important;
+                    display: flex !important;
+                    justify-content: flex-start !important;
+                    /* [요청] 모바일도 왼쪽 정렬 */
+                    gap: 8px !important;
                     /* [요청] 모바일은 기존 파란색 유지 */
                     background: linear-gradient(135deg, #1976d2, #1565c0) !important;
                 }
