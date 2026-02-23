@@ -6407,16 +6407,20 @@
                 }
                 calculateWeight(n, userPreference = 1.0) {
                     const num = Number(n);
-                    let appearanceCount = 0;
-                    let totalRounds = Object.keys(this.history).length;
-                    for (const round in this.history) { if (this.history[round].slice(0, 6).map(Number).includes(num)) appearanceCount++; }
-                    const frequencyFactor = appearanceCount / totalRounds;
-                    let recentFactor = 1.0;
-                    for (let i = 0; i < 10; i++) {
-                        const r = this.latestRound - i;
-                        if (this.history[r]?.slice(0, 6).map(Number).includes(num)) { recentFactor += (10 - i) * 0.1; }
+                    if (!this._weightCache) this._weightCache = {};
+                    if (!this._weightCache[num]) {
+                        let appearanceCount = 0;
+                        let totalRounds = Object.keys(this.history).length;
+                        for (const round in this.history) { if (this.history[round].slice(0, 6).map(Number).includes(num)) appearanceCount++; }
+                        const frequencyFactor = appearanceCount / totalRounds;
+                        let recentFactor = 1.0;
+                        for (let i = 0; i < 10; i++) {
+                            const r = this.latestRound - i;
+                            if (this.history[r]?.slice(0, 6).map(Number).includes(num)) { recentFactor += (10 - i) * 0.1; }
+                        }
+                        this._weightCache[num] = frequencyFactor * recentFactor;
                     }
-                    return frequencyFactor * recentFactor * userPreference;
+                    return this._weightCache[num] * userPreference;
                 }
                 getAIRecommendedCarryover(round = this.latestRound) {
                     const baseNumbers = this.history[round]?.slice(0, 6) || [];
