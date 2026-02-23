@@ -9934,40 +9934,80 @@
                     display: none !important;
                 }
 
-                /* [요청] 2번째 박스 간격 1/2 (48px -> 24px) */
+                /* ==================================
+                   Step 3 Mobile UI Optimization 
+                   ================================== */
+                #naviStep3 h2 {
+                    margin-top: 5px !important;
+                    margin-bottom: 0px !important;
+                    font-size: 18px !important;
+                }
+
+                #step3Subtitle {
+                    font-size: 13px !important;
+                    margin: 2px 0 8px 0 !important;
+                }
+
                 .futuristic-card {
-                    padding: 15px 12px !important;
+                    padding: 10px 10px !important;
+                    border-radius: 12px !important;
                 }
 
                 .energy-funnel-container {
-                    height: 50px !important;
+                    height: 25px !important;
                     margin: -5px 0 !important;
                 }
 
                 .energy-funnel {
-                    width: 50px !important;
+                    width: 30px !important;
                 }
 
                 .perfect-balance-text {
-                    font-size: 16px !important;
+                    font-size: 12px !important;
                     top: 25% !important;
                 }
 
                 #balanceScoreText {
-                    font-size: 20px !important;
+                    font-size: 16px !important;
                 }
 
-                /* [요청] 게이지 라벨 및 합계 텍스트 90% 축소 (11px -> 9.9px) */
-                .gauge-label,
+                .golden-zone-container {
+                    margin-bottom: 0px !important;
+                }
+
+                .gauge-label {
+                    font-size: 8.5px !important;
+                    margin-bottom: 2px !important;
+                    letter-spacing: -0.5px !important;
+                }
+
+                .gauge-label span {
+                    letter-spacing: -0.2px !important;
+                }
+
                 #gaugeSumValue {
-                    font-size: 9.9px !important;
+                    font-size: 12px !important;
+                    margin-top: 3px !important;
+                    margin-bottom: 0px !important;
                 }
 
-                /* [요청] Step 3 결과 공 80% 축소 (38px -> 30px) */
+                /* [요청] GOLDEN ZONE HIT 줄 삭제 (모바일에서 공간 최적화를 위해 숨김) */
+                #goldenZoneHitText {
+                    display: none !important;
+                }
+
+                #step3BallsNew {
+                    margin: 8px 0 0px 0 !important;
+                    min-height: 40px !important;
+                    gap: 10px !important;
+                }
+
                 .rotating-ball {
-                    width: 30px !important;
-                    height: 30px !important;
-                    font-size: 11px !important;
+                    width: 28px !important;
+                    height: 28px !important;
+                    font-size: 12px !important;
+                    line-height: 26px !important;
+                    border-width: 1px !important;
                 }
 
                 .rotating-ball.active {
@@ -9976,6 +10016,14 @@
 
                 .rotating-ball.selected-step3 {
                     transform: rotate(360deg) scale(1.1) !important;
+                }
+
+                #fingerPointerWrapStep3Balls {
+                    height: 30px !important;
+                }
+
+                #fingerPointerStep3Balls {
+                    font-size: 24px !important;
                 }
 
                 .hologram-chart {
