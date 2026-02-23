@@ -5980,11 +5980,10 @@
 
                             <div class="battle-container">
                                 <div class="battle-side side-left">
-                                    <div class="battle-title"
-                                        style="font-size: 1.08em; white-space: nowrap; letter-spacing: -0.5px;">지난주 당첨의
-                                        <span style="font-weight: 900;">이월수</span></div>
-                                    <div class="battle-subtitle"
-                                        style="font-size: 0.96em; white-space: nowrap; letter-spacing: -0.5px;">운명을 이어갈
+                                    <div class="battle-title" style="font-size: 1.08em;">지난주 당첨의
+                                        <span style="font-weight: 900;">이월수</span>
+                                    </div>
+                                    <div class="battle-subtitle" style="font-size: 0.96em;">운명을 이어갈
                                         이월수</div>
                                     <div class="battle-ball-grid" id="carryoverGrid"></div>
                                 </div>
@@ -5994,11 +5993,10 @@
                                     VS</div>
 
                                 <div class="battle-side side-right">
-                                    <div class="battle-title"
-                                        style="font-size: 1.08em; white-space: nowrap; letter-spacing: -0.5px;">지난주 당첨의
-                                        <span style="font-weight: 900;">이웃수</span></div>
-                                    <div class="battle-subtitle"
-                                        style="font-size: 0.96em; white-space: nowrap; letter-spacing: -0.5px;">새로운 기운의
+                                    <div class="battle-title" style="font-size: 1.08em;">지난주 당첨의
+                                        <span style="font-weight: 900;">이웃수</span>
+                                    </div>
+                                    <div class="battle-subtitle" style="font-size: 0.96em;">새로운 기운의
                                         이웃수</div>
                                     <div class="battle-ball-grid" id="neighborGrid"></div>
                                 </div>
@@ -8069,6 +8067,15 @@
                 font-size: 11px;
                 margin-bottom: 20px;
                 opacity: 0.7;
+            }
+
+            @media (min-width: 769px) {
+
+                .battle-title,
+                .battle-subtitle {
+                    white-space: nowrap;
+                    letter-spacing: -0.5px;
+                }
             }
 
             .battle-ball-grid {
