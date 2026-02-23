@@ -2742,7 +2742,7 @@
                 </div>
                 <div class="menu-item" onclick="openLastOMR();">
                     <span class="m-icon">📝</span>
-                    <span class="m-text">이번 주 1등번호 OMR로<br class="mobile-br"> 보기</span>
+                    <span class="m-text">이번 주 1등 예상번호<br>OMR로 보기</span>
                 </div>
 
                 <!-- Alert Box for OMR (Hidden by default) -->
@@ -3514,6 +3514,19 @@
                         showToast("📍 현재 위치를 확인 중입니다...", "info");
                         requestMyLocation();
                     }, 1000); // 1.0s delay for better mobile compatibility
+
+                    // [SNS Deep Link] OMR 파라미터가 있으면 즉시 열기
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const omrNums = urlParams.get('omr');
+                    if (omrNums) {
+                        const numbers = omrNums.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+                        if (numbers.length > 0) {
+                            setTimeout(() => {
+                                console.log('[DeepLink] Auto-opening OMR with numbers:', numbers);
+                                openOMR(numbers);
+                            }, 1500);
+                        }
+                    }
                 } catch (err) {
                     console.error("Critical Init Error:", err);
                     const mapDiv = document.getElementById('map');
@@ -7876,7 +7889,11 @@
                     return;
                 }
 
-                const currentUrl = getKakaoShareUrl();
+                let currentUrl = getKakaoShareUrl();
+                if (window.latestFateNumbers) {
+                    const cleanNums = window.latestFateNumbers.replace(/\s/g, '');
+                    currentUrl += `?omr=${cleanNums}`;
+                }
                 const numbers = window.latestFateNumbers.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
 
                 showToast('카카오 공유를 위해 OMR 이미지 생성 중... ✨');
