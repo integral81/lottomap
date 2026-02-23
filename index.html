@@ -57,19 +57,11 @@
 
         function getKakaoShareUrl() {
             // Kakao SDK does NOT support file:// protocol.
-            // When opened as a local file, fallback to the production URL.
             if (window.location.protocol === 'file:') {
-                return 'https://k-inov.com/lottomap/';
+                return 'https://www.k-inov.com/lottomap/';
             }
-            const currentOrigin = window.location.origin;
-            let currentPath = window.location.pathname;
-            if (currentPath.includes('index.html')) {
-                currentPath = currentPath.replace('index.html', '');
-            }
-            if (!currentPath.endsWith('/')) {
-                currentPath += '/';
-            }
-            return currentOrigin + currentPath;
+            // Use current absolute URL without query/hash as base
+            return window.location.origin + window.location.pathname;
         }
 
         // Initialize Kakao SDK as soon as it's loaded
@@ -3519,12 +3511,18 @@
                     const urlParams = new URLSearchParams(window.location.search);
                     const omrNums = urlParams.get('omr');
                     if (omrNums) {
-                        const numbers = omrNums.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
-                        if (numbers.length > 0) {
-                            setTimeout(() => {
-                                console.log('[DeepLink] Auto-opening OMR with numbers:', numbers);
-                                openOMR(numbers);
-                            }, 1500);
+                        try {
+                            const decoded = decodeURIComponent(omrNums);
+                            // Support both comma and underscore separators
+                            const numbers = decoded.split(/[ ,_]+/).map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
+                            if (numbers.length > 0) {
+                                setTimeout(() => {
+                                    console.log('[DeepLink] Auto-opening OMR with numbers:', numbers);
+                                    openOMR(numbers);
+                                }, 1500); // Wait for map/data initialization
+                            }
+                        } catch (e) {
+                            console.error('[DeepLink] Error parsing parameters:', e);
                         }
                     }
                 } catch (err) {
@@ -7891,8 +7889,9 @@
 
                 let currentUrl = getKakaoShareUrl();
                 if (window.latestFateNumbers) {
-                    const cleanNums = window.latestFateNumbers.replace(/\s/g, '');
-                    currentUrl += `?omr=${cleanNums}`;
+                    // Use underscores to avoid shell/app issues with commas in URLs
+                    const cleanNums = window.latestFateNumbers.replace(/\s/g, '').replace(/,/g, '_');
+                    currentUrl += (currentUrl.includes('?') ? '&' : '?') + `omr=${encodeURIComponent(cleanNums)}`;
                 }
                 const numbers = window.latestFateNumbers.split(',').map(n => parseInt(n.trim(), 10)).filter(n => !isNaN(n));
 
