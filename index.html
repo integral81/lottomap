@@ -2807,13 +2807,23 @@
                         </h2>
 
                         <div class="selection-menu">
+                            <!-- 0. KINOV AI Navi -->
+                            <div class="selection-card"
+                                onclick="gtag('event', 'click_mode', {'mode_type': 'navi_ai'}); closeModal(); toggleNaviMode();">
+                                <div class="selection-icon">⚡</div>
+                                <div class="selection-info">
+                                    <span class="selection-title">당신의 직관 x KINOV Ai</span>
+                                    <span class="selection-desc">당신이 고른 번호, Ai가 역대 패턴으로 당첨 확률을 검증합니다.</span>
+                                </div>
+                            </div>
+
                             <!-- 1. Data Analysis -->
                             <div class="selection-card"
                                 onclick="gtag('event', 'click_mode', {'mode_type': 'analysis'}); selectAnalysisMode()">
                                 <div class="selection-icon">📊</div>
                                 <div class="selection-info">
                                     <span class="selection-title">데이터 정밀 분석</span>
-                                    <span class="selection-desc">명당으 과거 당첨 패턴을 정밀 분석</span>
+                                    <span class="selection-desc">명당의 과거 당첨 패턴을 정밀 분석</span>
                                 </div>
                             </div>
 
