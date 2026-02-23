@@ -2809,7 +2809,7 @@
                         <div class="selection-menu">
                             <!-- 0. KINOV AI Navi -->
                             <div class="selection-card"
-                                onclick="gtag('event', 'click_mode', {'mode_type': 'navi_ai'}); closeModal(); toggleNaviMode();">
+                                onclick="gtag('event', 'click_mode', {'mode_type': 'navi_ai'}); closeModal(); toggleNaviMode(true);">
                                 <div class="selection-icon">⚡</div>
                                 <div class="selection-info">
                                     <span class="selection-title">당신의 직관 x KINOV Ai</span>
@@ -6537,7 +6537,10 @@
             const TOTAL_COMBINATIONS = 8145060;
             let currentDisplayCount = TOTAL_COMBINATIONS;
 
-            async function toggleNaviMode() {
+            let naviOpenedFromAdModal = false; // Flag to track entry point
+
+            async function toggleNaviMode(fromAdModal = false) {
+                naviOpenedFromAdModal = fromAdModal; // Store entry point
                 if (!naviEngine) {
                     try {
                         // Resilient Data Source: use main map data if available
@@ -6681,6 +6684,10 @@
             function prevNaviStep() {
                 if (currentNaviStep === 1) {
                     closeNaviModal();
+                    if (naviOpenedFromAdModal && currentShopData) {
+                        // Re-open AI Modal if entered from there
+                        openAdModal(currentShopData.name, currentShopData.addr, currentShopData.lat, currentShopData.lng, currentShopData.totalWins);
+                    }
                     return;
                 }
                 if (currentNaviStep > 1) {
