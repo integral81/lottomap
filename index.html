@@ -8783,7 +8783,10 @@
                 transform: translate(-50%, -50%) scale(0.9);
                 color: #34d399;
                 font-weight: 900;
-                font-size: 26px;
+                font-size: 5.2px;
+                /* [요청] 본래 크기(26px)의 1/5 적용 */
+                margin-top: 8px;
+                /* [요청] 8px 아래로 이동 */
                 text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 25px rgba(16, 185, 129, 0.6);
                 opacity: 0;
                 pointer-events: none;
@@ -10246,8 +10249,8 @@
                 .perfect-balance-text {
                     font-size: 12px !important;
                     top: 25% !important;
-                    margin-top: 9px !important;
-                    /* [요청] 4px + 추가 5px 아래로 이동 */
+                    margin-top: 11px !important;
+                    /* [요청] 최종 2px 추가 이동 (총 11px) */
                 }
 
                 #balanceScoreText {
