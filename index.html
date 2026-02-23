@@ -6311,7 +6311,7 @@
                 <div
                     style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: white; position: relative; z-index: 10;">
                     <button id="naviPrevBtn" onclick="prevNaviStep()"
-                        style="padding: 8px 15px; border:none; background: #eee; border-radius: 10px; cursor:pointer; visibility:hidden;">이전단계</button>
+                        style="padding: 8px 15px; border:none; background: #eee; border-radius: 10px; cursor:pointer; visibility:visible;">이전단계</button>
                     <button id="naviNextBtn" onclick="nextNaviStep()"
                         style="padding: 8px 30px; border:none; background: var(--secondary); color:white; border-radius: 10px; font-weight:bold; cursor:pointer;">다음
                         단계</button>
@@ -6595,7 +6595,7 @@
                 const nextBtn = document.getElementById('naviNextBtn');
                 const closeBtn = document.getElementById('naviCloseBtn');
 
-                prevBtn.style.visibility = (currentNaviStep > 1) ? 'visible' : 'hidden';
+                prevBtn.style.visibility = 'visible';
 
                 // Step Selection Enforcement
                 if (currentNaviStep === 1) {
@@ -6677,6 +6677,10 @@
             }
 
             function prevNaviStep() {
+                if (currentNaviStep === 1) {
+                    closeNaviModal();
+                    return;
+                }
                 if (currentNaviStep > 1) {
                     currentNaviStep--;
 
