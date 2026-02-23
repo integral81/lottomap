@@ -57,11 +57,20 @@
 
         function getKakaoShareUrl() {
             // Kakao SDK does NOT support file:// protocol.
+            // When opened as a local file, fallback to the production URL.
             if (window.location.protocol === 'file:') {
-                return 'https://www.k-inov.com/lottomap/';
+                return 'https://k-inov.com/lottomap/';
             }
-            // Use current absolute URL without query/hash as base
-            return window.location.origin + window.location.pathname;
+            const currentOrigin = window.location.origin;
+            let currentPath = window.location.pathname;
+            // Robustly strip index.html and append trailing slash for Kakao Console compatibility
+            if (currentPath.includes('index.html')) {
+                currentPath = currentPath.replace('index.html', '');
+            }
+            if (!currentPath.endsWith('/')) {
+                currentPath += '/';
+            }
+            return currentOrigin + currentPath;
         }
 
         // Initialize Kakao SDK as soon as it's loaded
