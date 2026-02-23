@@ -6162,37 +6162,78 @@
                             </div>
 
                             <div class="regression-layout" style="flex-direction: column; gap: 20px;">
-                                <!-- Premium Regression Cards -->
-                                <div class="regression-card-container"
-                                    style="display: flex; justify-content: center; gap: 20px; width: 100%; perspective: 1000px; padding: 9px 0;">
-                                    <div class="reg-card-3d gold active" id="regCard7" onclick="selectRegression(7)">
-                                        <div class="bell-jar">
-                                            <div class="jar-glass"></div>
-                                            <div class="jar-dust"></div>
-                                            <div class="jar-sphere"></div>
-                                            <div class="jar-ring"></div>
+                                <!-- Glassmorphic Trend Cards -->
+                                <div class="trend-cards-container"
+                                    style="display: flex; justify-content: center; gap: 15px; width: 100%; padding: 10px 0; z-index: 2; position: relative;">
+
+                                    <!-- 7 Weeks Card -->
+                                    <div class="glass-trend-card theme-cyan active" id="regCard7"
+                                        onclick="selectRegression(7)">
+                                        <div class="trend-icon">⚡</div>
+                                        <div class="trend-title">7 WEEKS</div>
+                                        <div class="trend-tags">#최근급상승 #단기트렌드</div>
+                                        <div class="trend-desc">최근 7주간의 다이내믹한 패턴 흐름</div>
+                                        <div class="trend-mini-chart chart-cyan">
+                                            <div class="chart-bar" style="height: 40%"></div>
+                                            <div class="chart-bar" style="height: 70%"></div>
+                                            <div class="chart-bar" style="height: 30%"></div>
+                                            <div class="chart-bar" style="height: 90%"></div>
+                                            <div class="chart-bar" style="height: 60%"></div>
                                         </div>
-                                        <div class="reg-card-label">7 WEEKS</div>
                                     </div>
-                                    <div class="reg-card-3d cyan" id="regCard15" onclick="selectRegression(15)">
-                                        <div class="bell-jar">
-                                            <div class="jar-glass"></div>
-                                            <div class="jar-dust"></div>
-                                            <div class="jar-sphere"></div>
-                                            <div class="jar-ring"></div>
+
+                                    <!-- 15 Weeks Card -->
+                                    <div class="glass-trend-card theme-gold" id="regCard15"
+                                        onclick="selectRegression(15)">
+                                        <div class="trend-icon" style="font-size: 24px;">⚖️</div>
+                                        <div class="trend-title">15 WEEKS</div>
+                                        <div class="trend-tags">#안정적 #완벽한밸런스</div>
+                                        <div class="trend-desc">단기와 장기 패턴이 만나는 황금비율</div>
+                                        <div class="trend-mini-chart chart-gold">
+                                            <div class="chart-bar" style="height: 50%"></div>
+                                            <div class="chart-bar" style="height: 60%"></div>
+                                            <div class="chart-bar" style="height: 55%"></div>
+                                            <div class="chart-bar" style="height: 65%"></div>
+                                            <div class="chart-bar" style="height: 50%"></div>
                                         </div>
-                                        <div class="reg-card-label">15 WEEKS</div>
                                     </div>
-                                    <div class="reg-card-3d purple" id="regCard52" onclick="selectRegression(52)">
-                                        <div class="bell-jar">
-                                            <div class="jar-glass"></div>
-                                            <div class="jar-dust"></div>
-                                            <div class="jar-sphere"></div>
-                                            <div class="jar-ring"></div>
+
+                                    <!-- 52 Weeks Card -->
+                                    <div class="glass-trend-card theme-purple" id="regCard52"
+                                        onclick="selectRegression(52)">
+                                        <div class="trend-icon">🌌</div>
+                                        <div class="trend-title">52 WEEKS</div>
+                                        <div class="trend-tags">#전통강자 #1년빅데이터</div>
+                                        <div class="trend-desc">1년간 누적된 거대하고 묵직한 데이터베이스</div>
+                                        <div class="trend-mini-chart chart-purple">
+                                            <div class="chart-block"></div>
+                                            <div class="chart-block"></div>
+                                            <div class="chart-block"></div>
+                                            <div class="chart-block"></div>
+                                            <div class="chart-block"></div>
+                                            <div class="chart-block"></div>
                                         </div>
-                                        <div class="reg-card-label">52 WEEKS</div>
                                     </div>
                                 </div>
+
+                                <!-- AI Matching Score UI -->
+                                <div id="aiMatchingScoreContainer"
+                                    style="width: 100%; max-width: 400px; margin: 5px auto 10px; padding: 15px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; position: relative;">
+                                    <div style="font-size: 12px; color: #94a3b8; font-weight: bold;">AI 패턴 궁합 분석
+                                        (Matching Rate)</div>
+                                    <div
+                                        style="width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; position: relative;">
+                                        <div id="matchingScoreBar"
+                                            style="width: 85%; height: 100%; background: linear-gradient(90deg, #00f2fe, #4facfe); border-radius: 4px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;">
+                                        </div>
+                                    </div>
+                                    <div id="matchingScoreText"
+                                        style="font-size: 18px; font-weight: 900; color: #00f2fe; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); transition: color 0.3s;">
+                                        85% (안정적)</div>
+                                </div>
+
+                                <!-- Data Texture Animation Background Layer -->
+                                <div id="dataTextureCanvas" class="data-texture-cyan"></div>
                                 <!-- 손가락 포인터 (선택시 이동) -->
                                 <div id="fingerPointerWrap"
                                     style="position:relative; height:58px; display:flex; align-items:flex-start; justify-content:center; margin-top:-5px;">
@@ -7096,8 +7137,8 @@
             }
 
             function selectRegression(cycle) {
-                // 1. Premium Card Switching Logic (Updated for 3D Bell Jars)
-                document.querySelectorAll('.reg-card-3d').forEach(card => card.classList.remove('active'));
+                // 1. Premium Glassmorphic Card Switching
+                document.querySelectorAll('.glass-trend-card').forEach(card => card.classList.remove('active'));
                 const selectedCard = document.getElementById(`regCard${cycle}`);
                 if (selectedCard) selectedCard.classList.add('active');
 
@@ -7111,6 +7152,60 @@
                     const wrapCenterX = wrapRect.left + wrapRect.width / 2;
                     const offset = cardCenterX - wrapCenterX;
                     finger.style.transform = `translateX(calc(-50% + ${offset}px))`;
+                }
+
+                // Animate AI Matching Score & Background Texture
+                const scoreBar = document.getElementById('matchingScoreBar');
+                const scoreText = document.getElementById('matchingScoreText');
+                const canvas = document.getElementById('dataTextureCanvas');
+
+                // Set texture class
+                canvas.className = '';
+                if (cycle === 7) canvas.classList.add('data-texture-cyan');
+                if (cycle === 15) canvas.classList.add('data-texture-gold');
+                if (cycle === 52) canvas.classList.add('data-texture-purple');
+
+                // Show canvas with slight fade
+                canvas.style.opacity = '1';
+
+                // Calculate a mock matching score based on earlier selections (deterministic feel)
+                const fixedCount = naviSelections.step1.length + naviSelections.step2.length;
+                let baseScore = 75;
+                if (cycle === 7) baseScore = 82 + (fixedCount * 2);
+                if (cycle === 15) baseScore = 88 + (fixedCount * 1.5);
+                if (cycle === 52) baseScore = 92 + (fixedCount);
+
+                // Add some pseudo-randomness based on cycle
+                const finalScore = Math.min(99, Math.floor(baseScore + (Math.random() * 5)));
+
+                // Colors based on score
+                let scoreColor = '#00f2fe'; // Cyan
+                let scoreDesc = '최신 트렌드';
+                if (cycle === 15) { scoreColor = '#fbbf24'; scoreDesc = '완벽한 밸런스'; } // Gold
+                if (cycle === 52) { scoreColor = '#c084fc'; scoreDesc = '데이터 일치'; } // Purple
+
+                if (scoreBar && scoreText) {
+                    scoreBar.style.width = '0%';
+                    scoreText.style.color = scoreColor;
+                    scoreText.style.textShadow = `0 0 10px ${scoreColor}80`;
+
+                    setTimeout(() => {
+                        scoreBar.style.width = `${finalScore}%`;
+                        scoreBar.style.background = `linear-gradient(90deg, transparent, ${scoreColor})`;
+
+                        // Count up animation
+                        let current = 0;
+                        const target = finalScore;
+                        const step = Math.ceil(target / 20);
+                        const counter = setInterval(() => {
+                            current += step;
+                            if (current >= target) {
+                                current = target;
+                                clearInterval(counter);
+                            }
+                            scoreText.innerHTML = `${current}% <span style="font-size: 11px; font-weight: normal; color: #cbd5e1; opacity: 0.8; margin-left: 5px;">(${scoreDesc})</span>`;
+                        }, 30);
+                    }, 50);
                 }
 
                 // 2. Fetch Candidates
@@ -8886,157 +8981,231 @@
             .jar-glass {
                 position: absolute;
                 inset: 0;
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
-                border-radius: 40px 40px 10px 10px;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                backdrop-filter: blur(4px);
-                box-shadow:
-                    inset 0 10px 20px rgba(255, 255, 255, 0.1),
-                    inset 0 -5px 15px rgba(0, 0, 0, 0.5),
-                    0 20px 40px rgba(0, 0, 0, 0.4);
-                overflow: hidden;
-            }
 
-            .jar-dust {
-                position: absolute;
-                inset: 15%;
-                border-radius: 50%;
-                filter: blur(15px);
-                opacity: 0.6;
-                animation: swirl 4s infinite linear;
-            }
-
-            @keyframes swirl {
-                0% {
-                    transform: rotate(0deg) scale(1);
+                /* =========================================
+                   Step 4: Glassmorphic Trend Cards
+               ========================================= */
+                .trend-cards-container {
+                    perspective: 1000px;
                 }
 
-                50% {
-                    transform: rotate(180deg) scale(1.2);
+                .glass-trend-card {
+                    position: relative;
+                    flex: 1;
+                    max-width: 140px;
+                    background: rgba(15, 23, 42, 0.6);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 16px;
+                    padding: 15px 10px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
+                    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+                    cursor: pointer;
+                    overflow: hidden;
                 }
 
-                100% {
-                    transform: rotate(360deg) scale(1);
-                }
-            }
-
-            .gold .jar-dust {
-                background: radial-gradient(circle, #fbbf24 0%, transparent 70%);
-            }
-
-            .cyan .jar-dust {
-                background: radial-gradient(circle, #06b6d4 0%, transparent 70%);
-            }
-
-            .purple .jar-dust {
-                background: radial-gradient(circle, #a855f7 0%, transparent 70%);
-            }
-
-            .jar-ring {
-                position: absolute;
-                bottom: -5px;
-                left: 50%;
-                transform: translateX(-50%) rotateX(75deg);
-                width: 90px;
-                height: 90px;
-                border: 3px solid transparent;
-                border-radius: 50%;
-                box-shadow: 0 0 20px currentColor;
-            }
-
-            .gold .jar-ring {
-                color: #fbbf24;
-                border-color: #fbbf24;
-            }
-
-            .cyan .jar-ring {
-                color: #06b6d4;
-                border-color: #06b6d4;
-            }
-
-            .purple .jar-ring {
-                color: #a855f7;
-                border-color: #a855f7;
-            }
-
-            .jar-sphere {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 28px;
-                height: 28px;
-                background: radial-gradient(circle at 30% 30%, #e2e8f0, #475569);
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), inset -2px -2px 5px rgba(0, 0, 0, 0.5);
-                z-index: 2;
-                opacity: 0;
-                transition: opacity 0.35s ease, box-shadow 0.35s ease;
-            }
-
-            .reg-card-3d.active .jar-sphere {
-                opacity: 1;
-            }
-
-            .reg-card-label {
-                font-size: 13px;
-                font-weight: 900;
-                color: #334155;
-                /* Darker slate for better visibility */
-                letter-spacing: 1px;
-                transition: all 0.3s;
-                text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-                margin-top: 5px;
-            }
-
-            .reg-card-3d.active .reg-card-label {
-                transform: scale(1.15);
-                font-weight: 1000;
-            }
-
-            .reg-card-3d.gold.active .reg-card-label {
-                color: #fbbf24;
-            }
-
-            .reg-card-3d.cyan.active .reg-card-label {
-                color: #06b6d4;
-                text-shadow: 0 0 10px #06b6d4;
-            }
-
-            .reg-card-3d.purple.active .reg-card-label {
-                color: #a855f7;
-                text-shadow: 0 0 10px #a855f7;
-            }
-
-            .neon-select {
-                display: none;
-            }
-
-            @keyframes neonPulse {
-                from {
-                    box-shadow: 0 0 10px #06b6d4;
+                .glass-trend-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    border-radius: 16px;
+                    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+                    z-index: 0;
                 }
 
-                to {
-                    box-shadow: 0 0 25px #06b6d4, 0 0 5px white;
-                }
-            }
-
-            @keyframes badgePulse {
-
-                0%,
-                100% {
-                    box-shadow: 0 0 14px rgba(255, 160, 0, 0.6), 0 0 28px rgba(255, 100, 0, 0.25);
-                    transform: scale(1);
+                .glass-trend-card>* {
+                    position: relative;
+                    z-index: 1;
                 }
 
-                50% {
-                    box-shadow: 0 0 28px rgba(255, 200, 0, 1), 0 0 56px rgba(255, 140, 0, 0.55), inset 0 0 8px rgba(255, 255, 255, 0.3);
-                    transform: scale(1.06);
+                .glass-trend-card:hover {
+                    transform: translateY(-5px);
+                    border-color: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
                 }
-            }
 
-            .reg-card-3d:hover {
+                .glass-trend-card.active {
+                    transform: translateY(-8px) scale(1.05);
+                    background: rgba(30, 41, 59, 0.8);
+                }
+
+                .trend-icon {
+                    font-size: 28px;
+                    margin-bottom: 8px;
+                    filter: drop-shadow(0 0 8px currentColor);
+                    transition: transform 0.3s;
+                }
+
+                .glass-trend-card.active .trend-icon {
+                    transform: scale(1.2);
+                }
+
+                .trend-title {
+                    font-size: 15px;
+                    font-weight: 900;
+                    letter-spacing: 1px;
+                    color: #f8fafc;
+                    margin-bottom: 4px;
+                }
+
+                .trend-tags {
+                    font-size: 9px;
+                    color: #94a3b8;
+                    font-weight: 700;
+                    line-height: 1.2;
+                    margin-bottom: 6px;
+                    background: rgba(0, 0, 0, 0.3);
+                    padding: 3px 6px;
+                    border-radius: 6px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                }
+
+                .trend-desc {
+                    font-size: 9.5px;
+                    color: #cbd5e1;
+                    line-height: 1.3;
+                    margin-bottom: 12px;
+                    opacity: 0.8;
+                    word-break: keep-all;
+                }
+
+                /* Theme Colors */
+                .theme-cyan .trend-icon,
+                .theme-cyan.active .trend-title {
+                    color: #00f2fe;
+                    text-shadow: 0 0 10px rgba(0, 242, 254, 0.6);
+                }
+
+                .theme-gold .trend-icon,
+                .theme-gold.active .trend-title {
+                    color: #fbbf24;
+                    text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+                }
+
+                .theme-purple .trend-icon,
+                .theme-purple.active .trend-title {
+                    color: #c084fc;
+                    text-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
+                }
+
+                .theme-cyan.active {
+                    border-color: rgba(0, 242, 254, 0.5);
+                    box-shadow: 0 0 30px rgba(0, 242, 254, 0.2), inset 0 0 20px rgba(0, 242, 254, 0.1);
+                }
+
+                .theme-gold.active {
+                    border-color: rgba(251, 191, 36, 0.5);
+                    box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), inset 0 0 20px rgba(251, 191, 36, 0.1);
+                }
+
+                .theme-purple.active {
+                    border-color: rgba(192, 132, 252, 0.5);
+                    box-shadow: 0 0 30px rgba(192, 132, 252, 0.2), inset 0 0 20px rgba(192, 132, 252, 0.1);
+                }
+
+                /* Mini Charts */
+                .trend-mini-chart {
+                    width: 100%;
+                    height: 24px;
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    opacity: 0.5;
+                    transition: opacity 0.3s;
+                }
+
+                .glass-trend-card.active .trend-mini-chart {
+                    opacity: 1;
+                }
+
+                .chart-bar {
+                    width: 16%;
+                    background: currentColor;
+                    border-radius: 2px 2px 0 0;
+                    transition: height 0.5s ease-out;
+                }
+
+                .chart-block {
+                    width: 30%;
+                    height: 45%;
+                    background: currentColor;
+                    border-radius: 2px;
+                    margin-bottom: 2px;
+                }
+
+                .chart-cyan {
+                    color: #00f2fe;
+                }
+
+                .chart-gold {
+                    color: #fbbf24;
+                }
+
+                .chart-purple {
+                    color: #c084fc;
+                    flex-wrap: wrap;
+                    align-content: flex-end;
+                    gap: 2px;
+                }
+
+                .chart-purple .chart-block {
+                    width: 31%;
+                    height: 10px;
+                }
+
+                /* Data Texture Canvas Layer */
+                #dataTextureCanvas {
+                    position: absolute;
+                    bottom: 0px;
+                    left: 0;
+                    width: 100%;
+                    height: 120px;
+                    pointer-events: none;
+                    z-index: 1;
+                    opacity: 0;
+                    transition: opacity 0.5s, background 0.5s;
+                    mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+                    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
+                }
+
+                .data-texture-cyan {
+                    background: repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0, 242, 254, 0.05) 20px, rgba(0, 242, 254, 0.05) 22px);
+                }
+
+                .data-texture-gold {
+                    background: radial-gradient(circle at 50% 100%, rgba(251, 191, 36, 0.15) 0%, transparent 60%);
+                }
+
+                .data-texture-purple {
+                    background: repeating-radial-gradient(circle at 50% 100%, rgba(192, 132, 252, 0.1) 0%, rgba(192, 132, 252, 0) 10px, transparent 20px);
+                }
+
+                /* Utilities */
+                .neon-select {
+                    display: none;
+                }
+
+                @keyframes badgePulse {
+
+                    0%,
+                    100% {
+                        box-shadow: 0 0 14px rgba(255, 160, 0, 0.6), 0 0 28px rgba(255, 100, 0, 0.25);
+                        transform: scale(1);
+                    }
+
+                    50% {
+                        box-shadow: 0 0 28px rgba(255, 200, 0, 1), 0 0 56px rgba(255, 140, 0, 0.55), inset 0 0 8px rgba(255, 255, 255, 0.3);
+                        transform: scale(1.06);
+                    }
+                }
+
                 transform: translateY(-10px) scale(1.05);
             }
 
@@ -10129,251 +10298,271 @@
                     margin-top: -5px !important;
                 }
 
-                .regression-card-container {
+                .trend-cards-container {
                     padding: 5px 0 !important;
+                    gap: 10px !important;
                 }
 
-                .reg-card-3d {
-                    width: 60px !important;
-                    height: 110px !important;
-                    margin-bottom: 0 !important;
+                .glass-trend-card {
+                    padding: 10px 5px !important;
                 }
 
-                .reg-card-3d .bell-jar {
-                    transform: scale(0.6) !important;
-                    margin-bottom: -15px !important;
+                .trend-icon {
+                    font-size: 20px !important;
+                    margin-bottom: 2px !important;
                 }
 
-                .reg-card-label {
-                    font-size: 8.4px !important;
-                    margin-top: 0 !important;
-                }
-
-                #fingerPointer {
-                    font-size: 30px !important;
-                    position: absolute !important;
-                    top: 0 !important;
-                    left: 50% !important;
-                    /* JS translation handle: transform: translateX(calc(-50% + ...)) */
-                }
-
-                #fingerPointerWrap {
-                    position: relative !important;
-                    display: flex;
-                    justify-content: center;
-                    height: 35px !important;
-                    margin-top: -12px !important;
-                    /* Tight to capsules */
-                    overflow: visible !important;
-                }
-
-                .candidate-grid {
-                    display: none !important;
-                }
-
-                /* Step 5: Ending Digits Optimization */
-                #naviStep5 h2 {
-                    font-size: 13.46px !important;
-                    margin-bottom: 3px !important;
-                    margin-top: 10px !important;
-                }
-
-                .step5-main-layout {
-                    gap: 4px !important;
-                    margin-top: 0 !important;
-                    justify-content: center !important;
-                    display: flex !important;
-                }
-
-                .ending-digit-grid {
-                    grid-template-columns: repeat(2, 34px) !important;
-                    gap: 4px !important;
-                    justify-content: flex-end !important;
-                    flex: 1 !important;
-                    padding-right: 0 !important;
-                }
-
-                .ending-ball {
-                    font-size: 9.36px !important;
-                    /* 1.2x of 7.8px */
-                    width: 32px !important;
-                    height: 32px !important;
-                }
-
-                .ai-analysis-panel {
-                    flex: 0 0 calc(53% - 4px) !important;
-                    max-width: calc(53% - 4px) !important;
-                    margin-left: 0 !important;
-                }
-
-                .probability-container {
-                    margin-top: 5px !important;
-                }
-
-                /* ===== Main Navi Button: 84% width (1.2x of 70%), left aligned ===== */
-                #naviModeBtn {
-                    width: 84% !important;
-                    margin: 10px 0 20px 0 !important;
-                    font-size: 16.2px !important;
-                    padding: 14px 10px !important;
-                    border-radius: 14px !important;
-                    letter-spacing: 0.5px !important;
-                }
-
-                /* ===== Step 6: AI Matrix is the HIGHLIGHT — maximize its space ===== */
-                #naviStep6 h2 {
-                    font-size: 14.04px !important;
-                    margin-top: 5px !important;
-                    margin-bottom: 5px !important;
-                }
-
-                .step6-status-bar {
-                    width: 190px !important;
-                    padding: 6px 10px !important;
-                    gap: 4px !important;
-                    margin-bottom: 17px !important;
-                }
-
-                .step6-slot {
-                    width: 26px !important;
-                    height: 26px !important;
-                    font-size: 10px !important;
-                }
-
-                .step6-slot.empty {
-                    font-size: 12px !important;
-                }
-
-                /* Key: Matrix gets 75%, result panel gets 25% */
-                .step6-main-layout {
-                    gap: 4px !important;
-                    margin-top: 0 !important;
-                    align-items: center !important;
-                }
-
-                .step6-matrix-wrapper {
-                    flex: 0 0 73% !important;
-                    max-width: 73% !important;
-                    padding: 8px 6px !important;
-                }
-
-                .step6-matrix {
-                    display: grid !important;
-                    grid-template-columns: repeat(5, 1fr) !important;
-                    grid-template-rows: repeat(3, 1fr) !important;
-                    gap: 4px !important;
-                }
-
-                /* Cell: 3x5 grid — cells are now wider, numbers fit nicely */
-                .step6-cell {
+                .trend-title {
                     font-size: 11px !important;
-                    border-radius: 5px !important;
-                    aspect-ratio: 1 !important;
-                    height: auto !important;
-                    min-width: 0 !important;
-                    width: 100% !important;
                 }
 
-                .step6-matrix-label {
-                    font-size: 7.5px !important;
-                    letter-spacing: 0.5px !important;
-                    margin-bottom: 5px !important;
-                }
-
-                /* Result panel: minimal, compact */
-                .step6-result-wrapper {
-                    flex: 1 !important;
-                    gap: 4px !important;
-                    min-width: 0 !important;
-                }
-
-                .step6-result-box {
-                    width: 52px !important;
-                    height: 52px !important;
-                    border-radius: 10px !important;
-                }
-
-                .step6-result-box .result-number {
-                    font-size: 22px !important;
-                }
-
-                .step6-result-sublabel,
-                .step6-result-caption {
+                .trend-tags {
                     font-size: 8px !important;
-                    letter-spacing: 1px !important;
-                    text-align: center !important;
-                    word-break: keep-all !important;
-                }
-
-                /* ===== Step 7 (Final): 70% text scale for mobile fit ===== */
-                #naviStep7 h2 {
-                    font-size: 17.29px !important;
-                    /* 70% of 24.7px */
-                    margin-top: 8px !important;
+                    padding: 2px 4px !important;
                     margin-bottom: 4px !important;
                 }
 
-                #naviStep7>p {
+                .trend-desc {
+                    font-size: 7.5px !important;
                     margin-bottom: 8px !important;
-                    font-size: 12px !important;
+                    letter-spacing: -0.5px !important;
                 }
 
-                #finalNaviResult {
-                    border-radius: 16px !important;
-                    padding: 16px 14px !important;
-                }
-
-                #finalNaviResult h3 {
-                    font-size: 9.1px !important;
-                    /* 70% of 13px */
-                    letter-spacing: 2px !important;
-                    margin-bottom: 14px !important;
-                }
-
-                /* Mobile Final card: 3+3 two-row layout */
-                #finalNaviNumbers {
-                    display: grid !important;
-                    grid-template-columns: repeat(3, 44px) !important;
-                    gap: 8px !important;
-                    margin-bottom: 14px !important;
-                    justify-content: center !important;
-                }
-
-                /* Balls: perfectly circular, 44px */
-                #finalNaviNumbers .result-ball,
-                #finalNaviNumbers>div {
-                    width: 44px !important;
-                    height: 44px !important;
-                    min-width: 44px !important;
-                    min-height: 44px !important;
-                    font-size: 15px !important;
-                    border-radius: 50% !important;
-                    flex-shrink: 0 !important;
-                }
-
-                #finalNaviIndicators {
-                    font-size: 9.1px !important;
-                    /* 70% of 13px */
-                    padding: 8px !important;
-                    gap: 10px !important;
-                    margin-bottom: 14px !important;
-                    border-radius: 8px !important;
-                }
-
-                #downloadFateBtn {
-                    font-size: 10.5px !important;
-                    /* 70% of 15px */
+                #aiMatchingScoreContainer {
                     padding: 10px !important;
-                    margin-bottom: 8px !important;
-                    border-radius: 8px !important;
+                    margin: 5px auto 5px !important;
                 }
 
-                #naviStep7 .step7-share-row button,
-                #finalNaviResult>div:last-child button {
-                    font-size: 10.5px !important;
-                    padding: 9px !important;
-                    border-radius: 7px !important;
+                #matchingScoreText {
+                    font-size: 14px !important;
                 }
+            }
+
+            #fingerPointer {
+                font-size: 30px !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: 50% !important;
+                /* JS translation handle: transform: translateX(calc(-50% + ...)) */
+            }
+
+            #fingerPointerWrap {
+                position: relative !important;
+                display: flex;
+                justify-content: center;
+                height: 35px !important;
+                margin-top: -12px !important;
+                /* Tight to capsules */
+                overflow: visible !important;
+            }
+
+            .candidate-grid {
+                display: none !important;
+            }
+
+            /* Step 5: Ending Digits Optimization */
+            #naviStep5 h2 {
+                font-size: 13.46px !important;
+                margin-bottom: 3px !important;
+                margin-top: 10px !important;
+            }
+
+            .step5-main-layout {
+                gap: 4px !important;
+                margin-top: 0 !important;
+                justify-content: center !important;
+                display: flex !important;
+            }
+
+            .ending-digit-grid {
+                grid-template-columns: repeat(2, 34px) !important;
+                gap: 4px !important;
+                justify-content: flex-end !important;
+                flex: 1 !important;
+                padding-right: 0 !important;
+            }
+
+            .ending-ball {
+                font-size: 9.36px !important;
+                /* 1.2x of 7.8px */
+                width: 32px !important;
+                height: 32px !important;
+            }
+
+            .ai-analysis-panel {
+                flex: 0 0 calc(53% - 4px) !important;
+                max-width: calc(53% - 4px) !important;
+                margin-left: 0 !important;
+            }
+
+            .probability-container {
+                margin-top: 5px !important;
+            }
+
+            /* ===== Main Navi Button: 84% width (1.2x of 70%), left aligned ===== */
+            #naviModeBtn {
+                width: 84% !important;
+                margin: 10px 0 20px 0 !important;
+                font-size: 16.2px !important;
+                padding: 14px 10px !important;
+                border-radius: 14px !important;
+                letter-spacing: 0.5px !important;
+            }
+
+            /* ===== Step 6: AI Matrix is the HIGHLIGHT — maximize its space ===== */
+            #naviStep6 h2 {
+                font-size: 14.04px !important;
+                margin-top: 5px !important;
+                margin-bottom: 5px !important;
+            }
+
+            .step6-status-bar {
+                width: 190px !important;
+                padding: 6px 10px !important;
+                gap: 4px !important;
+                margin-bottom: 17px !important;
+            }
+
+            .step6-slot {
+                width: 26px !important;
+                height: 26px !important;
+                font-size: 10px !important;
+            }
+
+            .step6-slot.empty {
+                font-size: 12px !important;
+            }
+
+            /* Key: Matrix gets 75%, result panel gets 25% */
+            .step6-main-layout {
+                gap: 4px !important;
+                margin-top: 0 !important;
+                align-items: center !important;
+            }
+
+            .step6-matrix-wrapper {
+                flex: 0 0 73% !important;
+                max-width: 73% !important;
+                padding: 8px 6px !important;
+            }
+
+            .step6-matrix {
+                display: grid !important;
+                grid-template-columns: repeat(5, 1fr) !important;
+                grid-template-rows: repeat(3, 1fr) !important;
+                gap: 4px !important;
+            }
+
+            /* Cell: 3x5 grid — cells are now wider, numbers fit nicely */
+            .step6-cell {
+                font-size: 11px !important;
+                border-radius: 5px !important;
+                aspect-ratio: 1 !important;
+                height: auto !important;
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+
+            .step6-matrix-label {
+                font-size: 7.5px !important;
+                letter-spacing: 0.5px !important;
+                margin-bottom: 5px !important;
+            }
+
+            /* Result panel: minimal, compact */
+            .step6-result-wrapper {
+                flex: 1 !important;
+                gap: 4px !important;
+                min-width: 0 !important;
+            }
+
+            .step6-result-box {
+                width: 52px !important;
+                height: 52px !important;
+                border-radius: 10px !important;
+            }
+
+            .step6-result-box .result-number {
+                font-size: 22px !important;
+            }
+
+            .step6-result-sublabel,
+            .step6-result-caption {
+                font-size: 8px !important;
+                letter-spacing: 1px !important;
+                text-align: center !important;
+                word-break: keep-all !important;
+            }
+
+            /* ===== Step 7 (Final): 70% text scale for mobile fit ===== */
+            #naviStep7 h2 {
+                font-size: 17.29px !important;
+                /* 70% of 24.7px */
+                margin-top: 8px !important;
+                margin-bottom: 4px !important;
+            }
+
+            #naviStep7>p {
+                margin-bottom: 8px !important;
+                font-size: 12px !important;
+            }
+
+            #finalNaviResult {
+                border-radius: 16px !important;
+                padding: 16px 14px !important;
+            }
+
+            #finalNaviResult h3 {
+                font-size: 9.1px !important;
+                /* 70% of 13px */
+                letter-spacing: 2px !important;
+                margin-bottom: 14px !important;
+            }
+
+            /* Mobile Final card: 3+3 two-row layout */
+            #finalNaviNumbers {
+                display: grid !important;
+                grid-template-columns: repeat(3, 44px) !important;
+                gap: 8px !important;
+                margin-bottom: 14px !important;
+                justify-content: center !important;
+            }
+
+            /* Balls: perfectly circular, 44px */
+            #finalNaviNumbers .result-ball,
+            #finalNaviNumbers>div {
+                width: 44px !important;
+                height: 44px !important;
+                min-width: 44px !important;
+                min-height: 44px !important;
+                font-size: 15px !important;
+                border-radius: 50% !important;
+                flex-shrink: 0 !important;
+            }
+
+            #finalNaviIndicators {
+                font-size: 9.1px !important;
+                /* 70% of 13px */
+                padding: 8px !important;
+                gap: 10px !important;
+                margin-bottom: 14px !important;
+                border-radius: 8px !important;
+            }
+
+            #downloadFateBtn {
+                font-size: 10.5px !important;
+                /* 70% of 15px */
+                padding: 10px !important;
+                margin-bottom: 8px !important;
+                border-radius: 8px !important;
+            }
+
+            #naviStep7 .step7-share-row button,
+            #finalNaviResult>div:last-child button {
+                font-size: 10.5px !important;
+                padding: 9px !important;
+                border-radius: 7px !important;
+            }
             }
 
             /* ============================================================ */
