@@ -3509,16 +3509,20 @@
                         }
                     });
 
-                    // Auto-reflect GPS location on initial load (User Request)
-                    console.log('[Init] Initiating automatic GPS request on load...');
-                    setTimeout(() => {
-                        showToast("📍 현재 위치를 확인 중입니다...", "info");
-                        requestMyLocation();
-                    }, 1000); // 1.0s delay for better mobile compatibility
-
-                    // [SNS Deep Link] OMR 파라미터가 있으면 즉시 열기
+                    // [SNS Deep Link] OMR 파라미터가 있으면 즉시 열기 전용 로직
                     const urlParams = new URLSearchParams(window.location.search);
                     const omrNums = urlParams.get('omr');
+
+                    // Auto-reflect GPS location on initial load (User Request)
+                    // [개선] 딥링크로 들어온 경우 초기 GPS 토스트가 OMR을 가리지 않도록 자동 요청을 건너뜁니다.
+                    if (!omrNums) {
+                        console.log('[Init] Initiating automatic GPS request on load...');
+                        setTimeout(() => {
+                            showToast("📍 현재 위치를 확인 중입니다...", "info");
+                            requestMyLocation();
+                        }, 1000); // 1.0s delay for better mobile compatibility
+                    }
+
                     if (omrNums) {
                         try {
                             const decoded = decodeURIComponent(omrNums);
@@ -5528,6 +5532,7 @@
 
         <script>
             function openOMR(numbers) {
+                closeAllToasts(); // [추가] 초기 GPS 확인 등 모든 토스트(팝업)를 닫아 OMR 가림 방지
                 const grid = document.getElementById('omrGrid');
                 grid.innerHTML = '';
 
