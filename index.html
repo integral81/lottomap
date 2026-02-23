@@ -6168,8 +6168,8 @@
                                         onclick="selectRegression(7)">
                                         <div class="trend-icon">⚡</div>
                                         <div class="trend-title">7 WEEKS</div>
-                                        <div class="trend-tags">#최근급상승 #단기트렌드</div>
-                                        <div class="trend-desc">최근 7주간의 다이내믹한 패턴 흐름</div>
+                                        <div class="trend-tags">#최근급상승<br class="pc-br"> #단기트렌드</div>
+                                        <div class="trend-desc">최근 7주간의<br class="pc-br"> 다이내믹한 패턴 흐름</div>
                                         <div class="trend-mini-chart chart-cyan">
                                             <div class="chart-bar" style="height: 40%"></div>
                                             <div class="chart-bar" style="height: 70%"></div>
@@ -6184,8 +6184,8 @@
                                         onclick="selectRegression(15)">
                                         <div class="trend-icon" style="font-size: 24px;">⚖️</div>
                                         <div class="trend-title">15 WEEKS</div>
-                                        <div class="trend-tags">#안정적 #완벽한밸런스</div>
-                                        <div class="trend-desc">단기와 장기 패턴이 만나는 황금비율</div>
+                                        <div class="trend-tags">#안정적<br class="pc-br"> #완벽한밸런스</div>
+                                        <div class="trend-desc">단기와 장기 패턴이<br class="pc-br"> 만나는 황금비율</div>
                                         <div class="trend-mini-chart chart-gold">
                                             <div class="chart-bar" style="height: 50%"></div>
                                             <div class="chart-bar" style="height: 60%"></div>
@@ -6200,8 +6200,9 @@
                                         onclick="selectRegression(52)">
                                         <div class="trend-icon">🌌</div>
                                         <div class="trend-title">52 WEEKS</div>
-                                        <div class="trend-tags">#전통강자 #1년빅데이터</div>
-                                        <div class="trend-desc">1년간 누적된 거대하고 묵직한 데이터베이스</div>
+                                        <div class="trend-tags">#전통강자<br class="pc-br"> #1년빅데이터</div>
+                                        <div class="trend-desc">1년간 누적된<br class="pc-br"> 거대하고 묵직한<br class="pc-br">
+                                            데이터베이스</div>
                                         <div class="trend-mini-chart chart-purple">
                                             <div class="chart-block"></div>
                                             <div class="chart-block"></div>
@@ -9030,8 +9031,8 @@
                 .glass-trend-card {
                     position: relative;
                     flex: 1;
-                    max-width: 170px;
-                    /* PC Width */
+                    max-width: 195px;
+                    /* Expanded PC Width */
                     min-width: 140px;
                     background: rgba(15, 23, 42, 0.6);
                     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -9090,8 +9091,8 @@
                 }
 
                 .trend-title {
-                    font-size: 18px;
-                    /* PC Title Size */
+                    font-size: 21.6px;
+                    /* PC Title Size (1.2x of 18px) */
                     font-weight: 900;
                     letter-spacing: 1px;
                     color: #f8fafc;
@@ -9099,27 +9100,23 @@
                 }
 
                 .trend-tags {
-                    font-size: 11px;
-                    /* PC Tags */
+                    font-size: 8.8px;
+                    /* PC Tags (0.8x of 11px) */
                     color: #94a3b8;
                     font-weight: 700;
-                    line-height: 1.2;
-                    margin-bottom: 8px;
-                    background: rgba(0, 0, 0, 0.3);
-                    padding: 4px 8px;
-                    border-radius: 6px;
-                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    line-height: 1.4;
+                    margin-bottom: 12px;
                 }
 
                 .trend-desc {
-                    font-size: 11.5px;
-                    /* PC Desc */
+                    font-size: 10.9px;
+                    /* PC Desc (0.95x of 11.5px) */
                     color: #cbd5e1;
-                    line-height: 1.4;
-                    margin-bottom: 15px;
+                    line-height: 1.5;
+                    margin-bottom: 20px;
                     opacity: 0.8;
                     word-break: keep-all;
-                    height: 32px;
+                    height: 52px;
                     /* Fixed height for alignment */
                 }
 
@@ -10355,6 +10352,13 @@
                 .glass-trend-card {
                     padding: 12px 6px !important;
                     min-width: unset !important;
+                    flex: 1 !important;
+                    /* Keep equal width on mobile */
+                }
+
+                .pc-br {
+                    display: none !important;
+                    /* Hide line breaks on Mobile */
                 }
 
                 .trend-icon {
