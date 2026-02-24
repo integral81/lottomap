@@ -2579,14 +2579,25 @@
             }
 
             .result-row-wrapper .result-balls {
+                width: 100% !important;
+                /* Force to new line below label */
                 justify-content: flex-start !important;
-                margin-left: 5px !important;
+                padding-left: 5px !important;
+                margin-left: 0 !important;
             }
 
             .result-row-wrapper>div:last-child {
                 /* Target the buttons column to ensure it stays inline with balls on mobile */
-                margin-left: auto !important;
+                width: 100% !important;
+                /* Force to new line below balls */
+                flex-direction: row !important;
+                /* Side by side horizontal */
+                justify-content: flex-end !important;
+                /* Align to the right edge */
+                margin-left: 0 !important;
+                margin-top: 5px !important;
                 padding-right: 5px !important;
+                gap: 8px !important;
             }
 
             .roadview-modal-content {
