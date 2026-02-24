@@ -4939,6 +4939,19 @@
                 if (isOpen) {
                     closeNav();
                 } else {
+                    // Close all possible popups/overlays to ensure menu readability
+                    if (typeof closeInfoWindow === "function") closeInfoWindow();
+                    if (typeof closeOverlay === "function") closeOverlay();
+                    if (typeof hideCustomOverlay === "function") hideCustomOverlay();
+                    if (typeof closeCustomOverlay === "function") closeCustomOverlay();
+                    // Close the "Near me 1st Prize" overlay (class .overlay-panel) if exists
+                    const overlays = document.querySelectorAll('.overlay-panel');
+                    overlays.forEach(panel => {
+                        if (panel.style.display !== 'none') {
+                            panel.style.display = 'none';
+                        }
+                    });
+
                     nav.classList.add('open');
                     overlay.style.display = 'block';
                     setTimeout(() => overlay.classList.add('show'), 10);
