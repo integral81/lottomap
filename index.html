@@ -2593,8 +2593,10 @@
                 justify-content: flex-end !important;
                 margin-left: 0 !important;
                 margin-top: 3px !important;
-                /* Reduced from 5px */
-                padding-right: 5px !important;
+                /* Add a specific margin-right to pull the buttons leftwards to align perfectly with 
+                   the 6th ball. Usually balls are ~33px wide + 5px gap each = ~230px from left edge.
+                   On smaller screens, a calculated or fixed padding-right aligns them. */
+                padding-right: 22px !important;
                 gap: 8px !important;
             }
 
