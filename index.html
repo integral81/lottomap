@@ -2568,16 +2568,17 @@
                Moves the label to its own line, keeping balls below it. */
             .result-row-wrapper {
                 padding: 3px 0 !important;
-                /* Reduced from 6px */
                 flex-wrap: wrap !important;
+                justify-content: flex-start !important;
+                /* Force left anchor to prevent centering */
             }
 
             .result-row-wrapper .result-label {
                 width: 100% !important;
                 text-align: left !important;
                 margin-bottom: 2px !important;
-                /* Reduced from 5px to half */
                 padding-left: 5px !important;
+                box-sizing: border-box !important;
             }
 
             .result-row-wrapper .result-balls {
@@ -2585,18 +2586,18 @@
                 justify-content: flex-start !important;
                 padding-left: 5px !important;
                 margin-left: 0 !important;
+                box-sizing: border-box !important;
             }
 
             .result-row-wrapper>div:last-child {
-                width: 100% !important;
+                /* Lock width to exactly match the balls' physical footprint from the left edge 
+                   (6 balls * 35px = 210px + 5 gaps * 5px = 25px + 5px left padding = 240px) */
+                width: 240px !important;
                 flex-direction: row !important;
                 justify-content: flex-end !important;
                 margin-left: 0 !important;
                 margin-top: 3px !important;
-                /* Add a specific margin-right to pull the buttons leftwards to align perfectly with 
-                   the 6th ball. Usually balls are ~33px wide + 5px gap each = ~230px from left edge.
-                   On smaller screens, a calculated or fixed padding-right aligns them. */
-                padding-right: 22px !important;
+                padding-right: 0 !important;
                 gap: 8px !important;
             }
 
