@@ -1623,23 +1623,7 @@
                     top: 10px !important;
                 }
 
-                /* Lucky Number Result Mobile Layout Removal - Keep items inline */
-                .result-row-wrapper {
-                    padding: 5px 0;
-                    flex-wrap: wrap !important;
-                }
 
-                .result-label {
-                    width: 100% !important;
-                    text-align: left !important;
-                    margin-bottom: 5px !important;
-                    padding-left: 5px;
-                }
-
-                .result-balls {
-                    justify-content: flex-start !important;
-                    /* Align balls to left */
-                }
             }
         }
 
@@ -2575,7 +2559,29 @@
             transform: translateY(-2px);
         }
 
+        /* =========================================================
+           MOBILE ONLY START : Do not modify above PC CSS directly 
+           ========================================================= */
         @media (max-width: 768px) {
+
+            /* Fix truncating issue for "자동" / "수동" labels on recommended number generation.
+               Moves the label to its own line, keeping balls below it. */
+            .result-row-wrapper {
+                padding: 6px 0 !important;
+                flex-wrap: wrap !important;
+            }
+
+            .result-row-wrapper .result-label {
+                width: 100% !important;
+                text-align: left !important;
+                margin-bottom: 5px !important;
+                padding-left: 5px !important;
+            }
+
+            .result-row-wrapper .result-balls {
+                justify-content: flex-start !important;
+            }
+
             .roadview-modal-content {
                 width: 95%;
                 margin: 5% auto;
@@ -2593,6 +2599,10 @@
                 width: 100%;
             }
         }
+
+        /* =========================================================
+           MOBILE ONLY END 
+           ========================================================= */
     </style>
 </head>
 
