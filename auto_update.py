@@ -80,6 +80,10 @@ def scrape_round(draw_no):
                 name = cols[1].get_text(strip=True)
                 method = cols[2].get_text(strip=True)
                 address = cols[3].get_text(strip=True)
+                if b"\xeb\x8f\x99\xed\x96\x89\xeb\xb3\xb5\xea\xb6\x8c" in name.encode('utf-8', 'ignore') and b"\xec\x9d\xb8\xed\x84\xb0\xeb\x84\xb7" in name.encode('utf-8', 'ignore') or b"dhlottery" in address.encode('utf-8', 'ignore'):
+                    name = b"\xeb\x8f\x99\xed\x96\x89\xeb\xb3\xb5\xea\xb6\x8c(dhlottery.co.kr)".decode('utf-8')
+                    address = b"\xec\x84\x9c\xec\x9a\xb8 \xec\x84\x9c\xec\xb4\x88\xea\xb5\xac \xeb\x82\xa8\xeb\xb6\x80\xec\x88\x9c\xed\x99\x98\xeb\xa1\x9c 2423 \xed\x95\x9c\xec\x9b\x90\xeb\xb9\x8c\xeb\x94\xa9".decode('utf-8')
+                
                 records.append({
                     'r': draw_no,
                     'n': name,
