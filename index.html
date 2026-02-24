@@ -2569,8 +2569,10 @@
             .result-row-wrapper {
                 padding: 3px 0 !important;
                 flex-wrap: wrap !important;
-                justify-content: flex-start !important;
-                /* Force left anchor to prevent centering */
+                justify-content: center !important;
+                margin: 0 auto !important;
+                max-width: 240px !important;
+                /* Constrain the entire wrapper to 240px so it centers as a single block */
             }
 
             .result-row-wrapper .result-label {
