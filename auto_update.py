@@ -11,6 +11,7 @@ import time
 
 # --- CONFIGURATION ---
 JSON_FILE = "lotto_data.json"
+JS_FILE = "lotto_data.js"
 EXCEL_FILE = "temp_data.xlsx"
 CACHE_FILE = "geocoded_cache_healthy.xlsx"
 HISTORIC_FILE = "lotto_historic_numbers_1_1209_Final.xlsx"
@@ -253,9 +254,11 @@ def main():
         if lat and lng:
             rec['lat'] = lat
             rec['lng'] = lng
-            final_new_records.append(rec)
         else:
-            print(f"Skipping {rec['n']} - Geocode failed.")
+            rec['lat'] = None
+            rec['lng'] = None
+            print(f"Warning: {rec['n']} - Geocode failed.")
+        final_new_records.append(rec)
 
     if not final_new_records:
         print("No new geocoded records to add.")
@@ -269,6 +272,10 @@ def main():
     
     with open(JSON_FILE, 'w', encoding='utf-8') as f:
         json.dump(combined_json, f, ensure_ascii=False, indent=2)
+    
+    js_content = f"const lottoData = {json.dumps(combined_json, ensure_ascii=False, indent=2)};"
+    with open(JS_FILE, 'w', encoding='utf-8') as f:
+        f.write(js_content)
     
     # Merge Excel (temp_data.xlsx)
     if Path(EXCEL_FILE).exists():
