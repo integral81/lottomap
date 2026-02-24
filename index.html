@@ -4952,6 +4952,13 @@
                         }
                     });
 
+                    // Close active Toast notifications (e.g. Near me 1st Prize persistent toast)
+                    const toasts = document.querySelectorAll('.toast.show');
+                    toasts.forEach(t => {
+                        t.classList.remove('show');
+                        setTimeout(() => { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+                    });
+
                     nav.classList.add('open');
                     overlay.style.display = 'block';
                     setTimeout(() => overlay.classList.add('show'), 10);
